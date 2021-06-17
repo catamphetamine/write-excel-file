@@ -1,0 +1,17 @@
+{
+	"folders":
+	[
+		{
+			"follow_symlinks": true,
+			"path": ".",
+			"folder_exclude_patterns": ["node_modules", "coverage", "modules", "lib", "commonjs", "project.sublime-workspace"],
+			"file_exclude_patterns": ["bundle/write-excel-file.min.js", "bundle/write-excel-file.min.js.map"]
+		}
+	],
+	"settings":
+	{
+		"tab_size": 2,
+		"translate_tabs_to_spaces": false,
+		"trim_trailing_white_space_on_save": true
+	}
+}

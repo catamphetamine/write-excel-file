@@ -1,0 +1,428 @@
+<html>
+	<head>
+		<title>write-excel-file</title>
+
+		<meta charset="utf-8">
+
+		<script src="./write-excel-file.min.js"></script>
+
+		<script src="./lib/promise-polyfill.min.js"></script>
+
+		<script src="./lib/prism.js"></script>
+
+		<style>
+			body
+			{
+				margin : 20px;
+				font-family : Arial, Helvetica;
+			}
+
+			.supersection
+			{
+			}
+
+			.supersection-content > section > header
+			{
+				display: flex;
+				align-items: center;
+			}
+
+			.supersection-content > section > header > button
+			{
+				padding: 0.5rem;
+				background: none;
+				border: none;
+				cursor: pointer;
+				color: #0093C4;
+				margin-bottom: -5px;
+				font-size: 1rem;
+				margin-left: 0.5rem;
+				border-radius: 5px;
+			}
+
+			.supersection-content > section > header > button.selected
+			{
+				color: white;
+				background: #0093C4;
+			}
+
+			.supersection-content > section > header > button:active
+			{
+				color: white;
+				background: #0088bb;
+			}
+
+			.supersection > button
+			{
+				padding: 1rem;
+				background: #0093C4;
+				border: none;
+				cursor: pointer;
+				color: white;
+				margin-bottom: -5px;
+				font-size: 1rem;
+				border-radius: 5px;
+			}
+
+			.supersection > button:active
+			{
+				background: #0088bb;
+			}
+
+			#schema-edit
+			{
+				display: none;
+			}
+
+			.supersection-content
+			{
+				display: flex;
+			}
+
+			.supersection-content > section
+			{
+				flex: 1;
+			}
+
+			.supersection-content > section
+			{
+				margin-left: 0.5rem;
+				margin-right: 0.5rem;
+			}
+
+			.supersection-content > section:first-child
+			{
+				margin-left: 0;
+			}
+
+			.supersection-content > section:last-child
+			{
+				margin-right: 0;
+			}
+
+			.supersection-content > section > pre,
+			.supersection-content > section > textarea
+			{
+				width: 100%;
+				height: 24rem;
+			}
+
+			.supersection-content > section > pre
+			{
+				margin: 0;
+				padding: 1rem;
+			}
+
+			.supersection-content > section > textarea
+			{
+				padding: 1rem;
+				font-size: 1rem;
+				line-height: 1.5rem;
+				background-color: #2d2d2d;
+				color: #ccc;
+			}
+
+			.supersection-content > section > pre
+			{
+				width: calc(100% - 2rem);
+			}
+
+			.supersection > button
+			{
+				margin-top: 1rem;
+			}
+
+			#main-link
+			{
+				display     : block;
+				font-size   : 24px;
+				color       : #0093C4;
+				font-family : monospace;
+				text-decoration : none;
+			}
+		</style>
+
+		<link href="lib/prism.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<a id="main-link" href="https://gitlab.com/catamphetamine/write-excel-file">
+			write-excel-file
+		</a>
+
+		<br/>
+
+		<div>
+			Write simple <code>*.xlsx</code> files in a browser or Node.js
+		</div>
+
+		<br/>
+		<br/>
+
+		<div class="supersection">
+			<div class="supersection-content">
+				<section>
+					<header>
+						<h1>Objects</h1>
+						<button id="objects-edit">Edit</button>
+					</header>
+					<textarea id="objects" style="display: none"></textarea>
+					<pre><code class="language-js" id="objects-view"></code></pre>
+				</section>
+
+				<section>
+					<header>
+						<h1>Schema</h1>
+						<button id="schema-edit">Edit</button>
+					</header>
+					<textarea readonly id="schema" style="display: none"></textarea>
+					<pre><code class="language-js" id="schema-view"></code></pre>
+				</section>
+			</div>
+
+			<button id="write-xlsx-file-button-schema">
+				Write *.xlsx file
+			</button>
+		</div>
+
+		<br/>
+		<br/>
+
+
+		<br/>
+
+		<div class="supersection">
+			<div class="supersection-content">
+				<section>
+					<header>
+						<h1>Every cell data</h1>
+						<button id="every-cell-data-edit">Edit</button>
+					</header>
+					<textarea id="every-cell-data" style="display: none"></textarea>
+					<pre><code class="language-js" id="every-cell-data-view"></code></pre>
+				</section>
+			</div>
+
+			<button id="write-xlsx-file-button-cells">
+				Write *.xlsx file
+			</button>
+		</div>
+
+		<br/>
+		<br/>
+
+		<script>
+			document.getElementById('objects-edit').onclick = function() {
+				const objects = document.getElementById('objects')
+				const objectsView = document.getElementById('objects-view').parentNode
+				if (objects.style.display !== 'none') {
+					objects.style.display = 'none';
+					objectsView.style.display = 'block';
+					document.getElementById('objects-edit').textContent = 'Edit'
+					document.getElementById('objects-edit').className = ''
+					document.getElementById('objects-view').innerHTML = Prism.highlight(
+						document.getElementById('objects').value,
+						Prism.languages.javascript,
+						'javascript'
+					)
+				} else {
+					objects.style.display = 'block';
+					objectsView.style.display = 'none';
+					document.getElementById('objects-edit').textContent = 'Save'
+					document.getElementById('objects-edit').className = 'selected'
+				}
+			}
+
+			document.getElementById('every-cell-data-edit').onclick = function() {
+				const objects = document.getElementById('every-cell-data')
+				const objectsView = document.getElementById('every-cell-data-view').parentNode
+				if (objects.style.display !== 'none') {
+					objects.style.display = 'none';
+					objectsView.style.display = 'block';
+					document.getElementById('every-cell-data-edit').textContent = 'Edit'
+					document.getElementById('objects-edit').className = ''
+					document.getElementById('every-cell-data-view').innerHTML = Prism.highlight(
+						document.getElementById('every-cell-data').value,
+						Prism.languages.javascript,
+						'javascript'
+					)
+				} else {
+					objects.style.display = 'block';
+					objectsView.style.display = 'none';
+					document.getElementById('every-cell-data-edit').textContent = 'Save'
+					document.getElementById('objects-edit').className = 'selected'
+				}
+			}
+
+			document.getElementById('objects').value = JSON.stringify([
+			  {
+			    name: 'John Smith',
+			    age: 18,
+			    dateOfBirth: 999999999999999,
+			    graduated: true
+			  },
+			  {
+			    name: 'Alice Brown',
+			    age: 16,
+			    dateOfBirth: 999999999999999,
+			    graduated: false
+			  }
+			], null, 2).replace(/999999999999999/g, 'new Date()')
+
+			document.getElementById('objects-view').innerHTML = document.getElementById('objects').value
+
+			const schema = [
+			  {
+			    column: 'Name',
+			    type: String,
+			    value: student => student.name,
+			    width: 20
+			  },
+			  {
+			    column: 'Age',
+			    type: Number,
+			    value: student => student.age
+			  },
+			  {
+			    column: 'Date of Birth',
+			    type: Date,
+			    format: 'mm/dd/yyyy',
+			    value: student => student.dateOfBirth
+			  },
+			  {
+			    column: 'Graduated',
+			    type: Boolean,
+			    value: student => student.graduated
+			  }
+			]
+
+			document.getElementById('schema').value = `
+[
+  {
+    column: 'Name',
+    type: String,
+    value: student => student.name,
+    width: 20
+  },
+  {
+    column: 'Age',
+    type: Number,
+    value: student => student.age
+  },
+  {
+    column: 'Date of Birth',
+    type: Date,
+    format: 'mm/dd/yyyy',
+    value: student => student.dateOfBirth
+  },
+  {
+    column: 'Graduated',
+    type: Boolean,
+    value: student => student.graduated
+  }
+]
+`.trim()
+
+			document.getElementById('schema-view').innerHTML = document.getElementById('schema').value
+
+			document.getElementById('every-cell-data').value = JSON.stringify([
+			  [
+			    {
+			      value: 18,
+			      type: 'Number'
+			    },
+			    {
+			      value: 999999999999999,
+			      type: 'Date',
+			      format: 'mm/dd/yyyy'
+			    },
+			    {
+			      value: 'John Smith',
+			      type: 'String'
+			    },
+			    {
+			      value: true,
+			      type: 'Boolean'
+			    }
+			  ],
+			  [
+			    {
+			      value: 16,
+			      type: 'Number'
+			    },
+			    {
+			      value: 999999999999999,
+			      type: 'Date',
+			      format: 'mm/dd/yyyy'
+			    },
+			    {
+			      value: 'Alice Brown',
+			      type: 'String'
+			    },
+			    {
+			      value: false,
+			      type: 'Boolean'
+			    }
+			  ]
+			], null, 2).replace(/999999999999999/g, 'new Date()')
+				.replace(/"type": "([^",]+)"/g, '"type": $1')
+
+			document.getElementById('every-cell-data-view').innerHTML = document.getElementById('every-cell-data').value
+
+			document.getElementById('write-xlsx-file-button-schema').addEventListener('click', () => {
+				try {
+					const objects = JSON.parse(
+						document.getElementById('objects').value
+							.replace(/new Date\(\)/g, '999999999999999')
+					)
+					for (const object of objects) {
+						for (const key of Object.keys(object)) {
+							if (object[key] === 999999999999999) {
+								object[key] = new Date()
+							}
+						}
+					}
+					writeXlsxFile(objects, { schema, fileName: 'with-schema.xlsx' })
+				} catch (error) {
+					console.error(error)
+			  	alert("There was an error. See console output for the error stack trace.")
+				}
+			})
+
+			document.getElementById('write-xlsx-file-button-cells').addEventListener('click', () => {
+				try {
+					const data = JSON.parse(
+						document.getElementById('every-cell-data').value
+							.replace(/new Date\(\)/g, '999999999999999')
+							.replace(/"type": ([^\s,]+)/g, '"type": "$1"')
+					)
+					for (const row of data) {
+						for (const cell of row) {
+							if (cell.value === 999999999999999) {
+								cell.value = new Date()
+							}
+							switch (cell.type) {
+								case 'Number':
+									cell.type = Number;
+									break;
+								case 'String':
+									cell.type = String;
+									break;
+								case 'Date':
+									cell.type = Date;
+									break;
+								case 'Boolean':
+									cell.type = Boolean;
+									break;
+							}
+						}
+					}
+					writeXlsxFile(data, { fileName: 'cells.xlsx' })
+				} catch (error) {
+					console.error(error)
+			  	alert("There was an error. See console output for the error stack trace.")
+				}
+			})
+		</script>
+	</body>
+</html>
