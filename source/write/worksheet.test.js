@@ -7,7 +7,7 @@ import SharedStrings from './sharedStrings'
 
 describe('generateWorksheet()', () => {
   it('Should generate XML Worksheet', () => {
-  	const colsXML = '<cols></cols>';
+  	const colsXML = '';
   	const rowsXML = '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>1000</v></c></row>';
     const expectedXML = [
       '<?xml version="1.0" ?>',
@@ -22,7 +22,9 @@ describe('generateWorksheet()', () => {
       type: Number,
       // width: 60
     }]], {
-    	sharedStrings: new SharedStrings()
+      getSharedString(string) {
+        return 0
+      }
     })).to.equal(expectedXML)
   })
 })

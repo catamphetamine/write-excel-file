@@ -2,8 +2,8 @@ import generateColumnsDescription from './columns'
 
 describe('generateColumns()', () => {
   it('should generate columns description', () => {
-    expect(generateColumnsDescription(
-      [{
+    expect(generateColumnsDescription({
+      schema: [{
         value: 'Test',
         type: String,
         width: 25
@@ -12,8 +12,8 @@ describe('generateColumns()', () => {
         type: Number,
         width: 10
       }]
-    )).to.equal(
-    	'<cols><col min="1" max="1" width="25" style="1" /><col min="2" max="2" width="10" style="1" /></cols>'
+    })).to.equal(
+    	'<cols><col min="1" max="1" width="25" /><col min="2" max="2" width="10" /></cols>'
     )
   })
 })

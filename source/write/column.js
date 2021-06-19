@@ -6,6 +6,15 @@ import floatToInteger from './floatToInteger'
 const DATE_COLUMN_DEFAULT_WIDTH = 14
 
 export default function generateColumnDescription(column, index) {
+  // Guards against a developer forgetting to put some columns
+  // in the `columns` list when not using a `schema`.
+  // For example, a developer may pass `data` with `7` columns
+  // but only specify `6` of them in the `columns` list.
+  // Hence, it handles missing column description here.
+  if (!column) {
+    return ''
+  }
+
   // Dates usually don't fit in the default column width.
   if (column.type === Date && !column.width) {
     column.width = DATE_COLUMN_DEFAULT_WIDTH
@@ -20,17 +29,20 @@ export default function generateColumnDescription(column, index) {
   // To ensure the column number starts as in Excel.
   const columnNumber = index + 1
 
-  // Column "style".
-  // It's unclear what exactly does it mean.
-  // Something like font, etc.
-  // Is an integer "enum": perhaps, it can be one of the pre-defined styles in an Excel editor.
-  // Perhaps could be omitted.
-  // The default seems to be `1`.
-  const style = column.style ? column.style : 1
+  // // Column "style".
+  // // It's unclear what exactly does it mean.
+  // // Something like font, etc.
+  // // Is an integer "enum": perhaps, it can be one of the pre-defined styles in an Excel editor.
+  // // Perhaps could be omitted.
+  // // The default seems to be `1`.
+  // const style = column.style ? column.style : 1
 
   // `column` format is described here:
   // https://msdn.microsoft.com/en-us/library/office/documentformat.openxml.spreadsheet.column.aspx
-  return `<col min="${columnNumber}" max="${columnNumber}" width="${column.width}" style="${style}" />`
+  return `<col min="${columnNumber}" max="${columnNumber}" width="${column.width}" />`
+
+  // The `style` attribute doesn't seem to be required.
+  // style="${style}"
 }
 
 /**

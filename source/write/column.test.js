@@ -9,7 +9,7 @@ describe('generateColumnDescription()', () => {
 		// (see "Column Width" chapter)
 		// https://msdn.microsoft.com/en-us/library/office/documentformat.openxml.spreadsheet.column.aspx
     expect(generateColumnDescription({ width: 25 }, 0)).to.equal(
-    	'<col min="1" max="1" width="25" style="1" />'
+    	'<col min="1" max="1" width="25" />'
     )
   })
 })

@@ -16,7 +16,7 @@ If you're not using a bundler then use a [standalone version from a CDN](#cdn).
 
 ## Use
 
-To write an `*.xlsx` file, either provide a `value` and a `type` for each cell:
+To write an `*.xlsx` file, provide the `data` — an array of rows, each row being an array of cells, each cell having a `type` and a `value`:
 
 ```js
 const data = [
@@ -24,54 +24,54 @@ const data = [
   [
     // Column #1
     {
-      value: 18,
-      type: Number
+      type: Number,
+      value: 18
     },
     // Column #2
     {
-      value: new Date(),
       type: Date,
+      value: new Date(),
       format: 'mm/dd/yyyy'
     },
     // Column #3
     {
-      value: 'John Smith',
-      type: String
+      type: String,
+      value: 'John Smith'
     },
     // Column #4
     {
-      value: true,
-      type: Boolean
+      type: Boolean,
+      value: true
     }
   ],
   // Row #2
   [
     // Column #1
     {
-      value: 16,
-      type: Number
+      type: Number,
+      value: 16
     },
     // Column #2
     {
-      value: new Date(),
       type: Date,
+      value: new Date(),
       format: 'mm/dd/yyyy'
     },
     // Column #3
     {
-      value: 'Alice Brown',
-      type: String
+      type: String,
+      value: 'Alice Brown'
     },
     // Column #4
     {
-      value: false,
-      type: Boolean
+      type: Boolean,
+      value: false
     }
   ]
 ]
 ```
 
-Or provide data `objects` and a `schema`:
+Alternatively, provide a list of `objects` and a `schema` to transform those `objects` to `data`:
 
 ```js
 const objects = [
@@ -98,9 +98,7 @@ const schema = [
   {
     column: 'Name',
     type: String,
-    value: student => student.name,
-    // (optional) Column width (in characters).
-    width: 20
+    value: student => student.name
   },
   // Column #2
   {
@@ -124,55 +122,146 @@ const schema = [
 ]
 ```
 
-If no `type` is specified for a column or a cell then it's assumed to be a `String`.
+If no `type` is specified, it defaults to a `String`.
 
+<!--
 There're also some additional exported `type`s available:
 
 * `Integer` for integer `Number`s.
 * `URL` for URLs.
 * `Email` for email addresses.
+-->
 
-Each column or cell, aside from having `type` and `value`, can also have:
+Aside from having a `type` and a `value`, each cell (or schema column) can also have:
 
-* `width: number` — Approximate column width (in characters). Example: `20`.
+<!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
 <!--
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
 -->
 
-* `format: string` — A custom cell data format. Can only be used on `Date`, `Number` or `Integer` cells. [Examples](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format):
+* `format: string` — A custom cell data format. Can only be used on `Date` or `Number` <!-- or `Integer` --> cells. [Examples](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format):
 
   * `"0.000"` for printing a floating-point number with 3 decimal places.
   * `"#,##0.00"` for printing currency.
-  * `"mm/dd/yy"` for formatting a date (all `Date` cells or columns require a `format`).
+  * `"mm/dd/yy"` for formatting a date. All `Date` cells (or schema columns) require a `format`.
 
-* `fontWeight: string` — Can be used to print text in bold. Can only be used on `String` cells. Example: `"bold"`.
+* `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
+
+* `align: string` — Can be used to align cell content horizontally. Available values: `"left"`, `"center"`, `"right"`.
+
+### Column Title
+
+#### Schema
+
+When using a `schema`, column title can be set via a `column` property. It will be printed at the top of the table in bold.
+
+```js
+const schema = [
+  // Column #1
+  {
+    column: 'Name', // Column title
+    value: student => student.name
+  },
+  ...
+]
+```
+
+If `column` property is missing then column title won't be printed.
+
+#### Cell Data
+
+When not using a schema, one can print column titles by supplying them as the first row of the `data`:
+
+```js
+const data = [
+  [
+    { value: 'Name', fontWeight: 'bold' },
+    { value: 'Age', fontWeight: 'bold'},
+    ...
+  ],
+  ...
+]
+```
+
+### Column Width
+
+Column width can also be specified (in "characters").
+
+#### Schema
+
+To specify column width when using a `schema`, set a `width` on a schema column:
+
+```js
+const schema = [
+  // Column #1
+  {
+    column: 'Name',
+    value: student => student.name,
+    width: 20 // Column width (in characters).
+  },
+  ...
+]
+```
+
+#### Cell Data
+
+When not using a schema, one can provide a separate `columns` parameter to specify column widths:
+
+```js
+// Set Column #3 width to "20 characters".
+const columns = [
+  {},
+  {},
+  { width: 20 }, // in characters
+  {}
+]
+```
+
+## API
 
 ### Browser
 
 ```js
 import writeXlsxFile from 'write-excel-file'
 
-await writeXlsxFile(objects, table, {
-  fileName: 'Students.xlsx'
+// When passing `data` for each cell.
+await writeXlsxFile(data, {
+  columns, // optional
+  fileName: 'file.xlsx'
 })
+
+// When passing `objects` and `schema`.
+await writeXlsxFile(objects, {
+  schema,
+  fileName: 'file.xlsx'
+})
+
 ```
 
-Uses [`file-saver`](https://www.npmjs.com/package/file-saver) to save the `*.xlsx` file from a web browser.
+Uses [`file-saver`](https://www.npmjs.com/package/file-saver) to save an `*.xlsx` file from a web browser.
 
-If `fileName` parameter is not passed, the returned `Promise` resolves to a ["blob"](https://github.com/egeriis/zipcelx/issues/68).
+If `fileName` parameter is not passed then the returned `Promise` resolves to a ["blob"](https://github.com/egeriis/zipcelx/issues/68) with the contents of the `*.xlsx` file.
 
 ### Node.js
 
 ```js
 const { writeXlsxFile } = require('write-excel-file/node')
 
-await writeXlsxFile(objects, table, {
+// When passing `data` for each cell.
+await writeXlsxFile(data, {
+  columns, // optional
+  filePath: '/path/to/file.xlsx'
+})
+
+// When passing `objects` and `schema`.
+await writeXlsxFile(objects, {
+  schema,
   filePath: '/path/to/file.xlsx'
 })
 ```
 
-If `filePath` parameter is not passed, the returned `Promise` resolves to a `Stream`-like object having a `.pipe()` method:
+If `filePath` parameter is not passed then the returned `Promise` resolves to a `Stream`-like object having a `.pipe()` method:
 
 ```js
 const output = fs.createWriteStream(...)
@@ -192,7 +281,9 @@ One can use any npm CDN service, e.g. [unpkg.com](https://unpkg.com) or [jsdeliv
 <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
 
 <script>
-  writeXlsxFile(objects, tableDefinition, 'data.xlsx')
+  writeXlsxFile(objects, schema, {
+    fileName: 'file.xlsx'
+  })
 </script>
 ```
 

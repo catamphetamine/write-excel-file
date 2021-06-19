@@ -10,15 +10,15 @@ import rels from './statics/rels'
 import contentTypes from './statics/[Content_Types].xml'
 
 import generateWorksheet from './worksheet'
-import generateStyles from './styles'
-import SharedStrings from './sharedStrings'
+import initStyles from './styles'
+import initSharedStrings from './sharedStrings'
 
-export default async function writeXlsxFile(data, { filePath, schema } = {}) {
+export default async function writeXlsxFile(data, { filePath, schema, columns } = {}) {
 	const archive = new Archive(filePath)
 
-  const sharedStrings = new SharedStrings()
-  const { styles, formatStyles } = generateStyles(data, { schema })
-	const worksheet = generateWorksheet(data, { schema, formatStyles, sharedStrings })
+  const { getSharedStringsXml, getSharedString } = initSharedStrings()
+  const { getStylesXml, getStyle } = initStyles()
+	const worksheet = generateWorksheet(data, { schema, columns, getStyle, getSharedString })
 
 	// There doesn't seem to be a way to just append a file into a subdirectory
 	// in `archiver` library, hence using a hacky temporary directory workaround.
@@ -27,12 +27,13 @@ export default async function writeXlsxFile(data, { filePath, schema } = {}) {
 	const xl = await createDirectory(path.join(root, 'xl'))
 	const _rels = await createDirectory(path.join(xl, '_rels'))
 	const worksheets = await createDirectory(path.join(xl, 'worksheets'))
+
 	await Promise.all([
 		writeFile(path.join(_rels, 'workbook.xml.rels'), workbookXMLRels),
 		writeFile(path.join(worksheets, 'sheet1.xml'), worksheet),
 		writeFile(path.join(xl, 'workbook.xml'), workbookXML),
-		writeFile(path.join(xl, 'styles.xml'), styles),
-		writeFile(path.join(xl, 'sharedStrings.xml'), sharedStrings.getXml())
+		writeFile(path.join(xl, 'styles.xml'), getStylesXml()),
+		writeFile(path.join(xl, 'sharedStrings.xml'), getSharedStringsXml())
 	])
 
 	archive.directory(xl, 'xl')

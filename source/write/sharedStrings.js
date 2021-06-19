@@ -1,4 +1,25 @@
-function getSharedStringsXml(sharedStrings) {
+export default function initSharedStrings() {
+	const sharedStrings = []
+	const sharedStringsIndex = {}
+
+	return {
+		getSharedStringsXml() {
+			return generateXml(sharedStrings)
+		},
+
+		getSharedString(string) {
+      let id = sharedStringsIndex[string]
+      if (id === undefined) {
+				id = String(sharedStrings.length)
+				sharedStringsIndex[string] = id
+				sharedStrings.push(string)
+      }
+      return id
+		}
+	}
+}
+
+function generateXml(sharedStrings) {
 	let xml = '<?xml version="1.0"?>'
 	xml += '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
 	for (const string of sharedStrings) {
@@ -6,26 +27,4 @@ function getSharedStringsXml(sharedStrings) {
 	}
 	xml += '</sst>'
 	return xml
-}
-
-export default class SharedStrings {
-	constructor() {
-		this.sharedStrings = []
-		this.sharedStringsIndex = {}
-	}
-
-	get(string) {
-		return this.sharedStringsIndex[string]
-	}
-
-	add(string) {
-		const id = this.sharedStrings.length
-		this.sharedStringsIndex[string] = String(id)
-		this.sharedStrings.push(string)
-		return id
-	}
-
-	getXml() {
-		return getSharedStringsXml(this.sharedStrings)
-	}
 }
