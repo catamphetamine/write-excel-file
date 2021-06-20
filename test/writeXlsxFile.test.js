@@ -16,13 +16,13 @@ describe('writeXlsxFile', function() {
     const objects = [
       {
         name: 'John Smith',
-        age: 18,
+        age: 1800,
         dateOfBirth: new Date(),
         graduated: true
       },
       {
         name: 'Alice Brown',
-        age: 16,
+        age: 2600.50,
         dateOfBirth: new Date(),
         graduated: false
       }
@@ -37,8 +37,10 @@ describe('writeXlsxFile', function() {
         width: 20
       },
       {
-        column: 'Age',
+        column: 'Cost',
         type: Number,
+        format: '#,##0.00',
+        width: 12,
         align: 'center',
         value: student => student.age
       },
@@ -72,7 +74,7 @@ describe('writeXlsxFile', function() {
     const data = [
       [
         {
-          value: 'Age',
+          value: 'Cost',
           fontWeight: 'bold'
         },
         {
@@ -86,7 +88,8 @@ describe('writeXlsxFile', function() {
       ],
       [
         {
-          value: 18,
+          value: 180.00,
+          format: '#,##0.00',
           type: Number,
           align: 'center',
           fontWeight: 'bold'
@@ -107,7 +110,8 @@ describe('writeXlsxFile', function() {
       ],
       [
         {
-          value: 16,
+          value: 200.50,
+          format: '#,##0.00',
           type: Number,
           align: 'right'
         },

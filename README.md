@@ -4,7 +4,7 @@ Write simple `*.xlsx` files in a browser or Node.js
 
 [Demo](https://catamphetamine.gitlab.io/write-excel-file/)
 
-Also check [`read-excel-file`](https://www.npmjs.com/package/read-excel-file)
+Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file) for reading small to medium `*.xlsx` files.
 
 ## Install
 
@@ -24,8 +24,31 @@ const data = [
   [
     // Column #1
     {
-      type: Number,
-      value: 18
+      value: 'Name',
+      fontWeight: 'bold'
+    },
+    // Column #2
+    {
+      value: 'Date of Birth',
+      fontWeight: 'bold'
+    },
+    // Column #3
+    {
+      value: 'Cost',
+      fontWeight: 'bold'
+    },
+    // Column #4
+    {
+      value: 'Paid',
+      fontWeight: 'bold'
+    }
+  ],
+  // Row #2
+  [
+    // Column #1
+    {
+      type: String,
+      value: 'John Smith'
     },
     // Column #2
     {
@@ -35,8 +58,8 @@ const data = [
     },
     // Column #3
     {
-      type: String,
-      value: 'John Smith'
+      type: Number,
+      value: 1800
     },
     // Column #4
     {
@@ -44,12 +67,12 @@ const data = [
       value: true
     }
   ],
-  // Row #2
+  // Row #3
   [
     // Column #1
     {
-      type: Number,
-      value: 16
+      type: String,
+      value: 'Alice Brown'
     },
     // Column #2
     {
@@ -59,8 +82,8 @@ const data = [
     },
     // Column #3
     {
-      type: String,
-      value: 'Alice Brown'
+      type: Number,
+      value: 2600
     },
     // Column #4
     {
@@ -71,23 +94,23 @@ const data = [
 ]
 ```
 
-Alternatively, provide a list of `objects` and a `schema` to transform those `objects` to `data`:
+Or, alternatively, provide a list of `objects` and a `schema` to transform those `objects` into `data`:
 
 ```js
 const objects = [
-  // Row #1
+  // Object #1
   {
     name: 'John Smith',
-    age: 18,
     dateOfBirth: new Date(),
-    graduated: true
+    cost: 1800,
+    paid: true
   },
-  // Row #2
+  // Object #2
   {
     name: 'Alice Brown',
-    age: 16,
     dateOfBirth: new Date(),
-    graduated: false
+    cost: 2600,
+    paid: false
   }
 ]
 ```
@@ -102,27 +125,28 @@ const schema = [
   },
   // Column #2
   {
-    column: 'Age',
-    type: Number,
-    value: student => student.age
-  },
-  // Column #3
-  {
     column: 'Date of Birth',
     type: Date,
     format: 'mm/dd/yyyy',
     value: student => student.dateOfBirth
   },
+  // Column #3
+  {
+    column: 'Cost',
+    type: Number,
+    format: '#,##0.00',
+    value: student => student.cost
+  },
   // Column #4
   {
-    column: 'Graduated',
+    column: 'Paid',
     type: Boolean,
-    value: student => student.graduated
+    value: student => student.paid
   }
 ]
 ```
 
-If no `type` is specified, it defaults to a `String`.
+If no `type` is specified for a cell (or a schema column) then it defaults to a `String`.
 
 <!--
 There're also some additional exported `type`s available:
@@ -134,21 +158,45 @@ There're also some additional exported `type`s available:
 
 Aside from having a `type` and a `value`, each cell (or schema column) can also have:
 
+* `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
+
+* `align: string` — Can be used to align cell content horizontally. Available values: `"left"`, `"center"`, `"right"`.
+
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
 <!--
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
 -->
 
-* `format: string` — A custom cell data format. Can only be used on `Date` or `Number` <!-- or `Integer` --> cells. [Examples](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format):
+* `format: string` — Cell data format. Can only be used on `Date` or `Number` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
 
-  * `"0.000"` for printing a floating-point number with 3 decimal places.
-  * `"#,##0.00"` for printing currency.
-  * `"mm/dd/yy"` for formatting a date. All `Date` cells (or schema columns) require a `format`.
+  * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
+  * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
+  * `#,##0` — Number with a comma as a thousands separator, as used in most English-speaking countries. Example: `1,234,567`.
+  * `#,##0.00` — Currency, as in most English-speaking countries. Example: `1,234.50`.
+  * `0%` — Percents. Example: `30%`.
+  * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
+  * All `Date` cells (or schema columns) require a `format`:
 
-* `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
+    * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
+    * `mmm d yyyy` — Example: `Dec 31 2000`.
+    * `d mmmm yyyy` — Example: `31 December 2000`.
+    * `dd/mm/yyyy hh:mm AM/PM` — US date-time format. Example: `31/12/2000 12:30 AM`.
+    * or any other format where:
 
-* `align: string` — Can be used to align cell content horizontally. Available values: `"left"`, `"center"`, `"right"`.
+      * `yy` — Last two digits of a year number.
+      * `yyyy` — Four digits of a year number.
+      * `m` — Month number without a leading `0`.
+      * `mm` — Month number with a leading `0` (when less than `10`).
+      * `mmm` — Month name (short).
+      * `mmmm` — Month name (long).
+      * `d` — Day number without a leading `0`.
+      * `dd` — Day number with a leading `0` (when less than `10`).
+      * `h` — Hours without a leading `0`.
+      * `hh` — Hours with a leading `0` (when less than `10`).
+      * `mm` — Minutes with a leading `0` (when less than `10`).
+      * `ss` — Seconds with a leading `0` (when less than `10`).
+      * `AM/PM` — Either `AM` or `PM`, depending on the time.
 
 ### Column Title
 

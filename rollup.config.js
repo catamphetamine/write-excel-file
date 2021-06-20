@@ -5,7 +5,7 @@ import { terser } from 'rollup-plugin-terser'
 
 export default [
   {
-    input: './modules/write/writeXlsxFileBrowser',
+    input: './index',
     plugins: [
       json(),
       terser(),
