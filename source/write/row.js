@@ -5,7 +5,7 @@ import generateCell from './cell'
 
 // import Integer from '../types/Integer'
 
-export default function generateRow(row, rowIndex, { getStyle, getSharedString }) {
+export default function generateRow(row, rowIndex, { getStyle, getSharedString, customFont }) {
 	// To ensure the row number starts as in Excel.
 	const rowNumber = rowIndex + 1
 	const rowCells = row
@@ -15,20 +15,18 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString }
 				value,
 				format,
 				align,
-				fontWeight
+				alignVertical,
+				fontWeight,
+				wrap,
+				color,
+				backgroundColor
 			} = cell
 			if (format && type !== Date &&  type !== Number) { // && type !== Integer) {
 				throw new Error('`format` can only be used on `Date`, `Number` cells') // or `Integer` cells')
 			}
-			// if (fontWeight && type !== String) {
-			// 	throw new Error('`fontWeight` can only be used on `String` cells')
-			// }
-			// if (format && fontWeight) {
-			// 	throw new Error('`fontWeight` and `format` can\'t be used on a cell at the same time')
-			// }
 			let cellStyleId
-			if (fontWeight || align || format) {
-				cellStyleId = getStyle({ fontWeight, align, format })
+			if (fontWeight || align || alignVertical || format || wrap || color || backgroundColor || customFont) {
+				cellStyleId = getStyle({ fontWeight, align, alignVertical, format, wrap, color, backgroundColor })
 			}
 			return generateCell(
 				rowNumber,

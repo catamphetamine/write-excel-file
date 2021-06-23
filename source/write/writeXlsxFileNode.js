@@ -13,12 +13,12 @@ import generateWorksheet from './worksheet'
 import initStyles from './styles'
 import initSharedStrings from './sharedStrings'
 
-export default async function writeXlsxFile(data, { filePath, schema, columns } = {}) {
+export default async function writeXlsxFile(data, { filePath, schema, columns, fontFamily, fontSize } = {}) {
 	const archive = new Archive(filePath)
 
   const { getSharedStringsXml, getSharedString } = initSharedStrings()
-  const { getStylesXml, getStyle } = initStyles()
-	const worksheet = generateWorksheet(data, { schema, columns, getStyle, getSharedString })
+  const { getStylesXml, getStyle } = initStyles({ fontFamily, fontSize })
+	const worksheet = generateWorksheet(data, { schema, columns, getStyle, getSharedString, customFont: fontFamily || fontSize })
 
 	// There doesn't seem to be a way to just append a file into a subdirectory
 	// in `archiver` library, hence using a hacky temporary directory workaround.

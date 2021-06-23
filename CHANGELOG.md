@@ -1,3 +1,10 @@
+1.1.0 / 23.06.2021
+==================
+
+* Added `color`, `backgroundColor`, `alignVertical` and `wrap` properties.
+
+* Added `fontFamily` and `fontSize` parameters.
+
 1.0.3 / 18.06.2021
 ==================
 

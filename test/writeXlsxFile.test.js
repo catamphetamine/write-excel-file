@@ -101,7 +101,8 @@ describe('writeXlsxFile', function() {
         },
         {
           value: 'John Smith',
-          type: String
+          type: String,
+          backgroundColor: '#FFFF00'
         },
         {
           value: true,
@@ -113,20 +114,28 @@ describe('writeXlsxFile', function() {
           value: 200.50,
           format: '#,##0.00',
           type: Number,
-          align: 'right'
+          align: 'right',
+          alignVertical: 'top'
         },
         {
           value: new Date(),
           type: Date,
-          format: 'mm/dd/yyyy'
+          format: 'mm/dd/yyyy',
+          align: 'center',
+          alignVertical: 'bottom'
         },
         {
-          value: 'Alice Brown',
-          type: String
+          value: 'Alice Brown\nNew line',
+          type: String,
+          color: '#ff0000',
+          backgroundColor: '#eeeeee',
+          align: 'left',
+          wrap: true
         },
         {
           value: false,
-          type: Boolean
+          type: Boolean,
+          alignVertical: 'center'
         }
       ]
     ]
@@ -142,7 +151,7 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(objects, { schema: schemaNoSingleTitle, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-single-title.xlsx') })
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 
-    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
+    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx'), fontFamily: 'Arial', fontSize: 16 })
 
     const outputStream = fs.createWriteStream(path.join(OUTPUT_DIRECTORY, 'test-stream.xlsx'))
 

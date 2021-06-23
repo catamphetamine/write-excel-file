@@ -3,7 +3,7 @@
 
 import generateRow from './row'
 
-export default function generateRows(data, { schema, getStyle, getSharedString }) {
+export default function generateRows(data, { schema, getStyle, getSharedString, customFont }) {
 	if (schema) {
 		let header = [];
 		for (const column of schema) {
@@ -26,5 +26,5 @@ export default function generateRows(data, { schema, getStyle, getSharedString }
 			})
 		)))
 	}
-	return data.map((row, index) => generateRow(row, index, { getStyle, getSharedString })).join('')
+	return data.map((row, index) => generateRow(row, index, { getStyle, getSharedString, customFont })).join('')
 }

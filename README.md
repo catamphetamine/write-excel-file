@@ -158,9 +158,17 @@ There're also some additional exported `type`s available:
 
 Aside from having a `type` and a `value`, each cell (or schema column) can also have:
 
+* `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
+
+* `alignVertical: string` — Vertical alignment of cell content. Available values: `"top"`, `"center"`, `"bottom"`.
+
+* `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
+
 * `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
 
-* `align: string` — Can be used to align cell content horizontally. Available values: `"left"`, `"center"`, `"right"`.
+* `color: string` — Cell text color (in hexademical format). Example: `"#aabbcc"`.
+
+* `backgroundColor: string` — Cell background color (in hexademical format). Example: `"#aabbcc"`.
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
@@ -197,74 +205,6 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
       * `mm` — Minutes with a leading `0` (when less than `10`).
       * `ss` — Seconds with a leading `0` (when less than `10`).
       * `AM/PM` — Either `AM` or `PM`, depending on the time.
-
-### Column Title
-
-#### Schema
-
-When using a `schema`, column title can be set via a `column` property. It will be printed at the top of the table in bold.
-
-```js
-const schema = [
-  // Column #1
-  {
-    column: 'Name', // Column title
-    value: student => student.name
-  },
-  ...
-]
-```
-
-If `column` property is missing then column title won't be printed.
-
-#### Cell Data
-
-When not using a schema, one can print column titles by supplying them as the first row of the `data`:
-
-```js
-const data = [
-  [
-    { value: 'Name', fontWeight: 'bold' },
-    { value: 'Age', fontWeight: 'bold'},
-    ...
-  ],
-  ...
-]
-```
-
-### Column Width
-
-Column width can also be specified (in "characters").
-
-#### Schema
-
-To specify column width when using a `schema`, set a `width` on a schema column:
-
-```js
-const schema = [
-  // Column #1
-  {
-    column: 'Name',
-    value: student => student.name,
-    width: 20 // Column width (in characters).
-  },
-  ...
-]
-```
-
-#### Cell Data
-
-When not using a schema, one can provide a separate `columns` parameter to specify column widths:
-
-```js
-// Set Column #3 width to "20 characters".
-const columns = [
-  {},
-  {},
-  { width: 20 }, // in characters
-  {}
-]
-```
 
 ## API
 
@@ -317,6 +257,86 @@ const stream = await writeXlsxFile(objects)
 stream.pipe(output)
 ```
 
+## Column Title
+
+#### Schema
+
+When using a `schema`, column title can be set via a `column` property. It will be printed at the top of the table in bold.
+
+```js
+const schema = [
+  // Column #1
+  {
+    column: 'Name', // Column title
+    value: student => student.name
+  },
+  ...
+]
+```
+
+If `column` property is missing then column title won't be printed.
+
+#### Cell Data
+
+When not using a schema, one can print column titles by supplying them as the first row of the `data`:
+
+```js
+const data = [
+  [
+    { value: 'Name', fontWeight: 'bold' },
+    { value: 'Age', fontWeight: 'bold'},
+    ...
+  ],
+  ...
+]
+```
+
+## Column Width
+
+Column width can also be specified (in "characters").
+
+#### Schema
+
+To specify column width when using a `schema`, set a `width` on a schema column:
+
+```js
+const schema = [
+  // Column #1
+  {
+    column: 'Name',
+    value: student => student.name,
+    width: 20 // Column width (in characters).
+  },
+  ...
+]
+```
+
+#### Cell Data
+
+When not using a schema, one can provide a separate `columns` parameter to specify column widths:
+
+```js
+// Set Column #3 width to "20 characters".
+const columns = [
+  {},
+  {},
+  { width: 20 }, // in characters
+  {}
+]
+```
+
+## Font
+
+The default font is `Calibri` at `12px`. To change the default font, pass `fontFamily` and `fontSize` parameters when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  fontFamily: 'Arial',
+  fontSize: 16
+})
+```
+
 ## TypeScript
 
 Not implemented. I'm not familiar with TypeScript.
@@ -337,7 +357,7 @@ One can use any npm CDN service, e.g. [unpkg.com](https://unpkg.com) or [jsdeliv
 
 ## References
 
-Writing `*.xlsx` files was originally copy-pasted from [`zipcelx`](https://medium.com/@Nopziiemoo/create-excel-files-using-javascript-without-all-the-fuss-2c4aa5377813) package, and then rewritten.
+This project was inspired by [`zipcelx`](https://medium.com/@Nopziiemoo/create-excel-files-using-javascript-without-all-the-fuss-2c4aa5377813) package.
 
 ## GitHub
 

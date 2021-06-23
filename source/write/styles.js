@@ -1,23 +1,62 @@
-const fontSize = 12
-const fontFamily = 'Calibri'
-
 // There seem to be about 100 "built-in" formats in Excel.
 // https://docs.microsoft.com/en-us/previous-versions/office/developer/office-2010/ee857658(v=office.14)?redirectedfrom=MSDN
 const FORMAT_ID_STARTS_FROM = 100
 
-export default function initStyles() {
+export default function initStyles({
+  fontFamily,
+  fontSize
+}) {
+  const customFont = fontFamily || fontSize
+
+  if (fontFamily === undefined) {
+    fontFamily = 'Calibri'
+  }
+
+  if (fontSize === undefined) {
+    fontSize = 12
+  }
+
   const formats = []
   const formatsIndex = {}
 
   const styles = []
   const stylesIndex = {}
 
-  function getStyle({ fontWeight, align, format }) {
-    const key = `${fontWeight || 'normal'}/${align || 'none'}/${format || 'none'}`
-    const style = stylesIndex[key]
-    if (style !== undefined) {
-      return style
+  const fonts = []
+  const fontsIndex = {}
+
+  const fills = []
+  const fillsIndex = {}
+
+  // Default font.
+  fonts.push({
+    size: fontSize,
+    family: fontFamily
+  })
+  fontsIndex['-/-'] = 0
+
+  // Default fill.
+  fills.push({})
+  fillsIndex['-'] = 0
+
+  // "gray125" fill.
+  // For some weird reason, MS Office 2007 Excel seems to require that to be present.
+  // Otherwise, if absent, it would replace the first `backgroundColor`.
+  fills.push({
+    gray125: true
+  })
+
+  function getStyle({ fontWeight, align, alignVertical, format, wrap, color, backgroundColor }) {
+    // Look for an existing style.
+    const fontKey = `${fontWeight || '-'}/${color || '-'}`
+    const fillKey = backgroundColor || '-'
+    const key = `${align || '-'}/${alignVertical || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}`
+    const styleId = stylesIndex[key]
+    if (styleId !== undefined) {
+      return styleId
     }
+    // Create new style.
+    // Get format ID.
     let formatId
     if (format) {
       formatId = formatsIndex[format]
@@ -26,9 +65,38 @@ export default function initStyles() {
         formats.push(format)
       }
     }
+    // Get font ID.
+    let fontId = customFont ? 0 : undefined
+    if (fontWeight || color) {
+      fontId = fontsIndex[fontKey]
+      if (fontId === undefined) {
+        fontId = fontsIndex[fontKey] = String(fonts.length)
+        fonts.push({
+          size: fontSize,
+          family: fontFamily,
+          weight: fontWeight,
+          color
+        })
+      }
+    }
+    // Get fill ID.
+    let fillId
+    if (backgroundColor) {
+      fillId = fillsIndex[fillKey]
+      if (fillId === undefined) {
+        fillId = fillsIndex[fillKey] = String(fills.length)
+        fills.push({
+          color: backgroundColor
+        })
+      }
+    }
+    // Add a style.
     styles.push({
-      fontWeight,
+      fontId,
+      fillId,
       align,
+      alignVertical,
+      wrap,
       formatId
     })
     return stylesIndex[key] = String(styles.length - 1)
@@ -39,13 +107,13 @@ export default function initStyles() {
 
   return {
     getStylesXml() {
-      return generateXml({ formats, styles })
+      return generateXml({ formats, styles, fonts, fills })
     },
     getStyle
   }
 }
 
-function generateXml({ formats, styles }) {
+function generateXml({ formats, styles, fonts, fills }) {
   let xml = '<?xml version="1.0" ?>'
   xml += '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
 
@@ -66,15 +134,53 @@ function generateXml({ formats, styles }) {
     xml += `</numFmts>`
   }
 
-  xml += '<fonts count="2">'
-  xml += `<font><sz val="${fontSize}"/><color theme="1"/><name val="${fontFamily}"/><family val="2"/><scheme val="minor"/></font>`
-  xml += `<font><sz val="${fontSize}"/><color theme="1"/><name val="${fontFamily}"/><family val="2"/><scheme val="minor"/><b/></font>`
+  xml += `<fonts count="${fonts.length}">`
+  for (const font of fonts) {
+    const {
+      size,
+      family,
+      color,
+      weight
+    } = font
+    xml += '<font>'
+    xml += `<sz val="${size}"/>`
+    xml += `<color ${color ? 'rgb="' + getColor(color) + '"' : 'theme="1"'}/>`
+    xml += `<name val="${family}"/>`
+    // It's not clear what the `<family/>` tag means or does.
+    // It seems to always be `<family val="2"/>` even for different
+    // font families (Calibri, Arial, etc).
+    xml += '<family val="2"/>'
+    // It's not clear what the `<scheme/>` tag means or does.
+    xml += '<scheme val="minor"/>'
+    if (weight === 'bold') {
+      xml += '<b/>'
+    }
+    xml += '</font>'
+  }
   xml += '</fonts>'
 
   // MS Office 2007 Excel seems to require a `<fills/>` element to exist.
   // without it, MS Office 2007 Excel thinks that the file is broken.
-  xml += '<fills count="1">'
-  xml += '<fill><patternFill patternType="none"/></fill>'
+  xml += `<fills count="${fills.length}">`
+  for (const fill of fills) {
+    const { color, gray125 } = fill
+    xml += '<fill>'
+    if (color) {
+      xml += '<patternFill patternType="solid">'
+      xml += `<fgColor rgb="${getColor(color)}"/>`
+      // Whatever that could mean.
+      xml += '<bgColor indexed="64"/>'
+      xml += '</patternFill>'
+    } else if (gray125) {
+      // "gray125" fill.
+      // For some weird reason, MS Office 2007 Excel seems to require that to be present.
+      // Otherwise, if absent, it would replace the first `backgroundColor`.
+      xml += '<patternFill patternType="gray125"/>'
+    } else {
+      xml += '<patternFill patternType="none"/>'
+    }
+    xml += '</fill>'
+  }
   xml += '</fills>'
 
   // MS Office 2007 Excel seems to require a `<borders/>` element to exist:
@@ -109,24 +215,27 @@ function generateXml({ formats, styles }) {
   xml += `<cellXfs count="${styles.length}">`
   for (const cellStyle of styles) {
     const {
+      fontId,
+      fillId,
       align,
-      fontWeight,
+      alignVertical,
+      wrap,
       formatId
     } = cellStyle
-    const fontId = fontWeight === 'bold' ? 1 : 0
     // `applyNumberFormat="1"` means "apply the `numFmtId` attribute".
     // Seems like by default `applyNumberFormat` is `"0"` meaning that,
     // unless `"1"` is specified, it would ignore the `numFmtId` attribute.
     xml += '<xf ' +
       [
-        formatId !== undefined ? `numFmtId="${formatId || 0}"` : undefined,
+        formatId !== undefined ? `numFmtId="${formatId}"` : undefined,
         formatId !== undefined ? 'applyNumberFormat="1"' : undefined,
         fontId !== undefined ? `fontId="${fontId}"` : undefined,
         fontId !== undefined ? 'applyFont="1"' : undefined,
-        // 'fillId="0"',
+        fillId !== undefined ? `fillId="${fillId}"` : undefined,
+        fillId !== undefined ? 'applyFill="1"' : undefined,
+        align || alignVertical || wrap ? 'applyAlignment="1"' : undefined,
         // 'borderId="0"',
-        // 'xfId="0"',
-        align ? 'applyAlignment="1"' : undefined
+        // 'xfId="0"'
       ].filter(_ => _).join(' ') +
     '>' +
       // Possible horizontal alignment values:
@@ -134,18 +243,26 @@ function generateXml({ formats, styles }) {
       // Possible vertical alignment values:
       //  top, vcenter, bottom, vjustify, vdistributed.
       // https://xlsxwriter.readthedocs.io/format.html#set_align
-      (align ? `<alignment horizontal="${align}"/>` : '') +
+      (align || alignVertical || wrap
+        ? '<alignment' +
+          (align ? ` horizontal="${align}"` : '') +
+          (alignVertical ? ` vertical="${alignVertical}"` : '') +
+          (wrap ? ` wrapText="1"` : '') +
+          '/>'
+        : ''
+      ) +
     '</xf>'
   }
   xml += `</cellXfs>`
 
-  // To apply cell content alignment, a `cellXfs.xf` element should specify
-  // `applyAlignment="1"` and also contain a child `<alignment/>` element.
-  // Examples:
-  // `<alignment horizontal="center" vertical="center"/>`
-  // `<alignment wrapText="1"/>`
-
   xml += '</styleSheet>'
 
   return xml
+}
+
+function getColor(color) {
+  if (color[0] !== '#') {
+    throw new Error(`Color "${color}" must start with a "#"`)
+  }
+  return `FF${color.slice('#'.length).toUpperCase()}`
 }

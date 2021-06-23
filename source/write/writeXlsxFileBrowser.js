@@ -13,8 +13,8 @@ import generateWorksheet from './worksheet'
 import initStyles from './styles'
 import initSharedStrings from './sharedStrings'
 
-export default function writeXlsxFile(data, { fileName, schema, columns } = {}) {
-  return generateXlsxFile(data, { schema, columns }).then((blob) => {
+export default function writeXlsxFile(data, { fileName, schema, columns, fontFamily, fontSize } = {}) {
+  return generateXlsxFile(data, { schema, columns, fontFamily, fontSize }).then((blob) => {
     if (fileName) {
       return FileSaver.saveAs(blob, fileName)
     }
@@ -28,15 +28,15 @@ export default function writeXlsxFile(data, { fileName, schema, columns } = {}) 
  * "The reason if you want to send the excel file or store it natively on Cordova/capacitor app".
  * @return {Blob}
  */
-function generateXlsxFile(data, { schema, columns }) {
+function generateXlsxFile(data, { schema, columns, fontFamily, fontSize }) {
   const zip = new JSZip()
 
   zip.file('_rels/.rels', rels)
   zip.file('[Content_Types].xml', contentTypes)
 
   const { getSharedStringsXml, getSharedString } = initSharedStrings()
-  const { getStylesXml, getStyle } = initStyles()
-  const worksheet = generateWorksheet(data, { schema, columns, getStyle, getSharedString })
+  const { getStylesXml, getStyle } = initStyles({ fontFamily, fontSize })
+  const worksheet = generateWorksheet(data, { schema, columns, getStyle, getSharedString, customFont: fontFamily || fontSize })
 
   const xl = zip.folder('xl')
   xl.file('workbook.xml', workbookXML)
