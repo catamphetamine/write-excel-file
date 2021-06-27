@@ -148,10 +148,12 @@ describe('writeXlsxFile', function() {
     ]
 
     await writeXlsxFile(objects, { schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema.xlsx') })
+    await writeXlsxFile(objects, { schema: schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-header-style.xlsx'), headerStyle: { align: 'center', color: '#cc0000', backgroundColor: '#eeeeee' } })
     await writeXlsxFile(objects, { schema: schemaNoSingleTitle, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-single-title.xlsx') })
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 
-    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx'), fontFamily: 'Arial', fontSize: 16 })
+    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
+    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-default-font.xlsx'), fontFamily: 'Arial', fontSize: 16 })
 
     const outputStream = fs.createWriteStream(path.join(OUTPUT_DIRECTORY, 'test-stream.xlsx'))
 

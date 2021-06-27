@@ -3,7 +3,13 @@
 
 import generateRow from './row'
 
-export default function generateRows(data, { schema, getStyle, getSharedString, customFont }) {
+export default function generateRows(data, {
+	schema,
+	headerStyle,
+	getStyle,
+	getSharedString,
+	customFont
+}) {
 	if (schema) {
 		let header = [];
 		for (const column of schema) {
@@ -12,9 +18,10 @@ export default function generateRows(data, { schema, getStyle, getSharedString, 
 			if (column.column) {
 				header = [schema.map((column) => ({
 					type: String,
-					fontWeight: 'bold',
+					value: column.column,
 					align: column.align,
-					value: column.column
+					// `headerStyle` also overwrites `align`, if specified.
+					...(headerStyle || DEFAULT_HEADER_STYLE)
 				}))]
 				break
 			}
@@ -26,5 +33,13 @@ export default function generateRows(data, { schema, getStyle, getSharedString, 
 			})
 		)))
 	}
-	return data.map((row, index) => generateRow(row, index, { getStyle, getSharedString, customFont })).join('')
+	return data.map((row, index) => generateRow(row, index, {
+		getStyle,
+		getSharedString,
+		customFont
+	})).join('')
+}
+
+const DEFAULT_HEADER_STYLE = {
+	fontWeight: 'bold'
 }

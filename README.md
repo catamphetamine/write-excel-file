@@ -257,11 +257,11 @@ const stream = await writeXlsxFile(objects)
 stream.pipe(output)
 ```
 
-## Column Title
+## Table Header
 
 #### Schema
 
-When using a `schema`, column title can be set via a `column` property. It will be printed at the top of the table in bold.
+When using a `schema`, column titles can be set via a `column` property on each column. It will be printed at the top of the table.
 
 ```js
 const schema = [
@@ -275,6 +275,20 @@ const schema = [
 ```
 
 If `column` property is missing then column title won't be printed.
+
+The default table header style is `fontWeight: "bold"` and `align` being same as the schema column's `align`. One can provide a custom table header style by supplying a `headerStyle` parameter:
+
+```js
+await writeXlsxFile(objects, {
+  schema,
+  headerStyle: {
+    backgroundColor: '#eeeeee',
+    fontWeight: 'bold',
+    align: 'center'
+  },
+  filePath: '/path/to/file.xlsx'
+})
+```
 
 #### Cell Data
 
