@@ -4,14 +4,12 @@
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 
-import workbookXML from './statics/workbook.xml'
-import workbookXMLRels from './statics/workbook.xml.rels'
+import generateWorkbookXml from './statics/workbook.xml'
+import generateWorkbookXmlRels from './statics/workbook.xml.rels'
 import rels from './statics/rels'
 import contentTypes from './statics/[Content_Types].xml'
 
-import generateWorksheet from './worksheet'
-import initStyles from './styles'
-import initSharedStrings from './sharedStrings'
+import { generateSheets } from './writeXlsxFile.common'
 
 export default function writeXlsxFile(data, { fileName, ...rest } = {}) {
   return generateXlsxFile(data, rest).then((blob) => {
@@ -29,35 +27,43 @@ export default function writeXlsxFile(data, { fileName, ...rest } = {}) {
  * @return {Blob}
  */
 function generateXlsxFile(data, {
+  sheets: sheetNames,
   schema,
   columns,
   headerStyle,
   fontFamily,
-  fontSize
+  fontSize,
+  dateFormat
 }) {
   const zip = new JSZip()
 
   zip.file('_rels/.rels', rels)
   zip.file('[Content_Types].xml', contentTypes)
 
-  const { getSharedStringsXml, getSharedString } = initSharedStrings()
-  const { getStylesXml, getStyle } = initStyles({ fontFamily, fontSize })
-
-  const worksheet = generateWorksheet(data, {
+  const {
+    sheets,
+    getSharedStringsXml,
+    getStylesXml
+  } = generateSheets({
+    data,
+    sheetNames,
     schema,
     columns,
     headerStyle,
-    getStyle,
-    getSharedString,
-    customFont: fontFamily || fontSize
+    fontFamily,
+    fontSize,
+    dateFormat
   })
 
   const xl = zip.folder('xl')
-  xl.file('workbook.xml', workbookXML)
+  xl.file('_rels/workbook.xml.rels', generateWorkbookXmlRels({ sheets }))
+  xl.file('workbook.xml', generateWorkbookXml({ sheets }))
   xl.file('styles.xml', getStylesXml())
   xl.file('sharedStrings.xml', getSharedStringsXml())
-  xl.file('_rels/workbook.xml.rels', workbookXMLRels)
-  xl.file('worksheets/sheet1.xml', worksheet)
+
+  for (const { id, data } of sheets) {
+    xl.file(`worksheets/sheet${id}.xml`, data)
+  }
 
   return zip.generateAsync({
     type: 'blob',

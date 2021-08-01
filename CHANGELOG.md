@@ -1,3 +1,22 @@
+1.3.0 / 01.08.2021
+==================
+
+* Added row height option.
+
+* Added column `span` and `rowSpan` options.
+
+* Added `borderColor` and `borderStyle` options. Also the options for top / left / bottom / right border.
+
+1.2.0 / 30.07.2021
+==================
+
+* Added support for generating `*.xlsx` files with multiple sheets.
+
+1.1.2 / 04.07.2021
+==================
+
+* Added a global `dateFormat` configuration parameter (when using a `schema`).
+
 1.1.1 / 24.06.2021
 ==================
 

@@ -8,7 +8,8 @@ export default function generateRows(data, {
 	headerStyle,
 	getStyle,
 	getSharedString,
-	customFont
+	customFont,
+	dateFormat
 }) {
 	if (schema) {
 		let header = [];
@@ -29,6 +30,7 @@ export default function generateRows(data, {
 		data = header.concat(data.map((row) => schema.map(
 			(column) => ({
 				...column,
+				format: column.format || (column.type === Date ? dateFormat : undefined),
 				value: column.value(row)
 			})
 		)))

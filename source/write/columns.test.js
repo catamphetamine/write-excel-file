@@ -13,7 +13,7 @@ describe('generateColumns()', () => {
         width: 10
       }]
     })).to.equal(
-    	'<cols><col min="1" max="1" width="25" /><col min="2" max="2" width="10" /></cols>'
+    	'<cols><col min="1" max="1" width="25" customWidth="1"/><col min="2" max="2" width="10" customWidth="1"/></cols>'
     )
   })
 })

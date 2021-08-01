@@ -13,8 +13,13 @@ export default function generateCell(
   cellStyleId,
   getSharedString
 ) {
+  // Empty cells could be skipped completely,
+  // if they don't have a style applied to them,
+  // like border or background color.
   if (isEmpty(value)) {
-    return ''
+    if (!cellStyleId) {
+      return ''
+    }
   }
 
   // Validate date format.
@@ -22,38 +27,38 @@ export default function generateCell(
     throw new Error('No "format" has been specified for a Date cell')
   }
 
-  // The default cell type is `String`.
-  if (type === undefined) {
-    type = String
-    // if (!isEmpty(value)) {
-      value = String(value)
-    // }
-  }
+  let xml = `<c r="${generateCellNumber(columnIndex, rowNumber)}"`
 
-  // if (!isEmpty(value)) {
-    value = getXlsxValue(type, value, getSharedString)
-  // }
-  type = getXlsxType(type)
-
-  let cellStyle = ''
   // Available formatting style IDs (built-in in Excel):
   // https://xlsxwriter.readthedocs.io/format.html#format-set-num-format
   // `2` — 0.00
   // `3` —  #,##0
   if (cellStyleId) {
     // From the attribute s="12" we know that the cell's formatting is stored at the 13th (zero-based index) <xf> within the <cellXfs>
-    cellStyle = ` s="${cellStyleId}"`
+    xml += ` s="${cellStyleId}"`
   }
 
-  let valueType = ''
+  if (isEmpty(value)) {
+    return xml + '/>'
+  }
+
+  // The default cell type is `String`.
+  if (type === undefined) {
+    type = String
+    value = String(value)
+  }
+
+  value = getXlsxValue(type, value, getSharedString)
+  type = getXlsxType(type)
+
   // The default value for `t` is `"n"` (a number or a date).
   if (type) {
-    valueType = ` t="${type}"`
+    xml += ` t="${type}"`
   }
 
-  return `<c r="${generateCellNumber(columnIndex, rowNumber)}"${valueType}${cellStyle}>` +
+  return xml + '>' +
     (type === 'inlineStr' ? '<is><t>' : '<v>') +
-    (isEmpty(value) ? '' : value) +
+    value +
     (type === 'inlineStr' ? '</t></is>' : '</v>') +
     '</c>'
 }

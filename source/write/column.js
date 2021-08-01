@@ -39,7 +39,11 @@ export default function generateColumnDescription(column, index) {
 
   // `column` format is described here:
   // https://msdn.microsoft.com/en-us/library/office/documentformat.openxml.spreadsheet.column.aspx
-  return `<col min="${columnNumber}" max="${columnNumber}" width="${column.width}" />`
+  //
+  // `customWidth="1"` is required in order for `width="..."` to be applied.
+  // Otherwise, Microsoft Office 2007 Excel wouldn't apply the custom column `width`.
+  //
+  return `<col min="${columnNumber}" max="${columnNumber}" width="${column.width}" customWidth="1"/>`
 
   // The `style` attribute doesn't seem to be required.
   // style="${style}"

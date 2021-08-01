@@ -28,16 +28,28 @@ export default function initStyles({
   const fills = []
   const fillsIndex = {}
 
+  const borders = []
+  const bordersIndex = {}
+
   // Default font.
   fonts.push({
     size: fontSize,
     family: fontFamily
   })
-  fontsIndex['-/-'] = 0
+  fontsIndex['-:-'] = 0
 
   // Default fill.
   fills.push({})
   fillsIndex['-'] = 0
+
+  // Default border.
+  borders.push({
+    left: {},
+    right: {},
+    top: {},
+    bottom: {}
+  })
+  bordersIndex['-:-/-:-/-:-/-:-'] = 0
 
   // "gray125" fill.
   // For some weird reason, MS Office 2007 Excel seems to require that to be present.
@@ -46,11 +58,39 @@ export default function initStyles({
     gray125: true
   })
 
-  function getStyle({ fontWeight, align, alignVertical, format, wrap, color, backgroundColor }) {
+  function getStyle(
+    fontWeight,
+    align,
+    alignVertical,
+    format,
+    wrap,
+    color,
+    backgroundColor,
+    borderColor,
+    borderStyle,
+    leftBorderColor,
+    leftBorderStyle,
+    rightBorderColor,
+    rightBorderStyle,
+    topBorderColor,
+    topBorderStyle,
+    bottomBorderColor,
+    bottomBorderStyle,
+  ) {
+    // Custom borders aren't supported.
+    const border = undefined
     // Look for an existing style.
-    const fontKey = `${fontWeight || '-'}/${color || '-'}`
+    const fontKey = `${fontWeight || '-'}:${color || '-'}`
     const fillKey = backgroundColor || '-'
-    const key = `${align || '-'}/${alignVertical || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}`
+    const borderKey =
+      `${(topBorderColor || borderColor) || '-'}:${(topBorderStyle || borderStyle) || '-'}` +
+      '/' +
+      `${(rightBorderColor || borderColor) || '-'}:${(rightBorderStyle || borderStyle) || '-'}` +
+      '/' +
+      `${(bottomBorderColor || borderColor) || '-'}:${(bottomBorderStyle || borderStyle) || '-'}` +
+      '/' +
+      `${(leftBorderColor || borderColor) || '-'}:${(leftBorderStyle || borderStyle) || '-'}`
+    const key = `${align || '-'}/${alignVertical || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}/${borderKey}`
     const styleId = stylesIndex[key]
     if (styleId !== undefined) {
       return styleId
@@ -90,10 +130,48 @@ export default function initStyles({
         })
       }
     }
+    // Get border ID.
+    let borderId
+    if (
+      borderColor ||
+      borderStyle ||
+      leftBorderColor ||
+      leftBorderStyle ||
+      rightBorderColor ||
+      rightBorderStyle ||
+      topBorderColor ||
+      topBorderStyle ||
+      bottomBorderColor ||
+      bottomBorderStyle
+    ) {
+      borderId = bordersIndex[borderKey]
+      if (borderId === undefined) {
+        borderId = bordersIndex[borderKey] = String(borders.length)
+        borders.push({
+          left: {
+            style: leftBorderStyle || borderStyle,
+            color: leftBorderColor || borderColor
+          },
+          right: {
+            style: rightBorderStyle || borderStyle,
+            color: rightBorderColor || borderColor
+          },
+          top: {
+            style: topBorderStyle || borderStyle,
+            color: topBorderColor || borderColor
+          },
+          bottom: {
+            style: bottomBorderStyle || borderStyle,
+            color: bottomBorderColor || borderColor
+          }
+        })
+      }
+    }
     // Add a style.
     styles.push({
       fontId,
       fillId,
+      borderId,
       align,
       alignVertical,
       wrap,
@@ -103,17 +181,17 @@ export default function initStyles({
   }
 
   // Add the default style.
-  getStyle({})
+  getStyle()
 
   return {
     getStylesXml() {
-      return generateXml({ formats, styles, fonts, fills })
+      return generateXml({ formats, styles, fonts, fills, borders })
     },
     getStyle
   }
 }
 
-function generateXml({ formats, styles, fonts, fills }) {
+function generateXml({ formats, styles, fonts, fills, borders }) {
   let xml = '<?xml version="1.0" ?>'
   xml += '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
 
@@ -185,8 +263,33 @@ function generateXml({ formats, styles, fonts, fills }) {
 
   // MS Office 2007 Excel seems to require a `<borders/>` element to exist:
   // without it, MS Office 2007 Excel thinks that the file is broken.
-  xml += '<borders count="1">'
-  xml += '<border><left/><right/><top/><bottom/><diagonal/></border>'
+  xml += `<borders count="${borders.length}">`
+  for (const border of borders) {
+    const {
+      left,
+      right,
+      top,
+      bottom
+    } = border
+    const getBorderXml = (direction, { style, color }) => {
+      if (color && !style) {
+        style = 'thin'
+      }
+      const hasChildren = color ? true : false
+      return `<${direction}` +
+        (style ? ` style="${style}"` : '') +
+        (hasChildren ? '>' : '/>') +
+        (color ? `<color rgb="${getColor(color)}"/>` : '') +
+        (hasChildren ? `</${direction}>` : '')
+    }
+    xml += '<border>'
+    xml += getBorderXml('left', left)
+    xml += getBorderXml('right', right)
+    xml += getBorderXml('top', top)
+    xml += getBorderXml('bottom', bottom)
+    xml += '<diagonal/>'
+    xml += '</border>'
+  }
   xml += '</borders>'
 
   // What are `<cellXfs/>` and `<cellStyleXfs/>`:
@@ -217,6 +320,7 @@ function generateXml({ formats, styles, fonts, fills }) {
     const {
       fontId,
       fillId,
+      borderId,
       align,
       alignVertical,
       wrap,
@@ -233,8 +337,9 @@ function generateXml({ formats, styles, fonts, fills }) {
         fontId !== undefined ? 'applyFont="1"' : undefined,
         fillId !== undefined ? `fillId="${fillId}"` : undefined,
         fillId !== undefined ? 'applyFill="1"' : undefined,
+        borderId !== undefined ? `borderId="${borderId}"` : undefined,
+        borderId !== undefined ? 'applyBorder="1"' : undefined,
         align || alignVertical || wrap ? 'applyAlignment="1"' : undefined,
-        // 'borderId="0"',
         // 'xfId="0"'
       ].filter(_ => _).join(' ') +
     '>' +

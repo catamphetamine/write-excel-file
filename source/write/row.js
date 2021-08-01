@@ -8,6 +8,7 @@ import generateCell from './cell'
 export default function generateRow(row, rowIndex, { getStyle, getSharedString, customFont }) {
 	// To ensure the row number starts as in Excel.
 	const rowNumber = rowIndex + 1
+	let rowHeight
 	const rowCells = row
 		.map((cell, columnIndex) => {
 			const {
@@ -17,16 +18,69 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 				align,
 				alignVertical,
 				fontWeight,
+				height,
 				wrap,
 				color,
-				backgroundColor
+				backgroundColor,
+				borderColor,
+				borderStyle,
+				leftBorderColor,
+				leftBorderStyle,
+				rightBorderColor,
+				rightBorderStyle,
+				topBorderColor,
+				topBorderStyle,
+				bottomBorderColor,
+				bottomBorderStyle
 			} = cell
 			if (format && type !== Date &&  type !== Number) { // && type !== Integer) {
 				throw new Error('`format` can only be used on `Date`, `Number` cells') // or `Integer` cells')
 			}
 			let cellStyleId
-			if (fontWeight || align || alignVertical || format || wrap || color || backgroundColor || customFont) {
-				cellStyleId = getStyle({ fontWeight, align, alignVertical, format, wrap, color, backgroundColor })
+			if (
+				fontWeight ||
+				align ||
+				alignVertical ||
+				format ||
+				wrap ||
+				color ||
+				backgroundColor ||
+				borderColor ||
+				borderStyle ||
+				leftBorderColor ||
+				leftBorderStyle ||
+				rightBorderColor ||
+				rightBorderStyle ||
+				topBorderColor ||
+				topBorderStyle ||
+				bottomBorderColor ||
+				bottomBorderStyle ||
+				customFont
+			) {
+				cellStyleId = getStyle(
+					fontWeight,
+					align,
+					alignVertical,
+					format,
+					wrap,
+					color,
+					backgroundColor,
+					borderColor,
+					borderStyle,
+					leftBorderColor,
+					leftBorderStyle,
+					rightBorderColor,
+					rightBorderStyle,
+					topBorderColor,
+					topBorderStyle,
+					bottomBorderColor,
+					bottomBorderStyle
+				)
+			}
+			if (height) {
+				if (rowHeight === undefined || rowHeight < height) {
+					rowHeight = height
+				}
 			}
 			return generateCell(
 				rowNumber,
@@ -38,5 +92,10 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 			)
 		})
 		.join('')
-	return `<row r="${rowNumber}">${rowCells}</row>`
+
+	return `<row r="${rowNumber}"` +
+		(rowHeight ? ` ht="${rowHeight}" customHeight="1"` : '') +
+		'>' +
+		rowCells +
+		'</row>'
 }

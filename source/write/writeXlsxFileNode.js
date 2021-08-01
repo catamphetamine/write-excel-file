@@ -4,35 +4,38 @@ import os from 'os'
 
 import Archive from './archive'
 
-import workbookXML from './statics/workbook.xml'
-import workbookXMLRels from './statics/workbook.xml.rels'
+import generateWorkbookXml from './statics/workbook.xml'
+import generateWorkbookXmlRels from './statics/workbook.xml.rels'
 import rels from './statics/rels'
 import contentTypes from './statics/[Content_Types].xml'
 
-import generateWorksheet from './worksheet'
-import initStyles from './styles'
-import initSharedStrings from './sharedStrings'
+import { generateSheets } from './writeXlsxFile.common'
 
 export default async function writeXlsxFile(data, {
 	filePath,
+	sheets: sheetNames,
 	schema,
 	columns,
 	headerStyle,
 	fontFamily,
-	fontSize
+	fontSize,
+	dateFormat
 } = {}) {
 	const archive = new Archive(filePath)
 
-  const { getSharedStringsXml, getSharedString } = initSharedStrings()
-  const { getStylesXml, getStyle } = initStyles({ fontFamily, fontSize })
-
-	const worksheet = generateWorksheet(data, {
+	const {
+		sheets,
+		getSharedStringsXml,
+		getStylesXml
+	} = generateSheets({
+		data,
+		sheetNames,
 		schema,
 		columns,
 		headerStyle,
-		getStyle,
-		getSharedString,
-		customFont: fontFamily || fontSize
+		fontFamily,
+		fontSize,
+		dateFormat
 	})
 
 	// There doesn't seem to be a way to just append a file into a subdirectory
@@ -41,15 +44,20 @@ export default async function writeXlsxFile(data, {
 	const root = await createTempDirectory()
 	const xl = await createDirectory(path.join(root, 'xl'))
 	const _rels = await createDirectory(path.join(xl, '_rels'))
-	const worksheets = await createDirectory(path.join(xl, 'worksheets'))
+	const worksheetsPath = await createDirectory(path.join(xl, 'worksheets'))
 
-	await Promise.all([
-		writeFile(path.join(_rels, 'workbook.xml.rels'), workbookXMLRels),
-		writeFile(path.join(worksheets, 'sheet1.xml'), worksheet),
-		writeFile(path.join(xl, 'workbook.xml'), workbookXML),
+	const promises = [
+		writeFile(path.join(_rels, 'workbook.xml.rels'), generateWorkbookXmlRels({ sheets })),
+		writeFile(path.join(xl, 'workbook.xml'), generateWorkbookXml({ sheets })),
 		writeFile(path.join(xl, 'styles.xml'), getStylesXml()),
 		writeFile(path.join(xl, 'sharedStrings.xml'), getSharedStringsXml())
-	])
+	]
+
+	for (const { id, data } of sheets) {
+		promises.push(writeFile(path.join(worksheetsPath, `sheet${id}.xml`), data))
+	}
+
+	await Promise.all(promises)
 
 	archive.directory(xl, 'xl')
 	archive.append(rels, '_rels/.rels')

@@ -162,6 +162,12 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 * `alignVertical: string` — Vertical alignment of cell content. Available values: `"top"`, `"center"`, `"bottom"`.
 
+* `height: number` — Row height, in "points".
+
+* `span: number` — Column span. Even if a cell spans several columns, you still have to provide a value for every cell in every row and column.
+
+* `rowSpan: number` — Row span. Even if a cell spans several rows, you still have to provide a value for every cell in every row and column.
+
 * `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
 
 * `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
@@ -169,6 +175,19 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 * `color: string` — Cell text color (in hexademical format). Example: `"#aabbcc"`.
 
 * `backgroundColor: string` — Cell background color (in hexademical format). Example: `"#aabbcc"`.
+
+* `borderColor: string` — Cell border color. Example: `"#aabbcc"`.
+
+* `borderStyle: string` — Cell border style. Example: `"thick"`.
+
+  * `leftBorderColor`
+  * `leftBorderStyle`
+  * `rightBorderColor`
+  * `rightBorderStyle`
+  * `topBorderColor`
+  * `topBorderStyle`
+  * `bottomBorderColor`
+  * `bottomBorderStyle`
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
@@ -184,7 +203,7 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
   * `#,##0.00` — Currency, as in most English-speaking countries. Example: `1,234.50`.
   * `0%` — Percents. Example: `30%`.
   * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
-  * All `Date` cells (or schema columns) require a `format`:
+  * All `Date` cells (or schema columns) require a `format` (unless the [default `dateFormat`](#date-format) is set):
 
     * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
     * `mmm d yyyy` — Example: `Dec 31 2000`.
@@ -348,6 +367,49 @@ await writeXlsxFile(data, {
   filePath: '/path/to/file.xlsx',
   fontFamily: 'Arial',
   fontSize: 16
+})
+```
+
+## Date Format
+
+To set the default date format, pass `dateFormat` parameter when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  dateFormat: 'mm/dd/yyyy'
+})
+```
+
+## Multiple Sheets
+
+#### Schema
+
+To generate an `*.xlsx` file with multiple sheets:
+
+* Pass a `sheets` parameter — an array of sheet names.
+* The `objects` argument should be an array of `objects` for each sheet.
+* The `schema` parameter should be an array of `schema`s for each sheet.
+
+```js
+await writeXlsxFile([objects1, objects2], {
+  schema: [schema1, schema2],
+  sheets: ['Sheet 1', 'Sheet 2'],
+  filePath: '/path/to/file.xlsx'
+})
+```
+
+#### Cell Data
+
+To generate an `*.xlsx` file with multiple sheets:
+
+* Pass a `sheets` parameter — an array of sheet names.
+* The `data` argument should be an array of `data` for each sheet.
+
+```js
+await writeXlsxFile([data1, data2], {
+  sheets: ['Sheet 1', 'Sheet 2'],
+  filePath: '/path/to/file.xlsx'
 })
 ```
 
