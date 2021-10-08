@@ -1,44 +1,55 @@
 {
-	"env":
-	{
-		"development":
-		{
-			"presets":
-			[
+	"env": {
+		"development": {
+			"presets": [
 				"@babel/env"
 			],
 
-			"plugins":
-			[
+			"plugins": [
 				"@babel/transform-runtime",
-				["@babel/transform-for-of", { "loose": true }],
-				"@babel/proposal-class-properties"
+				["@babel/transform-for-of", { "loose": true }]
 			]
 		},
-		"commonjs":
-		{
-			"presets":
-			[
+
+		"commonjs": {
+			"presets": [
 				"@babel/env"
 			],
 
-			"plugins":
-			[
-				["@babel/transform-for-of", { "loose": true }],
-				"@babel/proposal-class-properties"
+			"plugins": [
+				["@babel/transform-for-of", { "loose": true }]
 			]
 		},
-		"es6":
-		{
-			"presets":
-			[
+
+		"es6": {
+			"presets": [
 				["@babel/env", { modules: false }]
 			],
 
-			"plugins":
-			[
+			"plugins": [
+				["@babel/transform-for-of", { "loose": true }]
+			]
+		},
+
+		"commonjs/server": {
+			"presets": [
+				"@babel/env"
+			],
+
+			"plugins": [
 				["@babel/transform-for-of", { "loose": true }],
-				"@babel/proposal-class-properties"
+				"@babel/plugin-transform-runtime"
+			]
+		},
+
+		"es6/server": {
+			"presets": [
+				["@babel/env", { modules: false }]
+			],
+
+			"plugins": [
+				["@babel/transform-for-of", { "loose": true }],
+				"@babel/plugin-transform-runtime"
 			]
 		}
 	}

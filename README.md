@@ -253,7 +253,7 @@ If `fileName` parameter is not passed then the returned `Promise` resolves to a 
 ### Node.js
 
 ```js
-const { writeXlsxFile } = require('write-excel-file/node')
+const writeXlsxFile = require('write-excel-file/node')
 
 // When passing `data` for each cell.
 await writeXlsxFile(data, {
@@ -405,9 +405,11 @@ To generate an `*.xlsx` file with multiple sheets:
 
 * Pass a `sheets` parameter — an array of sheet names.
 * The `data` argument should be an array of `data` for each sheet.
+* (optional) The `columns` parameter should be an array of `columns` for each sheet.
 
 ```js
 await writeXlsxFile([data1, data2], {
+  columns: [columns1, columns2], // (optional)
   sheets: ['Sheet 1', 'Sheet 2'],
   filePath: '/path/to/file.xlsx'
 })
@@ -415,7 +417,7 @@ await writeXlsxFile([data1, data2], {
 
 ## TypeScript
 
-Not implemented. I'm not familiar with TypeScript.
+This library comes with TypeScript "typings". If you happen to find any bugs in those, create an issue.
 
 ## CDN
 

@@ -15,7 +15,12 @@ export default function generateColumnDescription(column, index) {
     return ''
   }
 
-  // Dates usually don't fit in the default column width.
+  // Dates usually don't fit in the default column width,
+  // so set the default date column width to be a bit wider.
+  //
+  // `type` property can only be present on a `schema` entry of a column.
+  // It's not present on the `columns` parameter when not using a `schema`.
+  //
   if (column.type === Date && !column.width) {
     column.width = DATE_COLUMN_DEFAULT_WIDTH
   }

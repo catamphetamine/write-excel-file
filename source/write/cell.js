@@ -71,11 +71,9 @@ export default function generateCell(
  */
 function escapeString(string) {
   return string
-    .replace(/"/g, '&quot;')
     .replace(/&/g, '&amp;')
     .replace(/>/g, '&gt;')
     .replace(/</g, '&lt;')
-    .replace(/\'/g, '&apos;')
 }
 
 function isEmpty(value) {
