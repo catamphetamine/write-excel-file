@@ -16,15 +16,10 @@ export default function generateCell(
   // Empty cells could be skipped completely,
   // if they don't have a style applied to them,
   // like border or background color.
-  if (isEmpty(value)) {
+  if (value === null) {
     if (!cellStyleId) {
       return ''
     }
-  }
-
-  // Validate date format.
-  if (type === Date && !cellStyleId) {
-    throw new Error('No "format" has been specified for a Date cell')
   }
 
   let xml = `<c r="${generateCellNumber(columnIndex, rowNumber)}"`
@@ -38,14 +33,13 @@ export default function generateCell(
     xml += ` s="${cellStyleId}"`
   }
 
-  if (isEmpty(value)) {
+  if (value === null) {
     return xml + '/>'
   }
 
-  // The default cell type is `String`.
-  if (type === undefined) {
-    type = String
-    value = String(value)
+  // Validate date format.
+  if (type === Date && !cellStyleId) {
+    throw new Error('No "format" has been specified for a Date cell')
   }
 
   value = getXlsxValue(type, value, getSharedString)
@@ -74,10 +68,6 @@ function escapeString(string) {
     .replace(/&/g, '&amp;')
     .replace(/>/g, '&gt;')
     .replace(/</g, '&lt;')
-}
-
-function isEmpty(value) {
-  return value === undefined || value === null || value === ''
 }
 
 function getXlsxType(type) {

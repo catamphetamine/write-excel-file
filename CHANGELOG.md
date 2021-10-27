@@ -1,3 +1,12 @@
+1.3.5 / 27.10.2021
+==================
+
+* Added `sheet` name parameter.
+
+* Added cell value `type` autodetection (only when not using a `schema`).
+
+* Used the [propositions](https://gitlab.com/catamphetamine/write-excel-file/-/issues/4) from `@Antal.Bukos` and `@logistiview_lhoward` to fix TypeScript "typings".
+
 1.3.4 / 08.10.2021
 ==================
 

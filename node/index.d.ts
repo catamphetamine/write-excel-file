@@ -5,6 +5,10 @@ import {
 	CommonOptions
 } from '../index.d';
 
+export {
+	Row
+} from '../index.d';
+
 interface Stream {
 	pipe(output: Stream): void;
 }
@@ -20,7 +24,7 @@ interface WithSchemaOptions<Object> extends CommonOptions {
 	filePath?: string;
 }
 
-function writeXlsxFile<Object>(
+declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
 	options: WithSchemaOptions<Object> | WithSchemaOptionsMultipleSheets<Object>
 ) : Promise<void | Stream>;
@@ -33,7 +37,7 @@ interface WithoutSchemaOptions extends CommonOptions {
 	filePath?: string;
 }
 
-function writeXlsxFile(
+declare function writeXlsxFile(
 	data: SheetData | SheetData[],
 	options?: WithoutSchemaOptions
 ) : Promise<void | Stream>;

@@ -70,18 +70,6 @@ describe('generateCell()', () => {
         .to.equal(`<c r="A1" s="${cellStyleId}"><v>44194.875</v></c>`)
     })
 
-    it('should create an empty cell (`undefined`) (has custom style)', () => {
-      const cellStyleId = 123
-      expect(generateCell(1, 0, undefined, Date, cellStyleId, () => 0))
-        .to.equal('<c r="A1" s="123"/>')
-    })
-
-    it('should create an empty cell (`undefined`) (no custom style)', () => {
-      const cellStyleId = undefined
-      expect(generateCell(1, 0, undefined, Date, cellStyleId, () => 0))
-        .to.equal('')
-    })
-
     it('should create an empty cell (`null`) (has custom style)', () => {
       const cellStyleId = 123
       expect(generateCell(1, 0, null, Date, cellStyleId, () => 0))

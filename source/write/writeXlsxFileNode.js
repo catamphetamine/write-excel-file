@@ -13,6 +13,7 @@ import { generateSheets } from './writeXlsxFile.common'
 
 export default async function writeXlsxFile(data, {
 	filePath,
+  sheet: sheetName,
 	sheets: sheetNames,
 	schema,
 	columns,
@@ -29,6 +30,7 @@ export default async function writeXlsxFile(data, {
 		getStylesXml
 	} = generateSheets({
 		data,
+		sheetName,
 		sheetNames,
 		schema,
 		columns,

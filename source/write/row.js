@@ -5,15 +5,13 @@ import generateCell from './cell'
 
 // import Integer from '../types/Integer'
 
-export default function generateRow(row, rowIndex, { getStyle, getSharedString, customFont }) {
+export default function generateRow(row, rowIndex, { getStyle, getSharedString, customFont, usesSchema }) {
 	// To ensure the row number starts as in Excel.
 	const rowNumber = rowIndex + 1
 	let rowHeight
 	const rowCells = row
 		.map((cell, columnIndex) => {
 			const {
-				type,
-				value,
 				format,
 				align,
 				alignVertical,
@@ -33,9 +31,33 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 				bottomBorderColor,
 				bottomBorderStyle
 			} = cell
+
+			let {
+				type,
+				value
+			} = cell
+
+			if (isEmpty(value)) {
+				value = null
+			} else {
+				// Get cell value type.
+				if (type === undefined) {
+					if (!usesSchema) {
+						type = detectValueType(value)
+					}
+					if (type === undefined) {
+						// The default cell value type is `String`.
+						type = String
+						value = String(value)
+					}
+				}
+			}
+
+			// Validate `format` property.
 			if (format && type !== Date &&  type !== Number) { // && type !== Integer) {
 				throw new Error('`format` can only be used on `Date`, `Number` cells') // or `Integer` cells')
 			}
+
 			let cellStyleId
 			if (
 				fontWeight ||
@@ -77,11 +99,13 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 					bottomBorderStyle
 				)
 			}
+
 			if (height) {
 				if (rowHeight === undefined || rowHeight < height) {
 					rowHeight = height
 				}
 			}
+
 			return generateCell(
 				rowNumber,
 				columnIndex,
@@ -98,4 +122,23 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 		'>' +
 		rowCells +
 		'</row>'
+}
+
+function isEmpty(value) {
+  return value === undefined || value === null || value === ''
+}
+
+function detectValueType(value) {
+  switch (typeof value) {
+    case 'string':
+      return String
+    case 'number':
+      return Number
+    case 'boolean':
+      return Boolean
+    default:
+      if (value instanceof Date) {
+        return Date
+      }
+  }
 }

@@ -4,6 +4,7 @@ import initSharedStrings from './sharedStrings'
 
 export function generateSheets({
   data,
+  sheetName,
   sheetNames,
   schema,
   columns,
@@ -27,7 +28,7 @@ export function generateSheets({
   }
 
   if (!sheetNames) {
-    sheetNames = ['Sheet1']
+    sheetNames = [sheetName || 'Sheet1']
     data = [data]
     if (columns) {
       columns = [columns]

@@ -47,22 +47,26 @@ const data = [
   [
     // Column #1
     {
+      // `type` is optional
       type: String,
       value: 'John Smith'
     },
     // Column #2
     {
+      // `type` is optional
       type: Date,
       value: new Date(),
       format: 'mm/dd/yyyy'
     },
     // Column #3
     {
+      // `type` is optional
       type: Number,
       value: 1800
     },
     // Column #4
     {
+      // `type` is optional
       type: Boolean,
       value: true
     }
@@ -71,22 +75,26 @@ const data = [
   [
     // Column #1
     {
+      // `type` is optional
       type: String,
       value: 'Alice Brown'
     },
     // Column #2
     {
+      // `type` is optional
       type: Date,
       value: new Date(),
       format: 'mm/dd/yyyy'
     },
     // Column #3
     {
+      // `type` is optional
       type: Number,
       value: 2600
     },
     // Column #4
     {
+      // `type` is optional
       type: Boolean,
       value: false
     }
@@ -146,7 +154,7 @@ const schema = [
 ]
 ```
 
-If no `type` is specified for a cell (or a schema column) then it defaults to a `String`.
+If no `type` is specified for a cell then it is automatically detected from the cell `value`, but only when not using a `schema`. If `type` couldn't be detected from the cell `value`, it defaults to a `String`.
 
 <!--
 There're also some additional exported `type`s available:
@@ -156,7 +164,7 @@ There're also some additional exported `type`s available:
 * `Email` for email addresses.
 -->
 
-Aside from having a `type` and a `value`, each cell (or schema column) can also have:
+Aside from having an optional `type` and a `value`, each cell (or schema column) can also have:
 
 * `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
 
@@ -378,6 +386,17 @@ To set the default date format, pass `dateFormat` parameter when calling `writeX
 await writeXlsxFile(data, {
   filePath: '/path/to/file.xlsx',
   dateFormat: 'mm/dd/yyyy'
+})
+```
+
+## Sheet name
+
+To set the default sheet name, pass a `sheet` parameter when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  sheet: 'Data'
 })
 ```
 

@@ -38,7 +38,8 @@ export default function generateRows(data, {
 	return data.map((row, index) => generateRow(row, index, {
 		getStyle,
 		getSharedString,
-		customFont
+		customFont,
+		usesSchema: schema !== undefined
 	})).join('')
 }
 

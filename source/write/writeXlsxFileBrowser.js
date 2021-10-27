@@ -27,6 +27,7 @@ export default function writeXlsxFile(data, { fileName, ...rest } = {}) {
  * @return {Blob}
  */
 function generateXlsxFile(data, {
+  sheet: sheetName,
   sheets: sheetNames,
   schema,
   columns,
@@ -46,6 +47,7 @@ function generateXlsxFile(data, {
     getStylesXml
   } = generateSheets({
     data,
+    sheetName,
     sheetNames,
     schema,
     columns,
