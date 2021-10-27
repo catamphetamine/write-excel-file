@@ -30,7 +30,6 @@ export default function generateRows(data, {
 		data = header.concat(data.map((row) => schema.map(
 			(column) => ({
 				...column,
-				format: column.format || (column.type === Date ? dateFormat : undefined),
 				value: column.value(row)
 			})
 		)))
@@ -39,6 +38,7 @@ export default function generateRows(data, {
 		getStyle,
 		getSharedString,
 		customFont,
+		dateFormat,
 		usesSchema: schema !== undefined
 	})).join('')
 }

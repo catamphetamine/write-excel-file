@@ -5,14 +5,19 @@ import generateCell from './cell'
 
 // import Integer from '../types/Integer'
 
-export default function generateRow(row, rowIndex, { getStyle, getSharedString, customFont, usesSchema }) {
+export default function generateRow(row, rowIndex, {
+	getStyle,
+	getSharedString,
+	customFont,
+	dateFormat,
+	usesSchema
+}) {
 	// To ensure the row number starts as in Excel.
 	const rowNumber = rowIndex + 1
 	let rowHeight
 	const rowCells = row
 		.map((cell, columnIndex) => {
 			const {
-				format,
 				align,
 				alignVertical,
 				fontWeight,
@@ -34,7 +39,8 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 
 			let {
 				type,
-				value
+				value,
+				format
 			} = cell
 
 			if (isEmpty(value)) {
@@ -54,8 +60,14 @@ export default function generateRow(row, rowIndex, { getStyle, getSharedString, 
 			}
 
 			// Validate `format` property.
-			if (format && type !== Date &&  type !== Number) { // && type !== Integer) {
-				throw new Error('`format` can only be used on `Date`, `Number` cells') // or `Integer` cells')
+			if (format) {
+				if (type !== Date &&  type !== Number) { // && type !== Integer) {
+					throw new Error('`format` can only be used on `Date` or `Number` cells') // or `Integer` cells')
+				}
+			} else {
+				if (type === Date) {
+					format = dateFormat
+				}
 			}
 
 			let cellStyleId

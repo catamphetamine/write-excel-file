@@ -162,10 +162,12 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(
       data.map(row => row.map(cell => ({
         ...cell,
-        type: undefined
+        type: undefined,
+        format: undefined
       }))),
       {
         columns,
+        dateFormat: 'mm/dd/yyyy',
         filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-autodetect-type.xlsx')
       }
     )
