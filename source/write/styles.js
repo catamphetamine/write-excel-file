@@ -60,6 +60,7 @@ export default function initStyles({
 
   function getStyle(
     fontWeight,
+    fontStyle,
     align,
     alignVertical,
     format,
@@ -80,7 +81,7 @@ export default function initStyles({
     // Custom borders aren't supported.
     const border = undefined
     // Look for an existing style.
-    const fontKey = `${fontWeight || '-'}:${color || '-'}`
+    const fontKey = `${fontWeight || '-'}:${fontStyle || '-'}:${color || '-'}`
     const fillKey = backgroundColor || '-'
     const borderKey =
       `${(topBorderColor || borderColor) || '-'}:${(topBorderStyle || borderStyle) || '-'}` +
@@ -107,7 +108,7 @@ export default function initStyles({
     }
     // Get font ID.
     let fontId = customFont ? 0 : undefined
-    if (fontWeight || color) {
+    if (fontWeight || fontStyle || color) {
       fontId = fontsIndex[fontKey]
       if (fontId === undefined) {
         fontId = fontsIndex[fontKey] = String(fonts.length)
@@ -115,6 +116,7 @@ export default function initStyles({
           size: fontSize,
           family: fontFamily,
           weight: fontWeight,
+          style: fontStyle,
           color
         })
       }
@@ -218,7 +220,8 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       size,
       family,
       color,
-      weight
+      weight,
+      style
     } = font
     xml += '<font>'
     xml += `<sz val="${size}"/>`
@@ -232,6 +235,9 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
     xml += '<scheme val="minor"/>'
     if (weight === 'bold') {
       xml += '<b/>'
+    }
+    if (style === 'italic') {
+      xml += '<i/>'
     }
     xml += '</font>'
   }

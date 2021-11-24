@@ -180,6 +180,8 @@ Aside from having an optional `type` and a `value`, each cell (or schema column)
 
 * `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
 
+* `fontStyle: string` — Can be used to make text appear italicized. Available values: `"italic"`.
+
 * `color: string` — Cell text color (in hexademical format). Example: `"#aabbcc"`.
 
 * `backgroundColor: string` — Cell background color (in hexademical format). Example: `"#aabbcc"`.

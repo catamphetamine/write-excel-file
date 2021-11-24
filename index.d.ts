@@ -36,6 +36,8 @@ type BorderStyle =
 
 type FontWeight = 'bold';
 
+type FontStyle = 'italic';
+
 type Color = string;
 
 interface CellStyle {
@@ -46,6 +48,7 @@ interface CellStyle {
 	rowSpan?: number;
 	wrap?: boolean;
 	fontWeight?: FontWeight;
+	fontStyle?: FontStyle;
 	color?: Color;
 	backgroundColor?: Color;
 	borderColor?: Color;

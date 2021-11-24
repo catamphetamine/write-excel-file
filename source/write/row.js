@@ -21,6 +21,7 @@ export default function generateRow(row, rowIndex, {
 				align,
 				alignVertical,
 				fontWeight,
+				fontStyle,
 				height,
 				wrap,
 				color,
@@ -73,6 +74,7 @@ export default function generateRow(row, rowIndex, {
 			let cellStyleId
 			if (
 				fontWeight ||
+				fontStyle ||
 				align ||
 				alignVertical ||
 				format ||
@@ -93,6 +95,7 @@ export default function generateRow(row, rowIndex, {
 			) {
 				cellStyleId = getStyle(
 					fontWeight,
+					fontStyle,
 					align,
 					alignVertical,
 					format,

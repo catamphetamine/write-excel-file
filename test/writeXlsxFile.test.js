@@ -80,6 +80,7 @@ describe('writeXlsxFile', function() {
         {
           value: 'Date of Birth',
           fontWeight: 'bold',
+          fontStyle: 'italic',
           height: 48
         },
         {
