@@ -149,6 +149,12 @@ describe('writeXlsxFile', function() {
       // Fourth column missing intentionally
     ]
 
+    const dataRowSpan = data.slice()
+    data[1][0] = {
+      ...data[1][0],
+      rowSpan: 2
+    }
+
     await writeXlsxFile(objects, { schema, sheet: 'Test Schema', filePath: path.join(OUTPUT_DIRECTORY, 'test-schema.xlsx') })
     await writeXlsxFile([objects, objects], { sheets: ['Sheet One', 'Sheet Two'], schema: [schema, schema], filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-multiple-sheets.xlsx') })
     await writeXlsxFile(objects, { schema: schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-header-style.xlsx'), headerStyle: { align: 'center', color: '#cc0000', backgroundColor: '#eeeeee' } })
@@ -156,6 +162,10 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
+    await writeXlsxFile(data, { columns, stickyRowsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-row.xlsx') })
+    await writeXlsxFile(data, { columns, stickyRowsCount: 2, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-rows.xlsx') })
+    await writeXlsxFile(dataRowSpan, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-row-span.xlsx') })
+    await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-landscape.xlsx'), orientation: 'landscape' })
     await writeXlsxFile([data, data], { sheets: ['Sheet One', 'Sheet Two'], columns: [columns, columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-multiple-sheets.xlsx') })
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-default-font.xlsx'), fontFamily: 'Arial', fontSize: 16 })
 

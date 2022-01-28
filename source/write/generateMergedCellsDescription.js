@@ -30,12 +30,15 @@ export default function generateMergedCellsDescription(data, { schema }) {
 		let columnIndex = 0
 		while (columnIndex < row.length) {
 			const { span, rowSpan } = row[columnIndex]
-			if (span) {
+			if (span || rowSpan) {
 				const rowNumber = rowIndex + 1
 				mergedCells.push(
 					generateCellNumber(columnIndex, rowNumber) +
 					':' +
-					generateCellNumber(columnIndex + span - 1, rowNumber + (rowSpan ? rowSpan - 1 : 0))
+					generateCellNumber(
+						columnIndex + (span ? span - 1 : 0),
+						rowNumber + (rowSpan ? rowSpan - 1 : 0)
+					)
 				)
 			}
 			columnIndex++

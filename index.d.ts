@@ -96,39 +96,57 @@ type Column = {
 	width?: number;
 };
 
+type Orientation = 'landscape';
+
 export type Columns = Column[];
 
 export interface CommonOptions {
   headerStyle?: CellProps<ValueType>;
   fontFamily?: string;
   fontSize?: number;
+  orientation?: Orientation;
+  stickyRowsCount?: number;
   dateFormat?: string;
 }
 
 // With Schema.
 
-interface WithSchemaOptions<Object> extends CommonOptions {
-	sheets?: string[];
+interface WithSchemaCommonOptions<Object> extends CommonOptions {
 	schema: Schema<Object> | Schema<Object>[];
 	fileName: string;
 }
 
+interface WithSchemaOptions<Object> extends WithSchemaCommonOptions<Object> {
+	sheet?: string;
+}
+
+interface WithSchemaOptionsMultipleSheets<Object> extends WithSchemaCommonOptions<Object> {
+	sheets?: string[];
+}
+
 declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
-	options: WithSchemaOptions<Object>
+	options: WithSchemaOptions<Object> | WithSchemaOptionsMultipleSheets<Object>
 ) : Promise<void>;
 
 // Without Schema.
 
-interface WithoutSchemaOptions extends CommonOptions {
-	sheets?: string[];
+interface WithoutSchemaCommonOptions extends CommonOptions {
 	columns?: Columns | Columns[];
 	fileName: string;
 }
 
+interface WithoutSchemaOptions extends WithoutSchemaCommonOptions {
+	sheet?: string;
+}
+
+interface WithoutSchemaOptionsMultipleSheets extends WithoutSchemaCommonOptions {
+	sheets?: string[];
+}
+
 declare function writeXlsxFile(
 	data: SheetData | SheetData[],
-	options: WithoutSchemaOptions
+	options: WithoutSchemaOptions | WithoutSchemaOptionsMultipleSheets
 ) : Promise<void>;
 
 export default writeXlsxFile;

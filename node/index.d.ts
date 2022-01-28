@@ -9,7 +9,7 @@ export {
 	Row
 } from '../index.d';
 
-interface Stream {
+export interface Stream {
 	pipe(output: Stream): void;
 }
 
@@ -18,10 +18,17 @@ interface Stream {
 
 // With Schema.
 
-interface WithSchemaOptions<Object> extends CommonOptions {
-	sheets?: string[];
+interface WithSchemaCommonOptions<Object> extends CommonOptions {
 	schema: Schema<Object> | Schema<Object>[];
 	filePath?: string;
+}
+
+interface WithSchemaOptions<Object> extends WithSchemaCommonOptions<Object> {
+	sheet?: string;
+}
+
+interface WithSchemaOptionsMultipleSheets<Object> extends WithSchemaCommonOptions<Object> {
+	sheets?: string[];
 }
 
 declare function writeXlsxFile<Object>(
@@ -31,15 +38,22 @@ declare function writeXlsxFile<Object>(
 
 // Without Schema.
 
-interface WithoutSchemaOptions extends CommonOptions {
-	sheets?: string[];
+interface WithoutSchemaCommonOptions extends CommonOptions {
 	columns?: Columns | Columns[];
 	filePath?: string;
 }
 
+interface WithoutSchemaOptions extends WithoutSchemaCommonOptions {
+	sheet?: string;
+}
+
+interface WithoutSchemaOptionsMultipleSheets extends WithoutSchemaCommonOptions {
+	sheets?: string[];
+}
+
 declare function writeXlsxFile(
 	data: SheetData | SheetData[],
-	options?: WithoutSchemaOptions
+	options?: WithoutSchemaOptions | WithoutSchemaOptionsMultipleSheets
 ) : Promise<void | Stream>;
 
 export default writeXlsxFile;
