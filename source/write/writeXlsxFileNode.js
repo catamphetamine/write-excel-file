@@ -13,15 +13,16 @@ import { generateSheets } from './writeXlsxFile.common'
 
 export default async function writeXlsxFile(data, {
 	filePath,
-  sheet: sheetName,
+	sheet: sheetName,
 	sheets: sheetNames,
 	schema,
 	columns,
 	headerStyle,
 	fontFamily,
 	fontSize,
-  orientation,
-  stickyRowsCount,
+	orientation,
+	stickyRowsCount,
+	stickyColumnsCount,
 	dateFormat
 } = {}) {
 	const archive = new Archive(filePath)
@@ -39,8 +40,9 @@ export default async function writeXlsxFile(data, {
 		headerStyle,
 		fontFamily,
 		fontSize,
-    orientation,
-    stickyRowsCount,
+		orientation,
+		stickyRowsCount,
+		stickyColumnsCount,
 		dateFormat
 	})
 

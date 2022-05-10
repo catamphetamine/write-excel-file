@@ -1,7 +1,7 @@
 import generateCellNumber from './generateCellNumber'
 
-export default function generateViews({ stickyRowsCount }) {
-	if (!stickyRowsCount) {
+export default function generateViews({ stickyRowsCount, stickyColumnsCount }) {
+	if (!stickyRowsCount && !stickyColumnsCount) {
 		return ''
 	}
 
@@ -9,7 +9,7 @@ export default function generateViews({ stickyRowsCount }) {
 
 	views += '<sheetViews>'
 	views += '<sheetView tabSelected="1" workbookViewId="0">'
-	views += `<pane ySplit="${stickyRowsCount}" topLeftCell="${generateCellNumber(0, stickyRowsCount + 1)}" activePane="bottomRight" state="frozen"/>`
+	views += `<pane ySplit="${stickyRowsCount || 0}" xSplit="${stickyColumnsCount || 0}" topLeftCell="${generateCellNumber((stickyColumnsCount || 0), (stickyRowsCount || 0) + 1)}" activePane="bottomRight" state="frozen"/>`
 	views += '</sheetView>'
 	views += '</sheetViews>'
 

@@ -23,7 +23,8 @@ function generateXml(sharedStrings) {
 	let xml = '<?xml version="1.0"?>'
 	xml += '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
 	for (const string of sharedStrings) {
-		xml += `<si><t>${string}</t></si>`
+		const attributes = string.trim().length === string.length ? '' : ' xml:space="preserve"';
+		xml += `<si><t${attributes}>${string}</t></si>`
 	}
 	xml += '</sst>'
 	return xml

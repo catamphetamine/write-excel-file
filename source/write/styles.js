@@ -6,7 +6,7 @@ export default function initStyles({
   fontFamily,
   fontSize
 }) {
-  const customFont = fontFamily || fontSize
+  const customFont = Boolean(fontFamily || fontSize)
 
   if (fontFamily === undefined) {
     fontFamily = 'Calibri'
@@ -34,7 +34,8 @@ export default function initStyles({
   // Default font.
   fonts.push({
     size: fontSize,
-    family: fontFamily
+    family: fontFamily,
+    custom: customFont
   })
   fontsIndex['-:-'] = 0
 
@@ -113,6 +114,7 @@ export default function initStyles({
       if (fontId === undefined) {
         fontId = fontsIndex[fontKey] = String(fonts.length)
         fonts.push({
+          custom: true,
           size: fontSize,
           family: fontFamily,
           weight: fontWeight,
@@ -221,7 +223,8 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       family,
       color,
       weight,
-      style
+      style,
+      custom
     } = font
     xml += '<font>'
     xml += `<sz val="${size}"/>`
@@ -231,8 +234,24 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
     // It seems to always be `<family val="2"/>` even for different
     // font families (Calibri, Arial, etc).
     xml += '<family val="2"/>'
+    //
     // It's not clear what the `<scheme/>` tag means or does.
-    xml += '<scheme val="minor"/>'
+    // Seems like it's only preset for the default "Calibri" font.
+    // Adding it to any other font resets the font family in Microsoft Excel 2007.
+    //
+    // "Defines the font scheme, if any, to which this font belongs.
+    //  When a font definition is part of a theme definition, then the font
+    //  is categorized as either a "major" or "minor" font scheme component.
+    //  When a new theme is chosen, every font that is part of a theme definition
+    //  is updated to use the new "major" or "minor" font definition for that theme.
+    //  Usually "major" fonts are used for styles like headings,
+    //  and "minor" fonts are used for body and paragraph text."
+    //
+    // https://hackage.haskell.org/package/xlsx-0.8.4/docs/Codec-Xlsx-Types-StyleSheet.html
+    //
+    if (!custom) {
+      xml += '<scheme val="minor"/>'
+    }
     if (weight === 'bold') {
       xml += '<b/>'
     }

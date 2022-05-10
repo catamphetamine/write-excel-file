@@ -1,3 +1,8 @@
+1.3.16 / 17.02.2022
+==================
+
+* Fixed [whitespace getting trimmed](https://gitlab.com/catamphetamine/write-excel-file/-/issues/19) in cell values.
+
 1.3.10 / 16.12.2021
 ==================
 

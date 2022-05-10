@@ -5,10 +5,10 @@ type ValueType =
 	Boolean;
 
 // It's unclear how to express something like `type? = Type` in TypeScript.
-// So instead it's defined as `type?: CellType<Type>`.
+// So instead it's defined as `type?: TypeConstructor<Type>`.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/4#note_715204034
 // https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
-type CellType<Type> =
+type TypeConstructor<Type> =
 	Type extends String
 		? StringConstructor
 		: Type extends Date
@@ -64,10 +64,14 @@ interface CellStyle {
 }
 
 interface CellProps<Type> extends CellStyle {
-	// It's unclear how to express something like `type? = Type` in TypeScript.
-	type?: CellType<Type>;
+	// TypeScript interprets `type?: Type` as "`type` is an instance of `Type`",
+	// while in reality the definition of `type` is "`type` is `Type.constructor`".
+	type?: TypeConstructor<Type>;
+
 	// A simpler (loose) variant:
 	// type?: ValueType;
+
+	// Data output format (for numbers or dates).
 	format?: string;
 }
 
@@ -101,10 +105,11 @@ type Orientation = 'landscape';
 export type Columns = Column[];
 
 export interface CommonOptions {
-  headerStyle?: CellProps<ValueType>;
+  headerStyle?: CellStyle;
   fontFamily?: string;
   fontSize?: number;
   orientation?: Orientation;
+  stickyColumnsCount?: number;
   stickyRowsCount?: number;
   dateFormat?: string;
 }

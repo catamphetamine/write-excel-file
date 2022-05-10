@@ -413,6 +413,17 @@ await writeXlsxFile(data, {
 })
 ```
 
+## Sticky Columns
+
+To make some of the columns at the start "sticky" (Excel calls them "frozen"), pass `stickyColumnsCount` parameter when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  stickyColumnsCount: 1
+})
+```
+
 ## Sheet Name
 
 To set the default sheet name, pass a `sheet` parameter when calling `writeXlsxFile()`:

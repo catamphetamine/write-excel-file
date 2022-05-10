@@ -24,6 +24,7 @@ export default function generateWorksheet(data, {
 	dateFormat,
 	orientation,
 	stickyRowsCount,
+	stickyColumnsCount,
 	sheetId
 }) {
 	if (schema) {
@@ -50,7 +51,7 @@ export default function generateWorksheet(data, {
   		customFont,
   		dateFormat
   	}))
-  	.replace('{views}', generateViews({ stickyRowsCount }))
+  	.replace('{views}', generateViews({ stickyRowsCount, stickyColumnsCount }))
   	.replace('{columnsDescription}', generateColumnsDescription({ schema, columns }))
   	.replace('{mergedCellsDescription}', generateMergedCellsDescription(data, { schema }))
   	.replace('{layout}', generateLayout({ sheetId, orientation }))
