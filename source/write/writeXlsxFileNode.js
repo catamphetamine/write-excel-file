@@ -2,14 +2,14 @@ import fs from 'fs'
 import path from 'path'
 import os from 'os'
 
-import Archive from './archive'
+import Archive from './archive.js'
 
-import generateWorkbookXml from './statics/workbook.xml'
-import generateWorkbookXmlRels from './statics/workbook.xml.rels'
-import rels from './statics/rels'
-import contentTypes from './statics/[Content_Types].xml'
+import generateWorkbookXml from './statics/workbook.xml.js'
+import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
+import rels from './statics/rels.js'
+import contentTypes from './statics/[Content_Types].xml.js'
 
-import { generateSheets } from './writeXlsxFile.common'
+import { generateSheets } from './writeXlsxFile.common.js'
 
 export default async function writeXlsxFile(data, {
 	filePath,

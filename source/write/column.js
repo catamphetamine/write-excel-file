@@ -1,7 +1,7 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/cols/formatCols.js
 
-import floatToInteger from './floatToInteger'
+import floatToInteger from './floatToInteger.js'
 
 const DATE_COLUMN_DEFAULT_WIDTH = 14
 

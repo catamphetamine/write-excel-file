@@ -2,8 +2,15 @@
   "private": true,
   "name": "write-excel-file/node",
   "version": "1.0.0",
-  "main": "index.commonjs.js",
+  "main": "index.cjs",
   "module": "index.js",
-  "types.test": "./index.d.ts.test",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js",
+      "require": "./index.cjs"
+    }
+  },
   "sideEffects": false
 }

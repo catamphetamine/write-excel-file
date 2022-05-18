@@ -1,4 +1,4 @@
-import generateCellNumber from './generateCellNumber'
+import generateCellNumber from './generateCellNumber.js'
 
 export default function generateViews({ stickyRowsCount, stickyColumnsCount }) {
 	if (!stickyRowsCount && !stickyColumnsCount) {

@@ -1,9 +1,9 @@
-// import Integer, { isInteger } from '../types/Integer'
-// import URL, { isURL } from '../types/URL'
-// import Email, { isEmail } from '../types/Email'
+// import Integer, { isInteger } from '../types/Integer.js'
+// import URL, { isURL } from '../types/URL.js'
+// import Email, { isEmail } from '../types/Email.js'
 
-import generateCellNumber from './generateCellNumber'
-import convertDateToExcelSerial from './convertDateToExcelSerial'
+import generateCellNumber from './generateCellNumber.js'
+import convertDateToExcelSerial from './convertDateToExcelSerial.js'
 
 export default function generateCell(
   rowNumber,

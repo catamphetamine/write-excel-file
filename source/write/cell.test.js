@@ -1,11 +1,11 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/__test__/formatters/cells/formatCell.spec.js
 
-import generateCell from './cell'
+import generateCell from './cell.js'
 
-// import Integer from '../types/Integer'
-// import Email from '../types/Email'
-// import URL from '../types/URL'
+// import Integer from '../types/Integer.js'
+// import Email from '../types/Email.js'
+// import URL from '../types/URL.js'
 
 describe('generateCell()', () => {
   describe('Create a cell of type Sting', () => {

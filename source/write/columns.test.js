@@ -1,4 +1,4 @@
-import generateColumnsDescription from './columns'
+import generateColumnsDescription from './columns.js'
 
 describe('generateColumns()', () => {
   it('should generate columns description', () => {

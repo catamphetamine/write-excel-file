@@ -1,4 +1,4 @@
-import generateColumnDescription from './column'
+import generateColumnDescription from './column.js'
 
 /**
  * Generates columns description.

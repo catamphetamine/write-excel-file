@@ -1,7 +1,7 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/cols/formatCols.spec.js
 
-import generateColumnDescription from './column'
+import generateColumnDescription from './column.js'
 
 describe('generateColumnDescription()', () => {
   it('Should generate column description', () => {

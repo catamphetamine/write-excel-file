@@ -1,3 +1,8 @@
+1.4.0 / 18.05.2022
+==================
+
+* Migrated to [ES Modules](https://gitlab.com/catamphetamine/read-excel-file/-/issues/44) exports.
+
 1.3.16 / 17.02.2022
 ==================
 

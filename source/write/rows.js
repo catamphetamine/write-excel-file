@@ -1,7 +1,7 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/rows/generatorRows.js
 
-import generateRow from './row'
+import generateRow from './row.js'
 
 export default function generateRows(data, {
 	schema,

@@ -1,9 +1,9 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/__test__/zipcelx.spec.js
 
-import generateWorksheet from './worksheet'
+import generateWorksheet from './worksheet.js'
 
-import SharedStrings from './sharedStrings'
+import SharedStrings from './sharedStrings.js'
 
 describe('generateWorksheet()', () => {
   it('Should generate XML Worksheet', () => {

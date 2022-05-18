@@ -1,6 +1,6 @@
-import generateWorksheet from './worksheet'
-import initStyles from './styles'
-import initSharedStrings from './sharedStrings'
+import generateWorksheet from './worksheet.js'
+import initStyles from './styles.js'
+import initSharedStrings from './sharedStrings.js'
 
 export function generateSheets({
   data,

@@ -1,9 +1,9 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/rows/formatRow.js
 
-import generateCell from './cell'
+import generateCell from './cell.js'
 
-// import Integer from '../types/Integer'
+// import Integer from '../types/Integer.js'
 
 export default function generateRow(row, rowIndex, {
 	getStyle,

@@ -4,12 +4,12 @@
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 
-import generateWorkbookXml from './statics/workbook.xml'
-import generateWorkbookXmlRels from './statics/workbook.xml.rels'
-import rels from './statics/rels'
-import contentTypes from './statics/[Content_Types].xml'
+import generateWorkbookXml from './statics/workbook.xml.js'
+import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
+import rels from './statics/rels.js'
+import contentTypes from './statics/[Content_Types].xml.js'
 
-import { generateSheets } from './writeXlsxFile.common'
+import { generateSheets } from './writeXlsxFile.common.js'
 
 export default function writeXlsxFile(data, { fileName, ...rest } = {}) {
   return generateXlsxFile(data, rest).then((blob) => {

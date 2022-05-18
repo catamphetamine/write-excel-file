@@ -1,9 +1,9 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/__test__/formatters/rows/formatRows.spec.js
 
-import generateRow from './row'
+import generateRow from './row.js'
 
-import SharedStrings from './sharedStrings'
+import SharedStrings from './sharedStrings.js'
 
 describe('generateRow()', () => {
   it('Should create one row from given data', () => {

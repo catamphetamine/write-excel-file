@@ -1,7 +1,7 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/__test__/commons/generateCellNumber.spec.js
 
-import generateCellNumber from './generateCellNumber'
+import generateCellNumber from './generateCellNumber.js'
 
 describe('generateCellNumber()', () => {
   it('should create cell number A1', () => {

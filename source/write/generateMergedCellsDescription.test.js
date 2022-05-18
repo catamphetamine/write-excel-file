@@ -1,4 +1,4 @@
-import generateMergedCellsDescription from './generateMergedCellsDescription'
+import generateMergedCellsDescription from './generateMergedCellsDescription.js'
 
 describe('generateMergedCellsDescription()', () => {
   it('should generate merged cells across columns', () => {
