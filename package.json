@@ -15,7 +15,8 @@
       "types": "./node/index.d.ts",
       "import": "./node/index.js",
       "require": "./node/index.cjs"
-    }
+    },
+    "./package.json": "./package.json"
   },
   "sideEffects": false,
   "scripts": {
