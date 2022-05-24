@@ -13,6 +13,7 @@ import { generateSheets } from './writeXlsxFile.common.js'
 
 export default async function writeXlsxFile(data, {
 	filePath,
+	buffer,
 	sheet: sheetName,
 	sheets: sheetNames,
 	schema,
@@ -74,6 +75,8 @@ export default async function writeXlsxFile(data, {
 	if (filePath) {
 		await archive.write()
 		await removeDirectory(root)
+	} else if (buffer) {
+		return streamToBuffer(archive.write())
 	} else {
 		return archive.write()
 	}
@@ -120,5 +123,15 @@ function removeDirectory(path) {
 			}
 			resolve(path)
 		})
+	})
+}
+
+// https://stackoverflow.com/a/67729663
+function streamToBuffer(stream) {
+	return new Promise((resolve, reject) => {
+		const chunks = []
+		stream.on('data', (chunk) => chunks.push(chunk))
+		stream.on('end', () => resolve(Buffer.concat(chunks)))
+		stream.on('error', reject)
 	})
 }

@@ -104,13 +104,42 @@ await writeXlsxFile(data, {
 })
 ```
 
-If `filePath` parameter is not passed, then the returned `Promise` resolves to a `Stream`-like object having a `.pipe()` method:
+If `filePath` parameter is not passed, but `buffer: true` parameter is passed, then it returns a `Buffer`:
+
+```js
+const buffer = await writeXlsxFile(data, { buffer: true })
+```
+
+If neither `filePath` parameter nor `buffer: true` parameter are passed, then it returns a `Stream`:
 
 ```js
 const output = fs.createWriteStream(...)
 const stream = await writeXlsxFile(data)
 stream.pipe(output)
 ```
+
+<details>
+<summary>AWS S3 might refuse to accept the <code>stream</code></summary>
+
+#####
+
+AWS S3 might throw `Cannot determine length of [object Object]`:
+
+```js
+await new AWS.S3().putObject({
+  Bucket: ...,
+  Key: ...,
+  Body: stream,
+  ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+}).promise()
+```
+
+The reason is that AWS S3 [only accepts streams of known length](https://github.com/aws/aws-sdk-js/issues/2961), and the length of a zip file can't be known in advance.
+
+Workaround for AWS SDK v2: write to `Buffer` instead of a stream.
+
+Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packages-in-aws-sdk-for-javascript/): use [`Upload`](https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-868352176) operation.
+</details>
 
 ## Schema
 

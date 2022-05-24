@@ -203,6 +203,17 @@ describe('writeXlsxFile', function() {
       })
     })
 
+    const buffer = await writeXlsxFile(data, { columns, buffer: true })
+    writeBufferToFile(buffer, path.join(OUTPUT_DIRECTORY, 'test-buffer.xlsx'))
+
     console.log('Check `test-schema.xlsx`, `test-stream.xml` and `test-cells.xlsx` files in the `test` folder')
   })
 })
+
+function writeBufferToFile(buffer, path) {
+  // open the file in writing mode, adding a callback function where we do the actual writing
+  const fd = fs.openSync(path, 'w')
+  // write the contents of the buffer, from position 0 to the end, to the file descriptor returned in opening our file
+  fs.writeSync(fd, buffer, 0, buffer.length, null)
+  fs.closeSync(fd)
+}
