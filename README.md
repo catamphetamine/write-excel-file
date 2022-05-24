@@ -14,106 +14,116 @@ npm install write-excel-file --save
 
 If you're not using a bundler then use a [standalone version from a CDN](#cdn).
 
-## Use
+## Data
 
-To write an `*.xlsx` file, provide the `data` — an array of rows, each row being an array of cells, each cell having a `type` and a `value`:
+To write an `*.xlsx` file, one should provide the `data` — an array of rows. Each row must be an array of cells.
+
+Each cell should have a `value`, a `type`, and, optionally, other [cell parameters](#cell-parameters).
+
+If a cell doesn't have a `type`, then it is automatically detected from the `value`, or defaults to a `String`.
 
 ```js
+const HEADER_ROW = [
+  {
+    value: 'Name',
+    fontWeight: 'bold'
+  },
+  {
+    value: 'Date of Birth',
+    fontWeight: 'bold'
+  },
+  {
+    value: 'Cost',
+    fontWeight: 'bold'
+  },
+  {
+    value: 'Paid',
+    fontWeight: 'bold'
+  }
+]
+
+const DATA_ROW_1 = [
+  // "Name"
+  {
+    type: String,
+    value: 'John Smith'
+  },
+
+  // "Date of Birth"
+  {
+    type: Date,
+    value: new Date(),
+    format: 'mm/dd/yyyy'
+  },
+
+  // "Cost"
+  {
+    type: Number,
+    value: 1800
+  },
+
+  // "Paid"
+  {
+    type: Boolean,
+    value: true
+  }
+]
+
 const data = [
-  // Row #1
-  [
-    // Column #1
-    {
-      value: 'Name',
-      fontWeight: 'bold'
-    },
-    // Column #2
-    {
-      value: 'Date of Birth',
-      fontWeight: 'bold'
-    },
-    // Column #3
-    {
-      value: 'Cost',
-      fontWeight: 'bold'
-    },
-    // Column #4
-    {
-      value: 'Paid',
-      fontWeight: 'bold'
-    }
-  ],
-  // Row #2
-  [
-    // Column #1
-    {
-      // `type` is optional
-      type: String,
-      value: 'John Smith'
-    },
-    // Column #2
-    {
-      // `type` is optional
-      type: Date,
-      value: new Date(),
-      format: 'mm/dd/yyyy'
-    },
-    // Column #3
-    {
-      // `type` is optional
-      type: Number,
-      value: 1800
-    },
-    // Column #4
-    {
-      // `type` is optional
-      type: Boolean,
-      value: true
-    }
-  ],
-  // Row #3
-  [
-    // Column #1
-    {
-      // `type` is optional
-      type: String,
-      value: 'Alice Brown'
-    },
-    // Column #2
-    {
-      // `type` is optional
-      type: Date,
-      value: new Date(),
-      format: 'mm/dd/yyyy'
-    },
-    // Column #3
-    {
-      // `type` is optional
-      type: Number,
-      value: 2600
-    },
-    // Column #4
-    {
-      // `type` is optional
-      type: Boolean,
-      value: false
-    }
-  ]
+  HEADER_ROW,
+  DATA_ROW_1,
+  ...
 ]
 ```
 
-Or, alternatively, provide a list of `objects` and a `schema` to transform those `objects` into `data`:
+## API
+
+### Browser
+
+```js
+import writeXlsxFile from 'write-excel-file'
+
+await writeXlsxFile(data, {
+  columns, // (optional) column widths, etc.
+  fileName: 'file.xlsx'
+})
+```
+
+Uses [`file-saver`](https://www.npmjs.com/package/file-saver) to save an `*.xlsx` file from a web browser.
+
+If `fileName` parameter is not passed then the returned `Promise` resolves to a ["blob"](https://github.com/egeriis/zipcelx/issues/68) with the contents of the `*.xlsx` file.
+
+### Node.js
+
+```js
+const writeXlsxFile = require('write-excel-file/node')
+
+await writeXlsxFile(data, {
+  columns, // (optional) column widths, etc.
+  filePath: '/path/to/file.xlsx'
+})
+```
+
+If `filePath` parameter is not passed, then the returned `Promise` resolves to a `Stream`-like object having a `.pipe()` method:
+
+```js
+const output = fs.createWriteStream(...)
+const stream = await writeXlsxFile(data)
+stream.pipe(output)
+```
+
+## Schema
+
+Alternatively, instead of providing `data`, one could provide a list of `objects` and a `schema` describing each column:
 
 ```js
 const objects = [
-  // Object #1
   {
     name: 'John Smith',
     dateOfBirth: new Date(),
     cost: 1800,
     paid: true
   },
-  // Object #2
   {
     name: 'Alice Brown',
     dateOfBirth: new Date(),
@@ -125,27 +135,23 @@ const objects = [
 
 ```js
 const schema = [
-  // Column #1
   {
     column: 'Name',
     type: String,
     value: student => student.name
   },
-  // Column #2
   {
     column: 'Date of Birth',
     type: Date,
     format: 'mm/dd/yyyy',
     value: student => student.dateOfBirth
   },
-  // Column #3
   {
     column: 'Cost',
     type: Number,
     format: '#,##0.00',
     value: student => student.cost
   },
-  // Column #4
   {
     column: 'Paid',
     type: Boolean,
@@ -154,7 +160,33 @@ const schema = [
 ]
 ```
 
-If no `type` is specified for a cell then it is automatically detected from the cell `value`, but only when not using a `schema`. If `type` couldn't be detected from the cell `value`, it defaults to a `String`.
+When using a `schema`, column `type`s are required (not autodetected).
+
+### Schema API
+
+#### Browser
+
+```js
+import writeXlsxFile from 'write-excel-file'
+
+await writeXlsxFile(objects, {
+  schema,
+  fileName: 'file.xlsx'
+})
+```
+
+#### Node.js
+
+```js
+const writeXlsxFile = require('write-excel-file/node')
+
+await writeXlsxFile(objects, {
+  schema,
+  filePath: '/path/to/file.xlsx'
+})
+```
+
+## Cell Parameters
 
 <!--
 There're also some additional exported `type`s available:
@@ -164,7 +196,7 @@ There're also some additional exported `type`s available:
 * `Email` for email addresses.
 -->
 
-Aside from having an optional `type` and a `value`, each cell (or schema column) can also have:
+Aside from having a `type` and a `value`, each cell (or schema column) can also have:
 
 * `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
 
@@ -234,57 +266,6 @@ Aside from having an optional `type` and a `value`, each cell (or schema column)
       * `mm` — Minutes with a leading `0` (when less than `10`).
       * `ss` — Seconds with a leading `0` (when less than `10`).
       * `AM/PM` — Either `AM` or `PM`, depending on the time.
-
-## API
-
-### Browser
-
-```js
-import writeXlsxFile from 'write-excel-file'
-
-// When passing `data` for each cell.
-await writeXlsxFile(data, {
-  columns, // optional
-  fileName: 'file.xlsx'
-})
-
-// When passing `objects` and `schema`.
-await writeXlsxFile(objects, {
-  schema,
-  fileName: 'file.xlsx'
-})
-
-```
-
-Uses [`file-saver`](https://www.npmjs.com/package/file-saver) to save an `*.xlsx` file from a web browser.
-
-If `fileName` parameter is not passed then the returned `Promise` resolves to a ["blob"](https://github.com/egeriis/zipcelx/issues/68) with the contents of the `*.xlsx` file.
-
-### Node.js
-
-```js
-const writeXlsxFile = require('write-excel-file/node')
-
-// When passing `data` for each cell.
-await writeXlsxFile(data, {
-  columns, // optional
-  filePath: '/path/to/file.xlsx'
-})
-
-// When passing `objects` and `schema`.
-await writeXlsxFile(objects, {
-  schema,
-  filePath: '/path/to/file.xlsx'
-})
-```
-
-If `filePath` parameter is not passed then the returned `Promise` resolves to a `Stream`-like object having a `.pipe()` method:
-
-```js
-const output = fs.createWriteStream(...)
-const stream = await writeXlsxFile(objects)
-stream.pipe(output)
-```
 
 ## Table Header
 
