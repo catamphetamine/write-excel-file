@@ -110,7 +110,7 @@ If `filePath` parameter is not passed, but `buffer: true` parameter is passed, t
 const buffer = await writeXlsxFile(data, { buffer: true })
 ```
 
-If neither `filePath` parameter nor `buffer: true` parameter are passed, then it returns a `Stream`:
+If neither `filePath` parameter nor `buffer: true` parameter are passed, then it returns a readable `Stream`:
 
 ```js
 const output = fs.createWriteStream(...)

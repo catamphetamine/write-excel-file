@@ -48,7 +48,7 @@ export default class Archive {
 
         // good practice to catch warnings (ie stat failures and other non-blocking errors)
         archive.on('warning', function(error) {
-          if (err.code === 'ENOENT') {
+          if (error.code === 'ENOENT') {
             // log warning
             console.warn(error)
           } else {
