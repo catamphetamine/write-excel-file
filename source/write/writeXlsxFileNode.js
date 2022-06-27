@@ -117,7 +117,7 @@ function createTempDirectory() {
 
 function removeDirectory(path) {
 	return new Promise((resolve, reject) => {
-		fs.rmdir(path, { recursive: true }, (error) => {
+		fs.rm(path, { recursive: true, force: true }, (error) => {
 			if (error) {
 				return reject(error)
 			}
