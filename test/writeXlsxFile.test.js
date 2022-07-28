@@ -142,6 +142,14 @@ describe('writeXlsxFile', function() {
       ]
     ]
 
+    const dataWithCustomFontInFirstCell = data.slice()
+    dataWithCustomFontInFirstCell[0] = dataWithCustomFontInFirstCell[0].slice()
+    dataWithCustomFontInFirstCell[0][0] = {
+      ...dataWithCustomFontInFirstCell[0][0],
+      fontFamily: 'Courier New',
+      fontSize: 8
+    }
+
     const columns = [
       {},
       { width: 14 },
@@ -162,6 +170,7 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
+    await writeXlsxFile(dataWithCustomFontInFirstCell, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-custom-font.xlsx') })
     await writeXlsxFile(data, { columns, stickyRowsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-row.xlsx') })
     await writeXlsxFile(data, { columns, stickyRowsCount: 2, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-rows.xlsx') })
     await writeXlsxFile(data, { columns, stickyColumnsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-column.xlsx') })

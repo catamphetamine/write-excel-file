@@ -239,6 +239,10 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 * `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
 
+* `fontFamily: string` — Can be used to print text in a custom font family. Example: `"Calibri"`.
+
+* `fontSize: number` — Can be used to print text in a custom font size. Example: `12`.
+
 * `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
 
 * `fontStyle: string` — Can be used to make text appear italicized. Available values: `"italic"`.

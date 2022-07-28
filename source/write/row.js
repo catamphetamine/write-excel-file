@@ -20,6 +20,8 @@ export default function generateRow(row, rowIndex, {
 			const {
 				align,
 				alignVertical,
+				fontFamily,
+				fontSize,
 				fontWeight,
 				fontStyle,
 				height,
@@ -73,6 +75,8 @@ export default function generateRow(row, rowIndex, {
 
 			let cellStyleId
 			if (
+				fontFamily ||
+				fontSize ||
 				fontWeight ||
 				fontStyle ||
 				align ||
@@ -94,6 +98,8 @@ export default function generateRow(row, rowIndex, {
 				customFont
 			) {
 				cellStyleId = getStyle(
+					fontFamily,
+					fontSize,
 					fontWeight,
 					fontStyle,
 					align,

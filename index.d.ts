@@ -1,4 +1,6 @@
-type ValueType =
+// Some users have requested exporting `ValueType` type.
+// https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
+export type ValueType =
 	String |
 	Date |
 	Number |
@@ -47,6 +49,8 @@ interface CellStyle {
 	span?: number;
 	rowSpan?: number;
 	wrap?: boolean;
+	fontFamily?: string;
+	fontSize?: number;
 	fontWeight?: FontWeight;
 	fontStyle?: FontStyle;
 	color?: Color;
@@ -85,7 +89,9 @@ export type Row = Cell[];
 
 export type SheetData = Row[];
 
-interface ColumnSchema<Object, Type> extends CellProps<Type> {
+// Some users have requested exporting `ColumnSchema` type.
+// https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
+export interface ColumnSchema<Object, Type> extends CellProps<Type> {
 	// Column title.
 	column?: string;
 	// Column width (in characters).

@@ -3,17 +3,17 @@
 const FORMAT_ID_STARTS_FROM = 100
 
 export default function initStyles({
-  fontFamily,
-  fontSize
+  fontFamily: defaultFontFamily,
+  fontSize: defaultFontSize
 }) {
-  const customFont = Boolean(fontFamily || fontSize)
+  const customFont = Boolean(defaultFontFamily || defaultFontSize)
 
-  if (fontFamily === undefined) {
-    fontFamily = 'Calibri'
+  if (defaultFontFamily === undefined) {
+    defaultFontFamily = 'Calibri'
   }
 
-  if (fontSize === undefined) {
-    fontSize = 12
+  if (defaultFontSize === undefined) {
+    defaultFontSize = 12
   }
 
   const formats = []
@@ -33,8 +33,8 @@ export default function initStyles({
 
   // Default font.
   fonts.push({
-    size: fontSize,
-    family: fontFamily,
+    size: defaultFontSize,
+    family: defaultFontFamily,
     custom: customFont
   })
   fontsIndex['-:-'] = 0
@@ -60,6 +60,8 @@ export default function initStyles({
   })
 
   function getStyle(
+    fontFamily,
+    fontSize,
     fontWeight,
     fontStyle,
     align,
@@ -82,7 +84,7 @@ export default function initStyles({
     // Custom borders aren't supported.
     const border = undefined
     // Look for an existing style.
-    const fontKey = `${fontWeight || '-'}:${fontStyle || '-'}:${color || '-'}`
+    const fontKey = `${fontFamily || '-'}:${fontSize || '-'}:${fontWeight || '-'}:${fontStyle || '-'}:${color || '-'}`
     const fillKey = backgroundColor || '-'
     const borderKey =
       `${(topBorderColor || borderColor) || '-'}:${(topBorderStyle || borderStyle) || '-'}` +
@@ -115,8 +117,8 @@ export default function initStyles({
         fontId = fontsIndex[fontKey] = String(fonts.length)
         fonts.push({
           custom: true,
-          size: fontSize,
-          family: fontFamily,
+          size: fontSize || defaultFontSize,
+          family: fontFamily || defaultFontFamily,
           weight: fontWeight,
           style: fontStyle,
           color
