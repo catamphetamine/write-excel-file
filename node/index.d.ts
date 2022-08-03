@@ -18,44 +18,104 @@ export {
 
 // With Schema.
 
-interface WithSchemaCommonOptions<Object> extends CommonOptions {
+interface WithSchemaCommonOptionsWriteToFile<Object> extends CommonOptions {
 	schema: Schema<Object> | Schema<Object>[];
-	filePath?: string;
-	buffer?: true;
+	filePath: string;
 }
 
-interface WithSchemaOptions<Object> extends WithSchemaCommonOptions<Object> {
+interface WithSchemaCommonOptionsReturnBuffer<Object> extends CommonOptions {
+	schema: Schema<Object> | Schema<Object>[];
+	buffer: true;
+}
+
+interface WithSchemaCommonOptionsReturnStream<Object> extends CommonOptions {
+	schema: Schema<Object> | Schema<Object>[];
+}
+
+interface WithSchemaOptionsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object> {
 	sheet?: string;
 }
 
-interface WithSchemaOptionsMultipleSheets<Object> extends WithSchemaCommonOptions<Object> {
+interface WithSchemaOptionsMultipleSheetsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object> {
+	sheets?: string[];
+}
+
+interface WithSchemaOptionsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object> {
+	sheet?: string;
+}
+
+interface WithSchemaOptionsMultipleSheetsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object> {
+	sheets?: string[];
+}
+
+interface WithSchemaOptionsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object> {
+	sheet?: string;
+}
+
+interface WithSchemaOptionsMultipleSheetsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object> {
 	sheets?: string[];
 }
 
 declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
-	options: WithSchemaOptions<Object> | WithSchemaOptionsMultipleSheets<Object>
-) : Promise<void | ReadableStream | Buffer>;
+	options: WithSchemaOptionsWriteToFile<Object> | WithSchemaOptionsMultipleSheetsWriteToFile<Object>
+) : Promise<void>;
+
+declare function writeXlsxFile<Object>(
+	objects: Object[] | Object[][],
+	options: WithSchemaOptionsReturnBuffer<Object> | WithSchemaOptionsMultipleSheetsReturnBuffer<Object>
+) : Promise<Buffer>;
+
+declare function writeXlsxFile<Object>(
+	objects: Object[] | Object[][],
+	options: WithSchemaOptionsReturnStream<Object> | WithSchemaOptionsMultipleSheetsReturnStream<Object>
+) : Promise<Readable>;
 
 // Without Schema.
 
-interface WithoutSchemaCommonOptions extends CommonOptions {
+interface WithoutSchemaCommonOptionsWriteToFile extends CommonOptions {
 	columns?: Columns | Columns[];
-	filePath?: string;
-	buffer?: true;
+	filePath: string;
 }
 
-interface WithoutSchemaOptions extends WithoutSchemaCommonOptions {
+interface WithoutSchemaCommonOptionsReturnBuffer extends CommonOptions {
+	columns?: Columns | Columns[];
+	buffer: true;
+}
+
+interface WithoutSchemaCommonOptionsReturnStream extends CommonOptions {
+	columns?: Columns | Columns[];
+}
+
+interface WithoutSchemaOptionsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile {
 	sheet?: string;
 }
 
-interface WithoutSchemaOptionsMultipleSheets extends WithoutSchemaCommonOptions {
+interface WithoutSchemaOptionsMultipleSheetsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile {
+	sheets?: string[];
+}
+
+interface WithoutSchemaOptionsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer {
+	sheet?: string;
+}
+
+interface WithoutSchemaOptionsMultipleSheetsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer {
 	sheets?: string[];
 }
 
 declare function writeXlsxFile(
 	data: SheetData | SheetData[],
-	options?: WithoutSchemaOptions | WithoutSchemaOptionsMultipleSheets
-) : Promise<void | ReadableStream | Buffer>;
+	options: WithoutSchemaOptionsWriteToFile | WithoutSchemaOptionsMultipleSheetsWriteToFile
+) : Promise<void>;
+
+declare function writeXlsxFile(
+	data: SheetData | SheetData[],
+	options: WithoutSchemaOptionsReturnBuffer | WithoutSchemaOptionsMultipleSheetsReturnBuffer
+) : Promise<Buffer>;
+
+declare function writeXlsxFile(
+	data: SheetData | SheetData[],
+	options?: WithoutSchemaOptionsReturnStream | WithoutSchemaOptionsMultipleSheetsReturnStream
+) : Promise<Readable>;
 
 export default writeXlsxFile;
