@@ -22,6 +22,8 @@ Each cell should have a `value`, a `type`, and, optionally, other [cell paramete
 
 If a cell doesn't have a `type`, then it is automatically detected from the `value`, or defaults to a `String`.
 
+An empty cell could be represented by `null` or `undefined`.
+
 ```js
 const HEADER_ROW = [
   {
@@ -233,9 +235,9 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 * `height: number` — Row height, in "points".
 
-* `span: number` — Column span. Even if a cell spans several columns, you still have to provide a value for every cell in every row and column.
+* `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
 
-* `rowSpan: number` — Row span. Even if a cell spans several rows, you still have to provide a value for every cell in every row and column.
+* `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
 
 * `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
 

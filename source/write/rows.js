@@ -12,7 +12,7 @@ export default function generateRows(data, {
 	dateFormat
 }) {
 	if (schema) {
-		let header = [];
+		let header = []
 		for (const column of schema) {
 			// If at least one schema column has a title,
 			// then print a header row.

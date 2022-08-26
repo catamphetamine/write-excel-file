@@ -17,6 +17,10 @@ export default function generateRow(row, rowIndex, {
 	let rowHeight
 	const rowCells = row
 		.map((cell, columnIndex) => {
+			if (cell === undefined || cell === null) {
+				return ''
+			}
+
 			const {
 				align,
 				alignVertical,

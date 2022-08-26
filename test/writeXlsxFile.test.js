@@ -157,11 +157,18 @@ describe('writeXlsxFile', function() {
       // Fourth column missing intentionally
     ]
 
+    // Create `data` with `rowSpan`.
     const dataRowSpan = data.slice()
-    data[1][0] = {
-      ...data[1][0],
+    let i = 0
+    while (i < dataRowSpan.length) {
+      dataRowSpan[i] = dataRowSpan[i].slice()
+      i++
+    }
+    dataRowSpan[1][0] = {
+      ...dataRowSpan[1][0],
       rowSpan: 2
     }
+    dataRowSpan[2][0] = null
 
     await writeXlsxFile(objects, { schema, sheet: 'Test Schema', filePath: path.join(OUTPUT_DIRECTORY, 'test-schema.xlsx') })
     await writeXlsxFile([objects, objects], { sheets: ['Sheet One', 'Sheet Two'], schema: [schema, schema], filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-multiple-sheets.xlsx') })

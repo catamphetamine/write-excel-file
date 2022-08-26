@@ -83,7 +83,7 @@ interface CellOfType<Type> extends CellProps<Type> {
 	value?: Type;
 }
 
-type Cell = CellOfType<ValueType>
+type Cell = CellOfType<ValueType> | null | undefined;
 
 export type Row = Cell[];
 
