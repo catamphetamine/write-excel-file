@@ -124,7 +124,7 @@ export interface CommonOptions {
 
 interface WithSchemaCommonOptions<Object> extends CommonOptions {
 	schema: Schema<Object> | Schema<Object>[];
-	fileName: string;
+	fileName?: string;
 }
 
 interface WithSchemaOptions<Object> extends WithSchemaCommonOptions<Object> {
@@ -144,7 +144,7 @@ declare function writeXlsxFile<Object>(
 
 interface WithoutSchemaCommonOptions extends CommonOptions {
 	columns?: Columns | Columns[];
-	fileName: string;
+	fileName?: string;
 }
 
 interface WithoutSchemaOptions extends WithoutSchemaCommonOptions {

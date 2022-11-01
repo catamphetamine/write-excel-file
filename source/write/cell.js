@@ -115,6 +115,9 @@ function getXlsxValue(type, value, getSharedString) {
     case String:
     // case Email:
     // case URL:
+      if (typeof value !== 'string') {
+        throw new Error(`Invalid cell value: ${value}. Expected a string`)
+      }
       // if (type === Email && !isEmail(value)) {
       //   throw new Error(`Invalid cell value: ${value}. Expected an Email`)
       // }
@@ -143,6 +146,9 @@ function getXlsxValue(type, value, getSharedString) {
       return String(convertDateToExcelSerial(value))
 
     case Boolean:
+      if (typeof value !== 'boolean') {
+        throw new Error(`Invalid cell value: ${value}. Expected a boolean`)
+      }
       return value ? '1' : '0'
 
     default:
