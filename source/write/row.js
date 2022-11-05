@@ -2,6 +2,7 @@
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/rows/formatRow.js
 
 import generateCell from './cell.js'
+import getCellStyleProperties from './getCellStyleProperties.js'
 
 // import Integer from '../types/Integer.js'
 
@@ -22,27 +23,10 @@ export default function generateRow(row, rowIndex, {
 			}
 
 			const {
-				align,
-				alignVertical,
-				fontFamily,
-				fontSize,
-				fontWeight,
-				fontStyle,
-				height,
-				wrap,
-				color,
-				backgroundColor,
-				borderColor,
-				borderStyle,
-				leftBorderColor,
-				leftBorderStyle,
-				rightBorderColor,
-				rightBorderStyle,
-				topBorderColor,
-				topBorderStyle,
-				bottomBorderColor,
-				bottomBorderStyle
+				height
 			} = cell
+
+			const cellStyleProperties = getCellStyleProperties(cell)
 
 			let {
 				type,
@@ -79,50 +63,11 @@ export default function generateRow(row, rowIndex, {
 
 			let cellStyleId
 			if (
-				fontFamily ||
-				fontSize ||
-				fontWeight ||
-				fontStyle ||
-				align ||
-				alignVertical ||
 				format ||
-				wrap ||
-				color ||
-				backgroundColor ||
-				borderColor ||
-				borderStyle ||
-				leftBorderColor ||
-				leftBorderStyle ||
-				rightBorderColor ||
-				rightBorderStyle ||
-				topBorderColor ||
-				topBorderStyle ||
-				bottomBorderColor ||
-				bottomBorderStyle ||
-				customFont
+				customFont ||
+				cellStyleProperties
 			) {
-				cellStyleId = getStyle(
-					fontFamily,
-					fontSize,
-					fontWeight,
-					fontStyle,
-					align,
-					alignVertical,
-					format,
-					wrap,
-					color,
-					backgroundColor,
-					borderColor,
-					borderStyle,
-					leftBorderColor,
-					leftBorderStyle,
-					rightBorderColor,
-					rightBorderStyle,
-					topBorderColor,
-					topBorderStyle,
-					bottomBorderColor,
-					bottomBorderStyle
-				)
+				cellStyleId = getStyle(cellStyleProperties || {}, { format })
 			}
 
 			if (height) {

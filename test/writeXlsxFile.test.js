@@ -166,7 +166,11 @@ describe('writeXlsxFile', function() {
     }
     dataRowSpan[1][0] = {
       ...dataRowSpan[1][0],
-      rowSpan: 2
+      rowSpan: 2,
+      // Add test styles.
+      // https://gitlab.com/catamphetamine/write-excel-file/-/issues/43
+      borderStyle: 'thick',
+      borderColor: '#cc0000'
     }
     dataRowSpan[2][0] = null
 

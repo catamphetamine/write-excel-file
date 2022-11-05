@@ -59,14 +59,13 @@ export default function initStyles({
     gray125: true
   })
 
-  function getStyle(
+  function getStyle({
     fontFamily,
     fontSize,
     fontWeight,
     fontStyle,
     align,
     alignVertical,
-    format,
     wrap,
     color,
     backgroundColor,
@@ -79,8 +78,10 @@ export default function initStyles({
     topBorderColor,
     topBorderStyle,
     bottomBorderColor,
-    bottomBorderStyle,
-  ) {
+    bottomBorderStyle
+  }, {
+    format
+  }) {
     // Custom borders aren't supported.
     const border = undefined
     // Look for an existing style.
@@ -111,7 +112,7 @@ export default function initStyles({
     }
     // Get font ID.
     let fontId = customFont ? 0 : undefined
-    if (fontWeight || fontStyle || color) {
+    if (fontFamily || fontSize || fontWeight || fontStyle || color) {
       fontId = fontsIndex[fontKey]
       if (fontId === undefined) {
         fontId = fontsIndex[fontKey] = String(fonts.length)
@@ -187,7 +188,7 @@ export default function initStyles({
   }
 
   // Add the default style.
-  getStyle()
+  getStyle({}, {})
 
   return {
     getStylesXml() {
