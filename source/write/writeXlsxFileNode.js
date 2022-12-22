@@ -74,7 +74,7 @@ export default async function writeXlsxFile(data, {
 
 	if (filePath) {
 		await archive.write()
-		await removeDirectory(root)
+		await removeDirectoryWithLegacyNodeVersionsSupport(root)
 	} else if (buffer) {
 		return streamToBuffer(archive.write())
 	} else {
@@ -115,15 +115,44 @@ function createTempDirectory() {
 	})
 }
 
+function removeDirectoryWithLegacyNodeVersionsSupport(path) {
+	if (fs.rm) {
+		return removeDirectory(path)
+	} else {
+		removeDirectoryLegacySync(path)
+  	return Promise.resolve()
+	}
+}
+
+// `fs.rm()` is available in Node.js since `14.14.0`.
 function removeDirectory(path) {
 	return new Promise((resolve, reject) => {
 		fs.rm(path, { recursive: true, force: true }, (error) => {
 			if (error) {
 				return reject(error)
 			}
-			resolve(path)
+			resolve()
 		})
 	})
+}
+
+// For Node.js versions below `14.14.0`.
+function removeDirectoryLegacySync(directoryPath) {
+  const childNames = fs.readdirSync(directoryPath)
+  for (const childName of childNames) {
+    const childPath = path.join(directoryPath, childName)
+    const stats = fs.statSync(childPath)
+    if (childPath === '.' || childPath === '..') {
+      // Skip.
+    } else if (stats.isDirectory()) {
+      // Remove subdirectory recursively.
+      removeDirectoryLegacySync(childPath)
+    } else {
+      // Remove file.
+      fs.unlinkSync(childPath)
+    }
+  }
+  fs.rmdirSync(directoryPath)
 }
 
 // https://stackoverflow.com/a/67729663
