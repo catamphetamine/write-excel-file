@@ -1,6 +1,7 @@
 import generateWorksheet from './worksheet.js'
 import initStyles from './styles.js'
 import initSharedStrings from './sharedStrings.js'
+import validateSheetName from './validateSheetName.js'
 
 export function generateSheets({
   data,
@@ -39,6 +40,11 @@ export function generateSheets({
     if (schema) {
       schema = [schema]
     }
+  }
+
+  // Validate sheet name.
+  for (const sheetName of sheetNames) {
+    validateSheetName(sheetName)
   }
 
   const worksheets = []

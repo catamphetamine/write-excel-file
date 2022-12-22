@@ -192,6 +192,21 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile([data, data], { sheets: ['Sheet One', 'Sheet Two'], columns: [columns, columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-multiple-sheets.xlsx') })
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-default-font.xlsx'), fontFamily: 'Arial', fontSize: 16 })
 
+    await shouldThrow('empty', async () => {
+      await writeXlsxFile([data], { columns: [columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-illegal-characters-in-sheet-name.xlsx'), sheets: [''] })
+    })
+
+    await shouldThrow('longer than', async () => {
+      await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-illegal-characters-in-sheet-name.xlsx'), sheet: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa' })
+    })
+
+    await shouldThrow('illegal', async () => {
+      await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-illegal-characters-in-sheet-name.xlsx'), sheet: 'a/b' })
+    })
+
+    // https://gitlab.com/catamphetamine/write-excel-file/-/issues/49
+    // Illegal sheet name characters.
+
     // Test cell data type autodetection.
     await writeXlsxFile(
       data.map(row => row.map(cell => ({
@@ -236,4 +251,18 @@ function writeBufferToFile(buffer, path) {
   // write the contents of the buffer, from position 0 to the end, to the file descriptor returned in opening our file
   fs.writeSync(fd, buffer, 0, buffer.length, null)
   fs.closeSync(fd)
+}
+
+async function shouldThrow(message, func) {
+  try {
+    await func()
+    throw new Error('Must throw an error')
+  } catch (error) {
+    if (error.message.includes(message)) {
+      // The error is the expected one.
+    } else {
+      console.error(error)
+      throw new Error(`Expected the error message "${error.message}" to contain "${message}"`)
+    }
+  }
 }
