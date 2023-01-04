@@ -9,6 +9,9 @@ export {
 	Row
 } from '../index.d';
 
+// `Readable` type becomes globally available after installing `@types/node`.
+// https://stackoverflow.com/questions/49508610/type-for-nodejs-stream-stream-in-typescript
+
 // export interface Stream {
 // 	pipe(output: Stream): void;
 // }
@@ -100,6 +103,14 @@ interface WithoutSchemaOptionsReturnBuffer extends WithoutSchemaCommonOptionsRet
 }
 
 interface WithoutSchemaOptionsMultipleSheetsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer {
+	sheets?: string[];
+}
+
+interface WithoutSchemaOptionsReturnStream extends WithoutSchemaCommonOptionsReturnStream {
+	sheet?: string;
+}
+
+interface WithoutSchemaOptionsMultipleSheetsReturnStream extends WithoutSchemaCommonOptionsReturnStream {
 	sheets?: string[];
 }
 
