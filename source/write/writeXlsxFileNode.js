@@ -57,7 +57,7 @@ export default async function writeXlsxFile(data, {
 
 	const promises = [
 		writeFile(path.join(_rels, 'workbook.xml.rels'), generateWorkbookXmlRels({ sheets })),
-		writeFile(path.join(xl, 'workbook.xml'), generateWorkbookXml({ sheets })),
+		writeFile(path.join(xl, 'workbook.xml'), generateWorkbookXml({ sheets, stickyRowsCount, stickyColumnsCount })),
 		writeFile(path.join(xl, 'styles.xml'), getStylesXml()),
 		writeFile(path.join(xl, 'sharedStrings.xml'), getSharedStringsXml())
 	]

@@ -65,7 +65,7 @@ function generateXlsxFile(data, {
 
   const xl = zip.folder('xl')
   xl.file('_rels/workbook.xml.rels', generateWorkbookXmlRels({ sheets }))
-  xl.file('workbook.xml', generateWorkbookXml({ sheets }))
+  xl.file('workbook.xml', generateWorkbookXml({ sheets, stickyRowsCount, stickyColumnsCount }))
   xl.file('styles.xml', getStylesXml())
   xl.file('sharedStrings.xml', getSharedStringsXml())
 
