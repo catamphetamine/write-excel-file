@@ -1,3 +1,5 @@
+import $attr from '../xml/sanitizeAttributeValue.js'
+
 export default function generateLayout({
 	sheetId,
 	orientation
@@ -47,7 +49,7 @@ export default function generateLayout({
 
 		layout += '<pageSetup'
 		layout += ` paperSize="${paperSize}"`
-		layout += ` orientation="${orientation}"`
+		layout += ` orientation="${$attr(orientation)}"`
 		layout += ` r:id="rId${sheetId}"`
 		layout += '/>'
 	}

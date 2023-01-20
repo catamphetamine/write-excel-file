@@ -1,3 +1,5 @@
+import $text from '../xml/sanitizeText.js'
+
 export default function initSharedStrings() {
 	const sharedStrings = []
 	const sharedStringsIndex = {}
@@ -24,7 +26,9 @@ function generateXml(sharedStrings) {
 	xml += '<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
 	for (const string of sharedStrings) {
 		const attributes = string.trim().length === string.length ? '' : ' xml:space="preserve"';
-		xml += `<si><t${attributes}>${string}</t></si>`
+		xml += `<si><t${attributes}>`
+		xml += $text(string)
+		xml += '</t></si>'
 	}
 	xml += '</sst>'
 	return xml

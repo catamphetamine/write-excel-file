@@ -1,3 +1,5 @@
+import $attr from '../xml/sanitizeAttributeValue.js'
+
 // There seem to be about 100 "built-in" formats in Excel.
 // https://docs.microsoft.com/en-us/previous-versions/office/developer/office-2010/ee857658(v=office.14)?redirectedfrom=MSDN
 const FORMAT_ID_STARTS_FROM = 100
@@ -214,7 +216,7 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
   if (formats.length > 0) {
     xml += `<numFmts count="${formats.length}">`
     for (let i = 0; i < formats.length; i++) {
-      xml += `<numFmt numFmtId="${FORMAT_ID_STARTS_FROM + i}" formatCode="${formats[i]}"/>`
+      xml += `<numFmt numFmtId="${FORMAT_ID_STARTS_FROM + i}" formatCode="${$attr(formats[i])}"/>`
     }
     xml += `</numFmts>`
   }
@@ -231,8 +233,8 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
     } = font
     xml += '<font>'
     xml += `<sz val="${size}"/>`
-    xml += `<color ${color ? 'rgb="' + getColor(color) + '"' : 'theme="1"'}/>`
-    xml += `<name val="${family}"/>`
+    xml += `<color ${color ? 'rgb="' + $attr(getColor(color)) + '"' : 'theme="1"'}/>`
+    xml += `<name val="${$attr(family)}"/>`
     // It's not clear what the `<family/>` tag means or does.
     // It seems to always be `<family val="2"/>` even for different
     // font families (Calibri, Arial, etc).
@@ -273,7 +275,7 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
     xml += '<fill>'
     if (color) {
       xml += '<patternFill patternType="solid">'
-      xml += `<fgColor rgb="${getColor(color)}"/>`
+      xml += `<fgColor rgb="${$attr(getColor(color))}"/>`
       // Whatever that could mean.
       xml += '<bgColor indexed="64"/>'
       xml += '</patternFill>'
@@ -305,9 +307,9 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       }
       const hasChildren = color ? true : false
       return `<${direction}` +
-        (style ? ` style="${style}"` : '') +
+        (style ? ` style="${$attr(style)}"` : '') +
         (hasChildren ? '>' : '/>') +
-        (color ? `<color rgb="${getColor(color)}"/>` : '') +
+        (color ? `<color rgb="${$attr(getColor(color))}"/>` : '') +
         (hasChildren ? `</${direction}>` : '')
     }
     xml += '<border>'
@@ -378,8 +380,8 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       // https://xlsxwriter.readthedocs.io/format.html#set_align
       (align || alignVertical || wrap
         ? '<alignment' +
-          (align ? ` horizontal="${align}"` : '') +
-          (alignVertical ? ` vertical="${alignVertical}"` : '') +
+          (align ? ` horizontal="${$attr(align)}"` : '') +
+          (alignVertical ? ` vertical="${$attr(alignVertical)}"` : '') +
           (wrap ? ` wrapText="1"` : '') +
           '/>'
         : ''

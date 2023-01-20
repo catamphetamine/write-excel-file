@@ -57,19 +57,6 @@ export default function generateCell(
     '</c>'
 }
 
-/**
- * Escapes text for XML: replaces ">" with "&gt;", etc.
- * https://en.wikipedia.org/wiki/Character_encodings_in_HTML#HTML_character_references
- * @param  {string} string
- * @return {string}
- */
-function escapeString(string) {
-  return string
-    .replace(/&/g, '&amp;')
-    .replace(/>/g, '&gt;')
-    .replace(/</g, '&lt;')
-}
-
 function getXlsxType(type) {
   // Available Excel cell types:
   // https://github.com/SheetJS/sheetjs/blob/19620da30be2a7d7b9801938a0b9b1fd3c4c4b00/docbits/52_datatype.md
@@ -124,7 +111,6 @@ function getXlsxValue(type, value, getSharedString) {
       // if (type === URL && !isURL(value)) {
       //   throw new Error(`Invalid cell value: ${value}. Expected a URL`)
       // }
-      value = escapeString(value)
       return getSharedString(value)
 
     case Number:
