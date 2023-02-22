@@ -6,6 +6,7 @@ import {
 } from '../index.d';
 
 export {
+	Cell,
 	Row
 } from '../index.d';
 
