@@ -109,6 +109,10 @@ describe('writeXlsxFile', function() {
         {
           value: true,
           type: Boolean
+        },
+        {
+          value: 'HYPERLINK("https://example.com", "A link")',
+          type: 'Formula'
         }
       ],
       [
@@ -138,6 +142,10 @@ describe('writeXlsxFile', function() {
           value: false,
           type: Boolean,
           alignVertical: 'center'
+        },
+        {
+          value: 'HYPERLINK("https://google.com", "Google.com")',
+          type: 'Formula'
         }
       ]
     ]

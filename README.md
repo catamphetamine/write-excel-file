@@ -20,7 +20,12 @@ To write an `*.xlsx` file, one should provide the `data` — an array of rows. E
 
 Each cell should have a `value`, a `type`, and, optionally, other [cell parameters](#cell-parameters).
 
-If a cell doesn't have a `type`, then it is automatically detected from the `value`, or defaults to a `String`.
+If a cell doesn't have a `type`, then it is automatically detected from the `value`, or defaults to a `String`. Possible `type`s are:
+* `String`
+* `Number`
+* `Boolean`
+* `Date`
+* `"Formula"`
 
 An empty cell could be represented by `null` or `undefined`.
 

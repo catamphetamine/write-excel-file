@@ -4,13 +4,14 @@ export type ValueType =
 	String |
 	Date |
 	Number |
-	Boolean;
+	Boolean |
+	'Formula';
 
 // It's unclear how to express something like `type? = Type` in TypeScript.
-// So instead it's defined as `type?: TypeConstructor<Type>`.
+// So instead it's defined as `type?: TypeOfType<Type>`.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/4#note_715204034
 // https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
-type TypeConstructor<Type> =
+type TypeOfType<Type> =
 	Type extends String
 		? StringConstructor
 		: Type extends Date
@@ -19,7 +20,9 @@ type TypeConstructor<Type> =
 				? NumberConstructor
 				: Type extends Boolean
 					? BooleanConstructor
-					: never
+					: Type === 'Formula'
+						? 'Formula'
+						: never
 
 type BorderStyle =
 	'hair' |
@@ -70,7 +73,7 @@ interface CellStyle {
 interface CellProps<Type> extends CellStyle {
 	// TypeScript interprets `type?: Type` as "`type` is an instance of `Type`",
 	// while in reality the definition of `type` is "`type` is `Type.constructor`".
-	type?: TypeConstructor<Type>;
+	type?: TypeOfType<Type>;
 
 	// A simpler (loose) variant:
 	// type?: ValueType;

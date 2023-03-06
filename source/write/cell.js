@@ -50,10 +50,12 @@ export default function generateCell(
     xml += ` t="${type}"`
   }
 
+  const [openingTags, closingTags] = getOpeningAndClosingTags(type)
+
   return xml + '>' +
-    (type === 'inlineStr' ? '<is><t>' : '<v>') +
+    openingTags +
     value +
-    (type === 'inlineStr' ? '</t></is>' : '</v>') +
+    closingTags +
     '</c>'
 }
 
@@ -85,6 +87,9 @@ function getXlsxType(type) {
 
     case Boolean:
       return 'b'
+
+    case 'Formula':
+      return 'f'
 
     default:
       throw new Error(`Unknown schema type: ${type && type.name || type}`)
@@ -137,7 +142,32 @@ function getXlsxValue(type, value, getSharedString) {
       }
       return value ? '1' : '0'
 
+    case 'Formula':
+      if (typeof value !== 'string') {
+        throw new Error(`Invalid cell value: ${value}. Expected a string`)
+      }
+      return value
+
     default:
       throw new Error(`Unknown schema type: ${type && type.name || type}`)
+  }
+}
+
+const TAG_BRACKET_LEFT_REGEXP = /</g
+
+function getOpeningAndClosingTags(xlsxType) {
+  const openingTags = getOpeningTags(xlsxType)
+  const closingTags = openingTags.replace(TAG_BRACKET_LEFT_REGEXP, '</')
+  return [openingTags, closingTags]
+}
+
+function getOpeningTags(xlsxType) {
+  switch (xlsxType) {
+    case 'inlineStr':
+      return '<is><t>'
+    case 'f':
+      return '<f>'
+    default:
+      return '<v>'
   }
 }
