@@ -8,10 +8,10 @@ export type ValueType =
 	'Formula';
 
 // It's unclear how to express something like `type? = Type` in TypeScript.
-// So instead it's defined as `type?: TypeOfType<Type>`.
+// So instead it's defined as `type?: TypeConstructor<Type>`.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/4#note_715204034
 // https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
-type TypeOfType<Type> =
+type TypeConstructor<Type> =
 	Type extends String
 		? StringConstructor
 		: Type extends Date
@@ -20,9 +20,9 @@ type TypeOfType<Type> =
 				? NumberConstructor
 				: Type extends Boolean
 					? BooleanConstructor
-					: Type === 'Formula'
-						? 'Formula'
-						: never
+					: never
+
+type TypeOfType<Type> = TypeConstructor<Type> | 'Formula'
 
 type BorderStyle =
 	'hair' |
