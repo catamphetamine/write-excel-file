@@ -52,8 +52,8 @@ export default function generateRow(row, rowIndex, {
 
 			// Validate `format` property.
 			if (format) {
-				if (type !== Date &&  type !== Number) { // && type !== Integer) {
-					throw new Error('`format` can only be used on `Date` or `Number` cells') // or `Integer` cells')
+				if (type !== Date && type !== Number && type !== 'Formula') { // && type !== Integer) {
+					throw new Error('`format` can only be used on `Date`, `Number` or `"Formula"` cells') // or `Integer` cells')
 				}
 			} else {
 				if (type === Date) {

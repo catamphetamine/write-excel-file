@@ -277,7 +277,7 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
 -->
 
-* `format: string` — Cell data format. Can only be used on `Date` or `Number` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
+* `format: string` — Cell data format. Can only be used on `Date`, `Number` or `"Formula"` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
 
   * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
   * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
