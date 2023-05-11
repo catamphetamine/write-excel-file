@@ -145,22 +145,39 @@ declare function writeXlsxFile<Object>(
 
 // Without Schema.
 
-interface WithoutSchemaCommonOptions extends CommonOptions {
+interface WithoutSchemaWithoutFileNameCommonOptions extends CommonOptions {
 	columns?: Columns | Columns[];
-	fileName?: string;
 }
 
-interface WithoutSchemaOptions extends WithoutSchemaCommonOptions {
+interface WithoutSchemaWithFileNameCommonOptions extends CommonOptions {
+	columns?: Columns | Columns[];
+	fileName: string;
+}
+
+interface WithoutSchemaWithoutFileNameOptions extends WithoutSchemaWithoutFileNameCommonOptions {
 	sheet?: string;
 }
 
-interface WithoutSchemaOptionsMultipleSheets extends WithoutSchemaCommonOptions {
+interface WithoutSchemaWithFileNameOptions extends WithoutSchemaWithFileNameCommonOptions {
+	sheet?: string;
+}
+
+interface WithoutSchemaWithoutFileNameOptionsMultipleSheets extends WithoutSchemaWithoutFileNameCommonOptions {
+	sheets?: string[];
+}
+
+interface WithoutSchemaWithFileNameOptionsMultipleSheets extends WithoutSchemaWithFileNameCommonOptions {
 	sheets?: string[];
 }
 
 declare function writeXlsxFile(
 	data: SheetData | SheetData[],
-	options: WithoutSchemaOptions | WithoutSchemaOptionsMultipleSheets
+	options: WithoutSchemaWithoutFileNameOptions | WithoutSchemaWithoutFileNameOptionsMultipleSheets
+) : Promise<Blob>;
+
+declare function writeXlsxFile(
+	data: SheetData | SheetData[],
+	options: WithoutSchemaWithFileNameOptions | WithoutSchemaWithFileNameOptionsMultipleSheets
 ) : Promise<void>;
 
 export default writeXlsxFile;
