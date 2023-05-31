@@ -2,6 +2,8 @@
 // import URL, { isURL } from '../types/URL.js'
 // import Email, { isEmail } from '../types/Email.js'
 
+import $text from '../xml/sanitizeText.js'
+
 import generateCellNumber from './generateCellNumber.js'
 import convertDateToExcelSerial from './convertDateToExcelSerial.js'
 
@@ -146,7 +148,7 @@ function getXlsxValue(type, value, getSharedString) {
       if (typeof value !== 'string') {
         throw new Error(`Invalid cell value: ${value}. Expected a string`)
       }
-      return value
+      return $text(value)
 
     default:
       throw new Error(`Unknown schema type: ${type && type.name || type}`)
