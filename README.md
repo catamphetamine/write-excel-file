@@ -490,6 +490,10 @@ await writeXlsxFile([data1, data2], {
 })
 ```
 
+## Images
+
+This library currently doesn't support inserting images in a spreadsheet, although implementing such feature would be kinda trivial because I've already researched it a bit and described the implementation instructions in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
+
 ## TypeScript
 
 This library comes with TypeScript "typings". If you happen to find any bugs in those, create an issue.

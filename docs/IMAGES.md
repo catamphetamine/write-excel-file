@@ -114,7 +114,7 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 
     <xdr:pic>
       <xdr:nvPicPr>
-        <xdr:cNvPr id="0" name="Picture {numericId}" descr="{imageOriginalFilename}"/>
+        <xdr:cNvPr id="0" name="Picture {numericId}" descr="{imageOriginalFilenameOrEmptyString}"/>
         <xdr:cNvPicPr>
         </xdr:cNvPicPr>
       </xdr:nvPicPr>
@@ -152,8 +152,11 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 </worksheet>
 ```
 
-## Miscellaneous
+## Implementation Notes
 
 * Since it has to include the physical image file in the `*.xlsx` archive, it should be passed:
   * On client: as a `File` or as a `Blob`.
+    * I guess the `Blob` doesn't have a filename, but it's optional anyway, and otherwise those two seem to be equal because `File` class extends `Blob` class.
   * On server: as a `String` path, or as a `Buffer`, or as a `Blob`.
+    * That would be analogous to how [`read-excel-file`](https://gitlab.com/catamphetamine/read-excel-file) supports the input being one of those types, so the input handling code could be copypasted from it, along with the TypeScript "typings".
+    * I guess a `Buffer` doesn't have a filename, but it's optional anyway.
