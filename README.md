@@ -26,6 +26,7 @@ If a cell doesn't have a `type`, then it is automatically detected from the `val
 * `Boolean`
 * `Date`
 * `"Formula"`
+<!-- * `"Image"` -->
 
 An empty cell could be represented by `null` or `undefined`.
 
@@ -491,6 +492,25 @@ await writeXlsxFile([data1, data2], {
 ```
 
 ## Images
+
+<!--
+To insert an image into a cell, specify a cell of `type: "Image"`:
+
+```js
+{
+  type: "Image",
+  value: {
+    // In a web browser, `data` could be any of: `File`, `Blob`, `ArrayBuffer`.
+    // In Node.js, `data` could be any of: `String` (path), `Buffer`, `Readable` (stream).
+    data: any,
+    width: number,
+    height: number,
+    name?: string,
+    description?: string
+  }
+}
+```
+-->
 
 This library currently doesn't support inserting images in a spreadsheet, although implementing such feature would be kinda trivial because I've already researched it a bit and described the implementation instructions in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
 

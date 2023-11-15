@@ -154,6 +154,12 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 
 ## Implementation Notes
 
+* Some parts have been implemented:
+  * TypeScript support for `type: "Image"`.
+  * README:
+    * `## Images` section.
+    * `* "Image"` value in description of `type` property.
+
 * Since it has to include the physical image file in the `*.xlsx` archive, it should be passed:
   * On client: as a `File` or as a `Blob`.
     * I guess the `Blob` doesn't have a filename, but it's optional anyway, and otherwise those two seem to be equal because `File` class extends `Blob` class.

@@ -1,13 +1,10 @@
 import {
-	SheetData,
+	SheetData_,
+	Schema_,
+	Row_,
+	Cell_,
 	Columns,
-	Schema,
 	CommonOptions
-} from '../index.d';
-
-export {
-	Cell,
-	Row
 } from '../index.d';
 
 // `Readable` type becomes globally available after installing `@types/node`.
@@ -16,6 +13,15 @@ export {
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/53#note_1245377052
 
 import { Readable } from 'stream';
+import { PathLike } from 'fs';
+
+type ImageData = Readable | Buffer | PathLike;
+
+type SheetData = SheetData_<ImageData>;
+type Schema = Schema_<ImageData>;
+
+export type Row = Row_<ImageData>;
+export type Cell = Cell_<ImageData>;
 
 // export interface Stream {
 // 	pipe(output: Stream): void;

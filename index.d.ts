@@ -1,11 +1,32 @@
-// Some users have requested exporting `ValueType` type.
-// https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
-export type ValueType =
+type ImageData = File | Blob | ArrayBuffer;
+
+interface ImageValueType<ImageDataType> {
+	data: ImageDataType;
+	width: number;
+	height: number;
+	name?: string;
+	description?: string;
+}
+
+// Images haven't been implemented, so TypeScript for them is disabled.
+// https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md
+//
+// type ValueType_<ImageDataType> =
+// 	String |
+// 	Date |
+// 	Number |
+// 	Boolean |
+// 	ImageValueType<ImageDataType>;
+
+type ValueType_<ImageDataType> =
 	String |
 	Date |
 	Number |
-	Boolean |
-	'Formula';
+	Boolean;
+
+// Some users have requested exporting `ValueType` type.
+// https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
+export type ValueType = ValueType_<ImageData>;
 
 // It's unclear how to express something like `type? = Type` in TypeScript.
 // So instead it's defined as `type?: TypeConstructor<Type>`.
@@ -20,9 +41,12 @@ type TypeConstructor<Type> =
 				? NumberConstructor
 				: Type extends Boolean
 					? BooleanConstructor
-					: never
+					: never;
 
-type TypeOfType<Type> = TypeConstructor<Type> | 'Formula'
+// Images haven't been implemented, so TypeScript for them is disabled.
+// https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md
+// type TypeOfType<Type> = TypeConstructor<Type> | 'Formula' | 'Image';
+type TypeOfType<Type> = TypeConstructor<Type> | 'Formula';
 
 type BorderStyle =
 	'hair' |
@@ -86,11 +110,14 @@ interface CellOfType<Type> extends CellProps<Type> {
 	value?: Type;
 }
 
-export type Cell = CellOfType<ValueType> | null | undefined;
+export type Cell_<ImageDataType> = CellOfType<ValueType_<ImageDataType>> | null | undefined;
+export type Cell = Cell_<ImageData>;
 
-export type Row = Cell[];
+export type Row_<ImageDataType> = Cell_<ImageDataType>[];
+export type Row = Row_<ImageData>;
 
-export type SheetData = Row[];
+export type SheetData_<ImageDataType> = Row_<ImageDataType>[];
+export type SheetData = SheetData_<ImageData>;
 
 // Some users have requested exporting `ColumnSchema` type.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
