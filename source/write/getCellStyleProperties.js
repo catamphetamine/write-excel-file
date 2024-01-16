@@ -18,7 +18,8 @@ export default function getCellStyleProperties(cell) {
 		topBorderColor,
 		topBorderStyle,
 		bottomBorderColor,
-		bottomBorderStyle
+		bottomBorderStyle,
+		textRotation
 	} = cell
 
 	if (align ||
@@ -39,7 +40,8 @@ export default function getCellStyleProperties(cell) {
 		topBorderColor ||
 		topBorderStyle ||
 		bottomBorderColor ||
-		bottomBorderStyle
+		bottomBorderStyle || 
+		textRotation
 	) {
 		return omitUndefinedProperties({
 			align,
@@ -60,7 +62,8 @@ export default function getCellStyleProperties(cell) {
 			topBorderColor,
 			topBorderStyle,
 			bottomBorderColor,
-			bottomBorderStyle
+			bottomBorderStyle,
+			textRotation
 		})
 	}
 }
