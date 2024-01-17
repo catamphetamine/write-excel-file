@@ -81,6 +81,7 @@ interface CellStyle {
 	fontWeight?: FontWeight;
 	fontStyle?: FontStyle;
 	color?: Color;
+	textRotation?: number;
 	backgroundColor?: Color;
 	borderColor?: Color;
 	borderStyle?: BorderStyle;
