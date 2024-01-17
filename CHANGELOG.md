@@ -1,3 +1,8 @@
+1.4.28 / 17.01.2024
+==================
+
+* Merged a [pull request](https://github.com/catamphetamine/write-excel-file/pull/7) by @AlexisLeite that adds `textRotation` parameter.
+
 1.4.0 / 18.05.2022
 ==================
 

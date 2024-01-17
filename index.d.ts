@@ -76,12 +76,12 @@ interface CellStyle {
 	span?: number;
 	rowSpan?: number;
 	wrap?: boolean;
+	textRotation?: number;
 	fontFamily?: string;
 	fontSize?: number;
 	fontWeight?: FontWeight;
 	fontStyle?: FontStyle;
 	color?: Color;
-	textRotation?: number;
 	backgroundColor?: Color;
 	borderColor?: Color;
 	borderStyle?: BorderStyle;

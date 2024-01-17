@@ -62,13 +62,14 @@ export default function initStyles({
   })
 
   function getStyle({
+    align,
+    alignVertical,
+    textRotation,
+    wrap,
     fontFamily,
     fontSize,
     fontWeight,
     fontStyle,
-    align,
-    alignVertical,
-    wrap,
     color,
     backgroundColor,
     borderColor,
@@ -80,8 +81,7 @@ export default function initStyles({
     topBorderColor,
     topBorderStyle,
     bottomBorderColor,
-    bottomBorderStyle,
-    textRotation,
+    bottomBorderStyle
   }, {
     format
   }) {
@@ -98,7 +98,7 @@ export default function initStyles({
       `${(bottomBorderColor || borderColor) || '-'}:${(bottomBorderStyle || borderStyle) || '-'}` +
       '/' +
       `${(leftBorderColor || borderColor) || '-'}:${(leftBorderStyle || borderStyle) || '-'}`
-    const key = `${align || '-'}/${alignVertical || '-'}${textRotation || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}/${borderKey}`
+    const key = `${align || '-'}/${alignVertical || '-'}/${textRotation || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}/${borderKey}`
     const styleId = stylesIndex[key]
     if (styleId !== undefined) {
       return styleId
@@ -355,9 +355,9 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       borderId,
       align,
       alignVertical,
-      wrap,
-      formatId,
       textRotation,
+      wrap,
+      formatId
     } = cellStyle
     // `applyNumberFormat="1"` means "apply the `numFmtId` attribute".
     // Seems like by default `applyNumberFormat` is `"0"` meaning that,
@@ -372,7 +372,7 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
         fillId !== undefined ? 'applyFill="1"' : undefined,
         borderId !== undefined ? `borderId="${borderId}"` : undefined,
         borderId !== undefined ? 'applyBorder="1"' : undefined,
-        align || alignVertical || wrap || textRotation ? 'applyAlignment="1"' : undefined,
+        align || alignVertical || textRotation || wrap ? 'applyAlignment="1"' : undefined,
         // 'xfId="0"'
       ].filter(_ => _).join(' ') +
     '>' +
@@ -381,12 +381,12 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       // Possible vertical alignment values:
       //  top, vcenter, bottom, vjustify, vdistributed.
       // https://xlsxwriter.readthedocs.io/format.html#set_align
-      (align || alignVertical || wrap || textRotation
+      (align || alignVertical || textRotation || wrap
         ? '<alignment' +
           (align ? ` horizontal="${$attr(align)}"` : '') +
           (alignVertical ? ` vertical="${$attr(alignVertical)}"` : '') +
           (wrap ? ` wrapText="1"` : '') +
-          (textRotation ? ` textRotation="${textRotation}"` : '') +
+          (textRotation ? ` textRotation="${validateTextRotation(textRotation)}"` : '') +
           '/>'
         : ''
       ) +
@@ -404,4 +404,15 @@ function getColor(color) {
     throw new Error(`Color "${color}" must start with a "#"`)
   }
   return `FF${color.slice('#'.length).toUpperCase()}`
+}
+
+// Text rotation could be from -90 to 90.
+// Positive values rotate the text counterclockwise, and negative values rotate the text clockwise.
+// https://docs.closedxml.io/en/latest/features/cell-format.html
+// https://xlsxwriter.readthedocs.io/format.html#format-set-rotation
+function validateTextRotation(textRotation) {
+  if (!(textRotation >= -90 && textRotation <= 90)) {
+    throw new Error(`Unsupported text rotation angle: ${textRotation}. Values from -90 to 90 are supported.`);
+  }
+  return textRotation
 }
