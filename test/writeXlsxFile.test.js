@@ -158,10 +158,16 @@ describe('writeXlsxFile', function() {
       fontSize: 8
     }
 
-    const dataWithTextRotationInFirstCell = data.slice()
-    dataWithTextRotationInFirstCell[0] = dataWithTextRotationInFirstCell[0].slice()
-    dataWithTextRotationInFirstCell[0][0] = {
-      ...dataWithTextRotationInFirstCell[0][0],
+    const dataWithTextRotation = data.slice()
+    dataWithTextRotation[0] = dataWithTextRotation[0].slice()
+    dataWithTextRotation[0][0] = {
+      ...dataWithTextRotation[0][0],
+      fontFamily: 'Courier New',
+      fontSize: 8,
+      textRotation: -90
+    }
+    dataWithTextRotation[0][1] = {
+      ...dataWithTextRotation[0][1],
       fontFamily: 'Courier New',
       fontSize: 8,
       textRotation: 90
@@ -199,7 +205,7 @@ describe('writeXlsxFile', function() {
 
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
     await writeXlsxFile(dataWithCustomFontInFirstCell, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-custom-font.xlsx') })
-    await writeXlsxFile(dataWithTextRotationInFirstCell, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-text-rotation.xlsx') })
+    await writeXlsxFile(dataWithTextRotation, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-text-rotation.xlsx') })
     await writeXlsxFile(data, { columns, stickyRowsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-row.xlsx') })
     await writeXlsxFile(data, { columns, stickyRowsCount: 2, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-rows.xlsx') })
     await writeXlsxFile(data, { columns, stickyColumnsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-column.xlsx') })
