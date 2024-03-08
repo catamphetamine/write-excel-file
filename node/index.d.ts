@@ -1,10 +1,14 @@
 import {
+	Schema,
 	SheetData_,
-	Schema_,
 	Row_,
 	Cell_,
 	Columns,
 	CommonOptions
+} from '../index.d';
+
+export {
+	Schema
 } from '../index.d';
 
 // `Readable` type becomes globally available after installing `@types/node`.
@@ -18,7 +22,6 @@ import { PathLike } from 'fs';
 type ImageData = Readable | Buffer | PathLike;
 
 type SheetData = SheetData_<ImageData>;
-type Schema = Schema_<ImageData>;
 
 export type Row = Row_<ImageData>;
 export type Cell = Cell_<ImageData>;
