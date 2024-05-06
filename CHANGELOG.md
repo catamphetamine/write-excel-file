@@ -1,3 +1,8 @@
+2.0.0 / 06.05.2024
+==================
+
+* Updated `archiver` module to [remove Node.js warning](https://gitlab.com/catamphetamine/write-excel-file/-/issues/85). That drops support for Node.js =< 12.
+
 1.4.28 / 17.01.2024
 ==================
 

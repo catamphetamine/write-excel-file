@@ -1,6 +1,6 @@
 {
   "name": "write-excel-file",
-  "version": "1.4.30",
+  "version": "2.0.0",
   "description": "Write simple `*.xlsx` files in a browser or Node.js",
   "module": "index.js",
   "main": "index.cjs",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.17.9",
-    "archiver": "^5.3.1",
+    "archiver": "^7.0.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.9.1"
   },
