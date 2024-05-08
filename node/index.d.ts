@@ -5,11 +5,11 @@ import {
 	Cell_,
 	Columns,
 	CommonOptions
-} from '../index.d';
+} from '../index.d.js';
 
 export {
 	Schema
-} from '../index.d';
+} from '../index.d.js';
 
 // `Readable` type becomes globally available after installing `@types/node`.
 // https://stackoverflow.com/questions/49508610/type-for-nodejs-stream-stream-in-typescript
