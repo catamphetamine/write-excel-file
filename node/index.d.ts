@@ -36,40 +36,43 @@ export type Cell = Cell_<ImageData>;
 // With Schema.
 
 interface WithSchemaCommonOptionsWriteToFile<Object> extends CommonOptions {
-	schema: Schema<Object> | Schema<Object>[];
 	filePath: string;
 }
 
 interface WithSchemaCommonOptionsReturnBuffer<Object> extends CommonOptions {
-	schema: Schema<Object> | Schema<Object>[];
 	buffer: true;
 }
 
 interface WithSchemaCommonOptionsReturnStream<Object> extends CommonOptions {
-	schema: Schema<Object> | Schema<Object>[];
 }
 
 interface WithSchemaOptionsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object> {
+	schema: Schema<Object>;
 	sheet?: string;
 }
 
 interface WithSchemaOptionsMultipleSheetsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object> {
+	schema: Schema<Object>[];
 	sheets?: string[];
 }
 
 interface WithSchemaOptionsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object> {
+	schema: Schema<Object>;
 	sheet?: string;
 }
 
 interface WithSchemaOptionsMultipleSheetsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object> {
+	schema: Schema<Object>[];
 	sheets?: string[];
 }
 
 interface WithSchemaOptionsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object> {
+	schema: Schema<Object>;
 	sheet?: string;
 }
 
 interface WithSchemaOptionsMultipleSheetsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object> {
+	schema: Schema<Object>[];
 	sheets?: string[];
 }
 
@@ -91,56 +94,74 @@ declare function writeXlsxFile<Object>(
 // Without Schema.
 
 interface WithoutSchemaCommonOptionsWriteToFile extends CommonOptions {
-	columns?: Columns | Columns[];
 	filePath: string;
 }
 
 interface WithoutSchemaCommonOptionsReturnBuffer extends CommonOptions {
-	columns?: Columns | Columns[];
 	buffer: true;
 }
 
 interface WithoutSchemaCommonOptionsReturnStream extends CommonOptions {
-	columns?: Columns | Columns[];
 }
 
 interface WithoutSchemaOptionsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile {
+	columns?: Columns;
 	sheet?: string;
 }
 
 interface WithoutSchemaOptionsMultipleSheetsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile {
+	columns?: Columns[];
 	sheets?: string[];
 }
 
 interface WithoutSchemaOptionsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer {
+	columns?: Columns;
 	sheet?: string;
 }
 
 interface WithoutSchemaOptionsMultipleSheetsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer {
+	columns?: Columns[];
 	sheets?: string[];
 }
 
 interface WithoutSchemaOptionsReturnStream extends WithoutSchemaCommonOptionsReturnStream {
+	columns?: Columns;
 	sheet?: string;
 }
 
 interface WithoutSchemaOptionsMultipleSheetsReturnStream extends WithoutSchemaCommonOptionsReturnStream {
+	columns?: Columns[];
 	sheets?: string[];
 }
 
 declare function writeXlsxFile(
-	data: SheetData | SheetData[],
-	options: WithoutSchemaOptionsWriteToFile | WithoutSchemaOptionsMultipleSheetsWriteToFile
+	data: SheetData,
+	options: WithoutSchemaOptionsWriteToFile
 ) : Promise<void>;
 
 declare function writeXlsxFile(
-	data: SheetData | SheetData[],
-	options: WithoutSchemaOptionsReturnBuffer | WithoutSchemaOptionsMultipleSheetsReturnBuffer
+	data: SheetData[],
+	options: WithoutSchemaOptionsMultipleSheetsWriteToFile
+) : Promise<void>;
+
+declare function writeXlsxFile(
+	data: SheetData,
+	options: WithoutSchemaOptionsReturnBuffer
 ) : Promise<Buffer>;
 
 declare function writeXlsxFile(
-	data: SheetData | SheetData[],
-	options?: WithoutSchemaOptionsReturnStream | WithoutSchemaOptionsMultipleSheetsReturnStream
+	data: SheetData[],
+	options: WithoutSchemaOptionsMultipleSheetsReturnBuffer
+) : Promise<Buffer>;
+
+declare function writeXlsxFile(
+	data: SheetData,
+	options?: WithoutSchemaOptionsReturnStream
+) : Promise<Readable>;
+
+declare function writeXlsxFile(
+	data: SheetData[],
+	options?: WithoutSchemaOptionsMultipleSheetsReturnStream
 ) : Promise<Readable>;
 
 export default writeXlsxFile;
