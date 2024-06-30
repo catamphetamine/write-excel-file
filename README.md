@@ -448,6 +448,17 @@ await writeXlsxFile(data, {
 })
 ```
 
+## Hide Grid Lines
+
+To hide grid lines, pass `showGridLines: false` parameter when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  showGridLines: false
+})
+```
+
 ## Sheet Name
 
 To set the default sheet name, pass a `sheet` parameter when calling `writeXlsxFile()`:

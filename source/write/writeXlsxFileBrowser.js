@@ -37,6 +37,7 @@ function generateXlsxFile(data, {
   orientation,
   stickyRowsCount,
   stickyColumnsCount,
+  showGridLines,
   dateFormat
 }) {
   const zip = new JSZip()
@@ -60,6 +61,7 @@ function generateXlsxFile(data, {
     orientation,
     stickyRowsCount,
     stickyColumnsCount,
+    showGridLines,
     dateFormat
   })
 

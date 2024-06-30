@@ -148,6 +148,7 @@ export interface CommonOptions {
   orientation?: Orientation;
   stickyColumnsCount?: number;
   stickyRowsCount?: number;
+  showGridLines?: boolean;
   dateFormat?: string;
 }
 

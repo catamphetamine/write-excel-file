@@ -3,6 +3,7 @@
 
 import generateCell from './cell.js'
 import getCellStyleProperties from './getCellStyleProperties.js'
+import getAttributesString from '../xml/getAttributesString.js'
 
 // import Integer from '../types/Integer.js'
 
@@ -87,9 +88,16 @@ export default function generateRow(row, rowIndex, {
 		})
 		.join('')
 
-	return `<row r="${rowNumber}"` +
-		(rowHeight ? ` ht="${rowHeight}" customHeight="1"` : '') +
-		'>' +
+	const rowAttributes = {
+		r: rowNumber
+	}
+
+	if (rowHeight) {
+		rowAttributes.ht = rowHeight
+		rowAttributes.customHeight = 1
+	}
+
+	return `<row${getAttributesString(rowAttributes)}>` +
 		rowCells +
 		'</row>'
 }

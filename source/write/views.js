@@ -1,15 +1,37 @@
 import generateCellNumber from './generateCellNumber.js'
+import getAttributesString from '../xml/getAttributesString.js'
 
-export default function generateViews({ stickyRowsCount, stickyColumnsCount }) {
-	if (!stickyRowsCount && !stickyColumnsCount) {
+export default function generateViews({
+	stickyRowsCount,
+	stickyColumnsCount,
+	showGridLines
+}) {
+	if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false)) {
 		return ''
 	}
 
 	let views = ''
 
+	const sheetViewAttributes = {
+		tabSelected: 1,
+		workbookViewId: 0
+	}
+
+	if (showGridLines === false) {
+		sheetViewAttributes.showGridLines = false
+	}
+
+	const paneAttributes = {
+		ySplit: stickyRowsCount || 0,
+		xSplit: stickyColumnsCount || 0,
+		topLeftCell: generateCellNumber((stickyColumnsCount || 0), (stickyRowsCount || 0) + 1),
+		activePane: 'bottomRight',
+		state: 'frozen'
+	}
+
 	views += '<sheetViews>'
-	views += '<sheetView tabSelected="1" workbookViewId="0">'
-	views += `<pane ySplit="${stickyRowsCount || 0}" xSplit="${stickyColumnsCount || 0}" topLeftCell="${generateCellNumber((stickyColumnsCount || 0), (stickyRowsCount || 0) + 1)}" activePane="bottomRight" state="frozen"/>`
+	views += `<sheetView${getAttributesString(sheetViewAttributes)}>`
+	views += `<pane${getAttributesString(paneAttributes)}/>`
 	views += '</sheetView>'
 	views += '</sheetViews>'
 

@@ -24,6 +24,7 @@ export default async function writeXlsxFile(data, {
 	orientation,
 	stickyRowsCount,
 	stickyColumnsCount,
+	showGridLines,
 	dateFormat
 } = {}) {
 	const archive = new Archive(filePath)
@@ -44,6 +45,7 @@ export default async function writeXlsxFile(data, {
 		orientation,
 		stickyRowsCount,
 		stickyColumnsCount,
+		showGridLines,
 		dateFormat
 	})
 

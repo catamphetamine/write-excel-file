@@ -1,3 +1,9 @@
+2.0.3 / 30.05.2024
+==================
+
+* Merged a [pull request](https://gitlab.com/catamphetamine/write-excel-file/-/merge_requests/2) by
+[Waldir Denver](https://gitlab.com/wdenver2007) that adds `showGridLines: false` option.
+
 2.0.0 / 06.05.2024
 ==================
 

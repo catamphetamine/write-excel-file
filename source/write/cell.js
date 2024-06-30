@@ -3,6 +3,7 @@
 // import Email, { isEmail } from '../types/Email.js'
 
 import $text from '../xml/sanitizeText.js'
+import getAttributesString from '../xml/getAttributesString.js'
 
 import generateCellNumber from './generateCellNumber.js'
 import convertDateToExcelSerial from './convertDateToExcelSerial.js'
@@ -24,7 +25,9 @@ export default function generateCell(
     }
   }
 
-  let xml = `<c r="${generateCellNumber(columnIndex, rowNumber)}"`
+  const cellAttributes = {
+    r: generateCellNumber(columnIndex, rowNumber)
+  }
 
   // Available formatting style IDs (built-in in Excel):
   // https://xlsxwriter.readthedocs.io/format.html#format-set-num-format
@@ -32,11 +35,11 @@ export default function generateCell(
   // `3` —  #,##0
   if (cellStyleId) {
     // From the attribute s="12" we know that the cell's formatting is stored at the 13th (zero-based index) <xf> within the <cellXfs>
-    xml += ` s="${cellStyleId}"`
+    cellAttributes.s = cellStyleId
   }
 
   if (value === null) {
-    return xml + '/>'
+    return `<c${getAttributesString(cellAttributes)}/>`
   }
 
   // Validate date format.
@@ -49,12 +52,12 @@ export default function generateCell(
 
   // The default value for `t` is `"n"` (a number or a date).
   if (type) {
-    xml += ` t="${type}"`
+    cellAttributes.t = type
   }
 
   const [openingTags, closingTags] = getOpeningAndClosingTags(type)
 
-  return xml + '>' +
+  return `<c${getAttributesString(cellAttributes)}>` +
     openingTags +
     value +
     closingTags +

@@ -215,6 +215,7 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-landscape.xlsx'), orientation: 'landscape' })
     await writeXlsxFile([data, data], { sheets: ['Sheet One', 'Sheet Two'], columns: [columns, columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-multiple-sheets.xlsx') })
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-default-font.xlsx'), fontFamily: 'Arial', fontSize: 16 })
+    await writeXlsxFile(data, { columns,  showGridLines: false, filePath: path.join(OUTPUT_DIRECTORY, 'test-hide-grid-lines.xlsx') })
 
     await shouldThrow('empty', async () => {
       await writeXlsxFile([data], { columns: [columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-illegal-characters-in-sheet-name.xlsx'), sheets: [''] })

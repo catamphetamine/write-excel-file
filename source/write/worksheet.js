@@ -26,6 +26,7 @@ export default function generateWorksheet(data_, {
 	orientation,
 	stickyRowsCount,
 	stickyColumnsCount,
+	showGridLines,
 	sheetId
 }) {
 	validateData(data_, { schema })
@@ -41,7 +42,7 @@ export default function generateWorksheet(data_, {
   		customFont,
   		dateFormat
   	}))
-  	.replace('{views}', generateViews({ stickyRowsCount, stickyColumnsCount }))
+  	.replace('{views}', generateViews({ stickyRowsCount, stickyColumnsCount, showGridLines }))
   	.replace('{columnsDescription}', generateColumnsDescription({ schema, columns }))
   	.replace('{mergedCellsDescription}', generateMergedCellsDescription(mergedCells))
   	.replace('{layout}', generateLayout({ sheetId, orientation }))
