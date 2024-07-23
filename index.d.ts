@@ -1,12 +1,10 @@
-type ImageData = File | Blob | ArrayBuffer;
-
-interface ImageValueType<ImageDataType> {
-	data: ImageDataType;
-	width: number;
-	height: number;
-	name?: string;
-	description?: string;
-}
+// interface ImageValueType<ImageDataType> {
+// 	data: ImageDataType;
+// 	width: number;
+// 	height: number;
+// 	name?: string;
+// 	description?: string;
+// }
 
 // Images haven't been implemented, so TypeScript for them is disabled.
 // https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md
@@ -17,6 +15,8 @@ interface ImageValueType<ImageDataType> {
 // 	Number |
 // 	Boolean |
 // 	ImageValueType<ImageDataType>;
+
+type ImageData = File | Blob | ArrayBuffer;
 
 type ValueType_<ImageDataType> =
 	String |
@@ -152,57 +152,72 @@ export interface CommonOptions {
   dateFormat?: string;
 }
 
-// With Schema.
+interface CommonOptionsWithoutFileName extends CommonOptions {}
 
-interface WithSchemaCommonOptions<Object> extends CommonOptions {
-	fileName?: string;
+interface CommonOptionsWithFileName extends CommonOptions {
+	fileName: string;
 }
 
-interface WithSchemaOptions<Object> extends WithSchemaCommonOptions<Object> {
+// With Schema.
+
+interface WithSchemaWithoutFileNameOptions<Object> extends CommonOptionsWithoutFileName {
 	schema: Schema<Object>;
 	sheet?: string;
 }
 
-interface WithSchemaOptionsMultipleSheets<Object> extends WithSchemaCommonOptions<Object> {
+interface WithSchemaWithFileNameOptions<Object> extends CommonOptionsWithFileName {
+	schema: Schema<Object>;
+	sheet?: string;
+}
+
+interface WithSchemaWithoutFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithoutFileName {
+	schema: Schema<Object>[];
+	sheets?: string[];
+}
+
+interface WithSchemaWithFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithFileName {
 	schema: Schema<Object>[];
 	sheets?: string[];
 }
 
 declare function writeXlsxFile<Object>(
 	objects: Object[],
-	options: WithSchemaOptions<Object>
+	options: WithSchemaWithFileNameOptions<Object>
+) : Promise<void>;
+
+declare function writeXlsxFile<Object>(
+	objects: Object[],
+	options: WithSchemaWithoutFileNameOptions<Object>
+) : Promise<Blob>;
+
+declare function writeXlsxFile<Object>(
+	objects: Object[][],
+	options: WithSchemaWithFileNameOptionsMultipleSheets<Object>
 ) : Promise<void>;
 
 declare function writeXlsxFile<Object>(
 	objects: Object[][],
-	options: WithSchemaOptionsMultipleSheets<Object>
-) : Promise<void>;
+	options: WithSchemaWithoutFileNameOptionsMultipleSheets<Object>
+) : Promise<Blob>;
 
 // Without Schema.
 
-interface WithoutSchemaWithoutFileNameCommonOptions extends CommonOptions {
-}
-
-interface WithoutSchemaWithFileNameCommonOptions extends CommonOptions {
-	fileName: string;
-}
-
-interface WithoutSchemaWithoutFileNameOptions extends WithoutSchemaWithoutFileNameCommonOptions {
+interface WithoutSchemaWithoutFileNameOptions extends CommonOptionsWithoutFileName {
 	columns?: Columns;
 	sheet?: string;
 }
 
-interface WithoutSchemaWithFileNameOptions extends WithoutSchemaWithFileNameCommonOptions {
+interface WithoutSchemaWithFileNameOptions extends CommonOptionsWithFileName {
 	columns?: Columns;
 	sheet?: string;
 }
 
-interface WithoutSchemaWithoutFileNameOptionsMultipleSheets extends WithoutSchemaWithoutFileNameCommonOptions {
+interface WithoutSchemaWithoutFileNameOptionsMultipleSheets extends CommonOptionsWithoutFileName {
 	columns?: Columns[];
 	sheets?: string[];
 }
 
-interface WithoutSchemaWithFileNameOptionsMultipleSheets extends WithoutSchemaWithFileNameCommonOptions {
+interface WithoutSchemaWithFileNameOptionsMultipleSheets extends CommonOptionsWithFileName {
 	columns?: Columns[];
 	sheets?: string[];
 }
