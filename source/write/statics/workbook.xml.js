@@ -1,3 +1,5 @@
+import $attr from '../../xml/sanitizeAttributeValue.js'
+
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/statics/workbook.xml.js
 
@@ -7,7 +9,7 @@ export default function generateWorkbookXml({ sheets, stickyRowsCount, stickyCol
 		'<workbookPr/>' +
 		(stickyRowsCount || stickyColumnsCount ? '<bookViews><workbookView/></bookViews>' : '') +
 		'<sheets>' +
-		sheets.map(({ id, name }) => `<sheet name="${name}" sheetId="${id}" r:id="rId${id}"/>`).join('') +
+		sheets.map(({ id, name }) => `<sheet name="${$attr(name)}" sheetId="${id}" r:id="rId${id}"/>`).join('') +
 		'</sheets>' +
 		'<definedNames/>' +
 		'<calcPr/>' +
