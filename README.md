@@ -247,6 +247,8 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 * `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
 
+* `indent: number` — Horizontal indentation level for the cell content.
+
 * `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
 
 * `fontFamily: string` — Can be used to print text in a custom font family. Example: `"Calibri"`.

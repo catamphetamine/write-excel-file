@@ -1,3 +1,8 @@
+2.0.6 / 16.08.2024
+==================
+
+* Added [cell indentation](https://github.com/catamphetamine/write-excel-file/issues/4) parameter: `indent?: number`.
+
 2.0.3 / 30.05.2024
 ==================
 

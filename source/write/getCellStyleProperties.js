@@ -3,6 +3,7 @@ export default function getCellStyleProperties(cell) {
 		align,
 		alignVertical,
 		textRotation,
+		indent,
 		wrap,
 		fontFamily,
 		fontSize,
@@ -25,6 +26,7 @@ export default function getCellStyleProperties(cell) {
 	if (align ||
 		alignVertical ||
 		textRotation ||
+		indent ||
 		wrap ||
 		fontFamily ||
 		fontSize ||
@@ -47,6 +49,7 @@ export default function getCellStyleProperties(cell) {
 			align,
 			alignVertical,
 			textRotation,
+			indent,
 			wrap,
 			fontFamily,
 			fontSize,

@@ -145,7 +145,8 @@ describe('writeXlsxFile', function() {
         },
         {
           value: 'HYPERLINK("https://google.com", "Google.com")',
-          type: 'Formula'
+          type: 'Formula',
+          indent: 2
         }
       ]
     ]

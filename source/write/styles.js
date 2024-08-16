@@ -65,6 +65,7 @@ export default function initStyles({
     align,
     alignVertical,
     textRotation,
+    indent,
     wrap,
     fontFamily,
     fontSize,
@@ -98,7 +99,7 @@ export default function initStyles({
       `${(bottomBorderColor || borderColor) || '-'}:${(bottomBorderStyle || borderStyle) || '-'}` +
       '/' +
       `${(leftBorderColor || borderColor) || '-'}:${(leftBorderStyle || borderStyle) || '-'}`
-    const key = `${align || '-'}/${alignVertical || '-'}/${textRotation || '-'}/${format || '-'}/${wrap || '-'}/${fontKey}/${fillKey}/${borderKey}`
+    const key = `${align || '-'}/${alignVertical || '-'}/${textRotation || '-'}/${indent || '-'}/${wrap || '-'}/${format || '-'}/${fontKey}/${fillKey}/${borderKey}`
     const styleId = stylesIndex[key]
     if (styleId !== undefined) {
       return styleId
@@ -185,6 +186,7 @@ export default function initStyles({
       align,
       alignVertical,
       textRotation,
+      indent,
       wrap,
       formatId
     })
@@ -356,6 +358,7 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       align,
       alignVertical,
       textRotation,
+      indent,
       wrap,
       formatId
     } = cellStyle
@@ -372,7 +375,7 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
         fillId !== undefined ? 'applyFill="1"' : undefined,
         borderId !== undefined ? `borderId="${borderId}"` : undefined,
         borderId !== undefined ? 'applyBorder="1"' : undefined,
-        align || alignVertical || textRotation || wrap ? 'applyAlignment="1"' : undefined,
+        align || alignVertical || textRotation || indent || wrap ? 'applyAlignment="1"' : undefined,
         // 'xfId="0"'
       ].filter(_ => _).join(' ') +
     '>' +
@@ -381,12 +384,13 @@ function generateXml({ formats, styles, fonts, fills, borders }) {
       // Possible vertical alignment values:
       //  top, vcenter, bottom, vjustify, vdistributed.
       // https://xlsxwriter.readthedocs.io/format.html#set_align
-      (align || alignVertical || textRotation || wrap
+      (align || alignVertical || textRotation || indent || wrap
         ? '<alignment' +
           (align ? ` horizontal="${$attr(align)}"` : '') +
           (alignVertical ? ` vertical="${$attr(alignVertical)}"` : '') +
-          (wrap ? ` wrapText="1"` : '') +
           (textRotation ? ` textRotation="${getTextRotation(validateTextRotation(textRotation))}"` : '') +
+          (indent ? ` indent="${$attr(String(indent))}"` : '') +
+          (wrap ? ` wrapText="1"` : '') +
           '/>'
         : ''
       ) +
