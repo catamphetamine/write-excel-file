@@ -16,6 +16,7 @@ export function generateSheets({
   stickyRowsCount,
   stickyColumnsCount,
   showGridLines,
+  rightToLeft,
   dateFormat
 }) {
   const { getSharedStringsXml, getSharedString } = initSharedStrings()
@@ -63,6 +64,7 @@ export function generateSheets({
       stickyRowsCount,
       stickyColumnsCount,
       showGridLines,
+      rightToLeft,
       sheetId: sheetIndex + 1
     }))
     sheetIndex++

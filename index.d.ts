@@ -150,6 +150,7 @@ export interface CommonOptions {
   stickyColumnsCount?: number;
   stickyRowsCount?: number;
   showGridLines?: boolean;
+  rightToLeft?: boolean;
   dateFormat?: string;
 }
 

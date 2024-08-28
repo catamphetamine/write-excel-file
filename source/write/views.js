@@ -4,9 +4,10 @@ import getAttributesString from '../xml/getAttributesString.js'
 export default function generateViews({
 	stickyRowsCount,
 	stickyColumnsCount,
-	showGridLines
+	showGridLines,
+	rightToLeft
 }) {
-	if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false)) {
+	if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false) && !rightToLeft) {
 		return ''
 	}
 
@@ -19,6 +20,10 @@ export default function generateViews({
 
 	if (showGridLines === false) {
 		sheetViewAttributes.showGridLines = false
+	}
+
+	if (rightToLeft) {
+		sheetViewAttributes.rightToLeft = 1
 	}
 
 	const paneAttributes = {

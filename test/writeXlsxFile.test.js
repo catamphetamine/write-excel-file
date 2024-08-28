@@ -205,6 +205,7 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells.xlsx') })
+    await writeXlsxFile(data, { columns, rightToLeft: true, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-right-to-left.xlsx') })
     await writeXlsxFile(dataWithCustomFontInFirstCell, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-custom-font.xlsx') })
     await writeXlsxFile(dataWithTextRotation, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-text-rotation.xlsx') })
     await writeXlsxFile(data, { columns, stickyRowsCount: 1, filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-sticky-row.xlsx') })
