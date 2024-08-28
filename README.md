@@ -461,6 +461,17 @@ await writeXlsxFile(data, {
 })
 ```
 
+## Right-to-Left
+
+To use right-to-left layout on all sheets, pass `rightToLeft: true` parameter when calling `writeXlsxFile()`:
+
+```js
+await writeXlsxFile(data, {
+  filePath: '/path/to/file.xlsx',
+  rightToLeft: true
+})
+```
+
 ## Sheet Name
 
 To set the default sheet name, pass a `sheet` parameter when calling `writeXlsxFile()`:
