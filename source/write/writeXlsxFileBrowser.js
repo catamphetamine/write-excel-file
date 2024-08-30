@@ -79,6 +79,7 @@ function generateXlsxFile(data, {
 
   return zip.generateAsync({
     type: 'blob',
-    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    compression: 'deflate'
   })
 }
