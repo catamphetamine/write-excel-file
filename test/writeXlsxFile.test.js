@@ -200,7 +200,8 @@ describe('writeXlsxFile', function() {
 
     await writeXlsxFile(objects, { schema, sheet: 'Test Schema', filePath: path.join(OUTPUT_DIRECTORY, 'test-schema.xlsx') })
     await writeXlsxFile([objects, objects], { sheets: ['Sheet One', 'Sheet Two'], schema: [schema, schema], filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-multiple-sheets.xlsx') })
-    await writeXlsxFile(objects, { schema: schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-header-style.xlsx'), headerStyle: { align: 'center', color: '#cc0000', backgroundColor: '#eeeeee' } })
+    await writeXlsxFile(objects, { schema: schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-header-style-old.xlsx'), headerStyle: { align: 'center', color: '#cc0000', backgroundColor: '#eeeeee' } })
+    await writeXlsxFile(objects, { schema: schema, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-header-style.xlsx'), getHeaderStyle: (column) => ({ align: 'center', color: '#cc0000', backgroundColor: '#eeeeee' }) })
     await writeXlsxFile(objects, { schema: schemaNoSingleTitle, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-single-title.xlsx') })
     await writeXlsxFile(objects, { schema: schemaNoTitles, filePath: path.join(OUTPUT_DIRECTORY, 'test-schema-no-titles.xlsx') })
 

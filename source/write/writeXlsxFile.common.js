@@ -10,6 +10,7 @@ export function generateSheets({
   schema,
   columns,
   headerStyle,
+  getHeaderStyle,
   fontFamily,
   fontSize,
   orientation,
@@ -44,6 +45,11 @@ export function generateSheets({
     }
   }
 
+  // Rename deprecated `headerStyle` parameter to `getHeaderStyle(column)`.
+  if (headerStyle && !getHeaderStyle) {
+    getHeaderStyle = () => headerStyle
+  }
+
   // Validate sheet name.
   for (const sheetName of sheetNames) {
     validateSheetName(sheetName)
@@ -55,7 +61,7 @@ export function generateSheets({
     worksheets.push(generateWorksheet(data[sheetIndex], {
       schema: schema && schema[sheetIndex],
       columns: columns && columns[sheetIndex],
-      headerStyle,
+      getHeaderStyle,
       getStyle,
       getSharedString,
       customFont: fontFamily || fontSize,

@@ -142,8 +142,10 @@ type Orientation = 'landscape';
 
 export type Columns = Column[];
 
-export interface CommonOptions {
+export interface CommonOptions<Object = never> {
+  // `headerStyle` parameter is deprecated, use `getHeaderStyle(column)` instead.
   headerStyle?: CellStyle;
+  getHeaderStyle?: (column: ColumnSchema<Object, ValueType>) => CellStyle;
   fontFamily?: string;
   fontSize?: number;
   orientation?: Orientation;
@@ -154,30 +156,30 @@ export interface CommonOptions {
   dateFormat?: string;
 }
 
-interface CommonOptionsWithoutFileName extends CommonOptions {}
+interface CommonOptionsWithoutFileName<Object = never> extends CommonOptions<Object> {}
 
-interface CommonOptionsWithFileName extends CommonOptions {
+interface CommonOptionsWithFileName<Object = never> extends CommonOptions<Object> {
 	fileName: string;
 }
 
 // With Schema.
 
-interface WithSchemaWithoutFileNameOptions<Object> extends CommonOptionsWithoutFileName {
+interface WithSchemaWithoutFileNameOptions<Object> extends CommonOptionsWithoutFileName<Object> {
 	schema: Schema<Object>;
 	sheet?: string;
 }
 
-interface WithSchemaWithFileNameOptions<Object> extends CommonOptionsWithFileName {
+interface WithSchemaWithFileNameOptions<Object> extends CommonOptionsWithFileName<Object> {
 	schema: Schema<Object>;
 	sheet?: string;
 }
 
-interface WithSchemaWithoutFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithoutFileName {
+interface WithSchemaWithoutFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithoutFileName<Object> {
 	schema: Schema<Object>[];
 	sheets?: string[];
 }
 
-interface WithSchemaWithFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithFileName {
+interface WithSchemaWithFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithFileName<Object> {
 	schema: Schema<Object>[];
 	sheets?: string[];
 }

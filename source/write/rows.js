@@ -5,7 +5,7 @@ import generateRow from './row.js'
 
 export default function generateRows(data, {
 	schema,
-	headerStyle,
+	getHeaderStyle,
 	getStyle,
 	getSharedString,
 	customFont,
@@ -21,8 +21,8 @@ export default function generateRows(data, {
 					type: String,
 					value: column.column,
 					align: column.align,
-					// `headerStyle` also overwrites `align`, if specified.
-					...(headerStyle || DEFAULT_HEADER_STYLE)
+					// `getHeaderStyle` also overwrites `align`, if specified.
+					...(getHeaderStyle ? getHeaderStyle(column) : DEFAULT_HEADER_STYLE)
 				}))]
 				break
 			}

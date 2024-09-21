@@ -18,7 +18,7 @@ const WORKSHEET_TEMPLATE = `<?xml version="1.0" ?>
 export default function generateWorksheet(data_, {
 	schema,
 	columns,
-	headerStyle,
+	getHeaderStyle,
 	getStyle,
 	getSharedString,
 	customFont,
@@ -37,7 +37,7 @@ export default function generateWorksheet(data_, {
   return WORKSHEET_TEMPLATE
   	.replace('{data}', generateRows(data, {
   		schema,
-  		headerStyle,
+  		getHeaderStyle,
   		getStyle,
   		getSharedString,
   		customFont,

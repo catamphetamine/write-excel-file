@@ -331,16 +331,17 @@ const schema = [
 
 If `column` property is missing then column title won't be printed.
 
-The default table header style is `fontWeight: "bold"` and `align` being same as the schema column's `align`. One can provide a custom table header style by supplying a `headerStyle` parameter:
+The default table header style is `fontWeight: "bold"` and `align` being same as the schema column's `align`. One can provide a custom table header style by supplying a `getHeaderStyle` parameter:
 
 ```js
 await writeXlsxFile(objects, {
   schema,
-  headerStyle: {
+  getHeaderStyle: (column) => ({
     backgroundColor: '#eeeeee',
     fontWeight: 'bold',
-    align: 'center'
-  },
+    align: column.align,
+    indent: column.indent
+  }),
   filePath: '/path/to/file.xlsx'
 })
 ```

@@ -35,15 +35,15 @@ export type Cell = Cell_<ImageData>;
 
 // With Schema.
 
-interface WithSchemaCommonOptionsWriteToFile<Object> extends CommonOptions {
+interface WithSchemaCommonOptionsWriteToFile<Object> extends CommonOptions<Object> {
 	filePath: string;
 }
 
-interface WithSchemaCommonOptionsReturnBuffer<Object> extends CommonOptions {
+interface WithSchemaCommonOptionsReturnBuffer<Object> extends CommonOptions<Object> {
 	buffer: true;
 }
 
-interface WithSchemaCommonOptionsReturnStream<Object> extends CommonOptions {
+interface WithSchemaCommonOptionsReturnStream<Object> extends CommonOptions<Object> {
 }
 
 interface WithSchemaOptionsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object> {
