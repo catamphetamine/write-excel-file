@@ -13,24 +13,26 @@ export default function generateRows(data, {
 }) {
 	if (schema) {
 		let header = []
-		for (const column of schema) {
-			// If at least one schema column has a title,
-			// then print a header row.
-			if (column.column) {
-				header = [schema.map((column) => ({
+		for (const columnSchema of schema) {
+			// If at least one schema column has a title specified
+			// then it means that the header row should be rendered.
+			// Otherwise, it wouldn't be rendered.
+			if (columnSchema.column) {
+				header = [schema.map((columnSchema) => ({
 					type: String,
-					value: column.column,
-					align: column.align,
-					// `getHeaderStyle` also overwrites `align`, if specified.
-					...(getHeaderStyle ? getHeaderStyle(column) : DEFAULT_HEADER_STYLE)
+					value: columnSchema.column,
+					align: columnSchema.align,
+					// `getHeaderStyle()` overwrites `align`, if `getHeaderStyle()` is specified.
+					...(getHeaderStyle ? getHeaderStyle(columnSchema) : DEFAULT_HEADER_STYLE)
 				}))]
 				break
 			}
 		}
 		data = header.concat(data.map((row) => schema.map(
-			(column) => ({
-				...column,
-				value: column.value(row)
+			(columnSchema) => ({
+				...columnSchema,
+				...(columnSchema.getCellStyle ? columnSchema.getCellStyle(row) : undefined),
+				value: columnSchema.value(row)
 			})
 		)))
 	}

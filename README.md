@@ -233,7 +233,52 @@ There're also some additional exported `type`s available:
 * `Email` for email addresses.
 -->
 
-Aside from having a `type` and a `value`, each cell (or schema column) can also have:
+Aside from having a `type` and a `value`, each cell (or schema column) can also specify:
+
+* Custom [format](#format) — by specifying a `format` property.
+* Custom [style](#style)
+  * By specifying any style properties.
+  * (advanced) (only when using a `schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which allows specifying different style for different rows.
+
+### Format
+
+<!--
+* `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
+-->
+
+* `format: string` — Cell data format. Can only be used on `Date`, `Number` or `"Formula"` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
+
+  * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
+  * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
+  * `#,##0` — Number with a comma as a thousands separator, as used in most English-speaking countries. Example: `1,234,567`.
+  * `#,##0.00` — Currency, as in most English-speaking countries. Example: `1,234.50`.
+  * `0%` — Percents. Example: `30%`.
+  * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
+  * All `Date` cells (or schema columns) require a `format` (unless the [default `dateFormat`](#date-format) is set):
+
+    * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
+    * `mmm d yyyy` — Example: `Dec 31 2000`.
+    * `d mmmm yyyy` — Example: `31 December 2000`.
+    * `dd/mm/yyyy hh:mm AM/PM` — US date-time format. Example: `31/12/2000 12:30 AM`.
+    * or any other format where:
+
+      * `yy` — Last two digits of a year number.
+      * `yyyy` — Four digits of a year number.
+      * `m` — Month number without a leading `0`.
+      * `mm` — Month number with a leading `0` (when less than `10`).
+      * `mmm` — Month name (short).
+      * `mmmm` — Month name (long).
+      * `d` — Day number without a leading `0`.
+      * `dd` — Day number with a leading `0` (when less than `10`).
+      * `h` — Hours without a leading `0`.
+      * `hh` — Hours with a leading `0` (when less than `10`).
+      * `mm` — Minutes with a leading `0` (when less than `10`).
+      * `ss` — Seconds with a leading `0` (when less than `10`).
+      * `AM/PM` — Either `AM` or `PM`, depending on the time.
+
+### Style
+
+Cell style includes the following properties:
 
 * `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
 
@@ -278,45 +323,13 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
-<!--
-* `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
--->
-
-* `format: string` — Cell data format. Can only be used on `Date`, `Number` or `"Formula"` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
-
-  * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
-  * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
-  * `#,##0` — Number with a comma as a thousands separator, as used in most English-speaking countries. Example: `1,234,567`.
-  * `#,##0.00` — Currency, as in most English-speaking countries. Example: `1,234.50`.
-  * `0%` — Percents. Example: `30%`.
-  * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
-  * All `Date` cells (or schema columns) require a `format` (unless the [default `dateFormat`](#date-format) is set):
-
-    * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
-    * `mmm d yyyy` — Example: `Dec 31 2000`.
-    * `d mmmm yyyy` — Example: `31 December 2000`.
-    * `dd/mm/yyyy hh:mm AM/PM` — US date-time format. Example: `31/12/2000 12:30 AM`.
-    * or any other format where:
-
-      * `yy` — Last two digits of a year number.
-      * `yyyy` — Four digits of a year number.
-      * `m` — Month number without a leading `0`.
-      * `mm` — Month number with a leading `0` (when less than `10`).
-      * `mmm` — Month name (short).
-      * `mmmm` — Month name (long).
-      * `d` — Day number without a leading `0`.
-      * `dd` — Day number with a leading `0` (when less than `10`).
-      * `h` — Hours without a leading `0`.
-      * `hh` — Hours with a leading `0` (when less than `10`).
-      * `mm` — Minutes with a leading `0` (when less than `10`).
-      * `ss` — Seconds with a leading `0` (when less than `10`).
-      * `AM/PM` — Either `AM` or `PM`, depending on the time.
-
 ## Table Header
 
 #### Schema
 
-When using a `schema`, column titles can be set via a `column` property on each column. It will be printed at the top of the table.
+When using a `schema`, table header row can be customized by providing column titles and style.
+
+To set column title, specify a `column` property for the corresponding column in the `schema`.
 
 ```js
 const schema = [
@@ -329,18 +342,22 @@ const schema = [
 ]
 ```
 
-If `column` property is missing then column title won't be printed.
+When column title is not specified, there's gonna be no title at the top of the column.
 
-The default table header style is `fontWeight: "bold"` and `align` being same as the schema column's `align`. One can provide a custom table header style by supplying a `getHeaderStyle` parameter:
+The default style for a table header cell is:
+* `fontWeight` — `"bold"`
+* `align` — equal to the `schema` column's `align` property value
+
+To override that default style, provide a `getHeaderStyle(columnSchema)` function:
 
 ```js
 await writeXlsxFile(objects, {
   schema,
-  getHeaderStyle: (column) => ({
+  getHeaderStyle: (columnSchema) => ({
     backgroundColor: '#eeeeee',
     fontWeight: 'bold',
-    align: column.align,
-    indent: column.indent
+    align: columnSchema.align,
+    indent: columnSchema.indent
   }),
   filePath: '/path/to/file.xlsx'
 })

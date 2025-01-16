@@ -45,7 +45,7 @@ export function generateSheets({
     }
   }
 
-  // Rename deprecated `headerStyle` parameter to `getHeaderStyle(column)`.
+  // Rename deprecated `headerStyle` parameter to `getHeaderStyle(columnSchema)`.
   if (headerStyle && !getHeaderStyle) {
     getHeaderStyle = () => headerStyle
   }

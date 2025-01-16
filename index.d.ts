@@ -130,6 +130,8 @@ export interface ColumnSchema<Object, Type> extends CellProps<Type> {
 	width?: number;
 	// Cell value getter.
 	value(object: Object): Type | undefined | null;
+	// Cell style getter.
+	getCellStyle?(object: Object): CellStyle | undefined;
 }
 
 export type Schema<Object> = ColumnSchema<Object, ValueType>[];
@@ -143,9 +145,9 @@ type Orientation = 'landscape';
 export type Columns = Column[];
 
 export interface CommonOptions<Object = never> {
-  // `headerStyle` parameter is deprecated, use `getHeaderStyle(column)` instead.
+  // `headerStyle` parameter is deprecated, use `getHeaderStyle(columnSchema)` instead.
   headerStyle?: CellStyle;
-  getHeaderStyle?: (column: ColumnSchema<Object, ValueType>) => CellStyle;
+  getHeaderStyle?: (columnSchema: ColumnSchema<Object, ValueType>) => CellStyle | undefined;
   fontFamily?: string;
   fontSize?: number;
   orientation?: Orientation;

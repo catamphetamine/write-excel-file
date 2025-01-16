@@ -1,3 +1,8 @@
+2.0.11 / 16.01.2025
+==================
+
+* Added a `getCellStyle(object)` function in cases when using a `schema`. This allows setting different style for different rows when using a `schema`.
+
 2.0.6 / 16.08.2024
 ==================
 
