@@ -53,8 +53,11 @@ export default function generateRow(row, rowIndex, {
 
 			// Validate `format` property.
 			if (format) {
-				if (type !== Date && type !== Number && type !== 'Formula') { // && type !== Integer) {
-					throw new Error('`format` can only be used on `Date`, `Number` or `"Formula"` cells') // or `Integer` cells')
+				if (type !== Date && type !== Number && type !== String && type !== 'Formula') { // && type !== Integer) {
+					throw new Error('`format` can only be used on `Date`, `Number`, `String` or `"Formula"` cells') // or `Integer` cells')
+				}
+				if (type === String && format !== '@') {
+					throw new Error('`String` cells only support "@" `format`')
 				}
 			} else {
 				if (type === Date) {

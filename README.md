@@ -242,11 +242,17 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
 
 ### Format
 
+A cell (or a schema column) could specify a `format` property:
+
 <!--
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
 -->
 
-* `format: string` — Cell data format. Can only be used on `Date`, `Number` or `"Formula"` <!-- or `Integer` --> cells. There're [many formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) supported in the `*.xlsx` standard. Some of the common ones:
+* `format: string` — Cell data format. Can only be used on `Date`, `Number`, `String` or `"Formula"` <!-- or `Integer` --> cells. Its purpose is to show the "raw" cell data — for example, a number or a date — in a particular way: as a floating-point number with a specific number of decimal places, or as a percentage, or maybe as a date in a particular date format.
+
+There're many [standardized formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) to choose from.
+
+Some of the commonly used `Number` formats are:
 
   * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
   * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
@@ -254,27 +260,30 @@ Aside from having a `type` and a `value`, each cell (or schema column) can also 
   * `#,##0.00` — Currency, as in most English-speaking countries. Example: `1,234.50`.
   * `0%` — Percents. Example: `30%`.
   * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
-  * All `Date` cells (or schema columns) require a `format` (unless the [default `dateFormat`](#date-format) is set):
 
-    * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
-    * `mmm d yyyy` — Example: `Dec 31 2000`.
-    * `d mmmm yyyy` — Example: `31 December 2000`.
-    * `dd/mm/yyyy hh:mm AM/PM` — US date-time format. Example: `31/12/2000 12:30 AM`.
-    * or any other format where:
+All `Date` cells (or schema columns) are required to specify a `format`, unless the [default `dateFormat`](#date-format) is set:
 
-      * `yy` — Last two digits of a year number.
-      * `yyyy` — Four digits of a year number.
-      * `m` — Month number without a leading `0`.
-      * `mm` — Month number with a leading `0` (when less than `10`).
-      * `mmm` — Month name (short).
-      * `mmmm` — Month name (long).
-      * `d` — Day number without a leading `0`.
-      * `dd` — Day number with a leading `0` (when less than `10`).
-      * `h` — Hours without a leading `0`.
-      * `hh` — Hours with a leading `0` (when less than `10`).
-      * `mm` — Minutes with a leading `0` (when less than `10`).
-      * `ss` — Seconds with a leading `0` (when less than `10`).
-      * `AM/PM` — Either `AM` or `PM`, depending on the time.
+  * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
+  * `mmm d yyyy` — Example: `Dec 31 2000`.
+  * `d mmmm yyyy` — Example: `31 December 2000`.
+  * `dd/mm/yyyy hh:mm AM/PM` — US date-time format. Example: `31/12/2000 12:30 AM`.
+  * or any other format where:
+
+    * `yy` — Last two digits of a year number.
+    * `yyyy` — Four digits of a year number.
+    * `m` — Month number without a leading `0`.
+    * `mm` — Month number with a leading `0` (when less than `10`).
+    * `mmm` — Month name (short).
+    * `mmmm` — Month name (long).
+    * `d` — Day number without a leading `0`.
+    * `dd` — Day number with a leading `0` (when less than `10`).
+    * `h` — Hours without a leading `0`.
+    * `hh` — Hours with a leading `0` (when less than `10`).
+    * `mm` — Minutes with a leading `0` (when less than `10`).
+    * `ss` — Seconds with a leading `0` (when less than `10`).
+    * `AM/PM` — Either `AM` or `PM`, depending on the time.
+
+A `String` cell (or a schema column) could specify `@` format in order to explicitly declare itself being of "Text" type rather than the default "General" type. The point is, this way Excel won't attempt to "intelligently" interpret the cell data as a number or a date, as it would do when using the default "General" type.
 
 ### Style
 

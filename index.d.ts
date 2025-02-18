@@ -104,7 +104,7 @@ interface CellProps<Type> extends CellStyle {
 	// A simpler (loose) variant:
 	// type?: ValueType;
 
-	// Data output format (for numbers or dates).
+	// Data output format (for numbers or dates or strings).
 	format?: string;
 }
 

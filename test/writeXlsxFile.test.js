@@ -32,6 +32,7 @@ describe('writeXlsxFile', function() {
       {
         column: 'Name',
         type: String,
+        format: '@',
         value: student => student.name,
         getCellStyle: (student) => {
           return {
