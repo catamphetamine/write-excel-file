@@ -325,15 +325,8 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 
 ## Implementation Notes
 
-* Some parts have been implemented:
-  * TypeScript support for `type: "Image"`.
-  * README:
-    * `## Images` section.
-    * `* "Image"` value in description of `type` property.
-
-* Since it has to include the physical image file in the `*.xlsx` archive, it should be passed:
-  * On client: as a `File` or as a `Blob`.
-    * I guess the `Blob` doesn't have a filename, but it's optional anyway, and otherwise those two seem to be equal because `File` class extends `Blob` class.
-  * On server: as a `String` path, or as a `Buffer`, or as a `Readable` stream.
-    * That would be analogous to how [`read-excel-file`](https://gitlab.com/catamphetamine/read-excel-file) supports the input being one of those types, so the input handling code could be copypasted from it, along with the TypeScript "typings".
-    * I guess a `Buffer` doesn't have a filename, but it's optional anyway.
+* The image `content` could be passed in the following forms:
+  * On client: as a `File` or a `Blob`.
+    * Both `File` and `Blob` have a `type` property that corresponds to the assumed content type of the image, but that one [can't be relied on](https://developer.mozilla.org/en-US/docs/Web/API/Blob/type).
+  * On server: as a `String` path, or a `Buffer`, or a `Readable` stream.
+    * That would be analogous to the format [`read-excel-file`](https://gitlab.com/catamphetamine/read-excel-file) supports its input to be in, so the input handling code could be copypasted from that package, along with the TypeScript "typings".
