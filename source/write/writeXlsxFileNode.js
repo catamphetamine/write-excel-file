@@ -7,7 +7,10 @@ import Archive from './archive.js'
 import generateWorkbookXml from './statics/workbook.xml.js'
 import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
 import rels from './statics/rels.js'
-import contentTypes from './statics/[Content_Types].xml.js'
+import generateContentTypesXml from './statics/[Content_Types].xml.js'
+import generateDrawingXml from './statics/drawing.xml.js'
+import generateDrawingXmlRels from './statics/drawing.xml.rels.js'
+import generateSheetXmlRels from './statics/sheet.xml.rels.js'
 
 import { generateSheets } from './writeXlsxFile.common.js'
 
@@ -58,8 +61,11 @@ export default async function writeXlsxFile(data, {
 	// https://www.npmjs.com/package/archiver
 	const root = await createTempDirectory()
 	const xl = await createDirectory(path.join(root, 'xl'))
+	const drawingsPath = await createDirectory(path.join(xl, 'drawings'))
+	const drawingsRelsPath = await createDirectory(path.join(drawingsPath, '_rels'))
 	const _rels = await createDirectory(path.join(xl, '_rels'))
 	const worksheetsPath = await createDirectory(path.join(xl, 'worksheets'))
+	const worksheetsRelsPath = await createDirectory(path.join(worksheetsPath, '_rels'))
 
 	const promises = [
 		writeFile(path.join(_rels, 'workbook.xml.rels'), generateWorkbookXmlRels({ sheets })),
@@ -68,15 +74,27 @@ export default async function writeXlsxFile(data, {
 		writeFile(path.join(xl, 'sharedStrings.xml'), getSharedStringsXml())
 	]
 
-	for (const { id, data } of sheets) {
+	for (const { id, data, images } of sheets) {
 		promises.push(writeFile(path.join(worksheetsPath, `sheet${id}.xml`), data))
+		promises.push(writeFile(path.join(worksheetsRelsPath, `sheet${id}.xml.rels`), generateSheetXmlRels({ id, images })))
+		if (images) {
+			promises.push(writeFile(path.join(drawingsPath, `drawing${id}.xml`), generateDrawingXml({ images })))
+			promises.push(writeFile(path.join(drawingsRelsPath, `drawing${id}.xml.rels`), generateDrawingXmlRels({ images })))
+		}
+    // ... Copy images to `xl/media` folder ...
 	}
 
 	await Promise.all(promises)
 
 	archive.directory(xl, 'xl')
+
 	archive.append(rels, '_rels/.rels')
-	archive.append(contentTypes, '[Content_Types].xml')
+
+  archive.append(generateContentTypesXml({
+  	// Get `fileExtensionContentTypes` from `images`:
+    // fileExtensionContentTypes: [{ fileExtension: 'jpeg', contentType: 'image/jpeg' }, ...]
+    fileExtensionContentTypes: []
+  }), '[Content_Types].xml')
 
 	if (filePath) {
 		await archive.write()

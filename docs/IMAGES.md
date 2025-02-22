@@ -84,7 +84,13 @@ The image object could look like:
   width: number,
 
   // Image height, in pixels.
-  height: number
+  height: number,
+
+  // (optional) Title.
+  title?: string,
+
+  // (optional) Description.
+  description?: string
 }
 ```
 
@@ -243,6 +249,7 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 
   ...
 
+  <!-- (not required?) -->
   <!-- Add this entry for each "drawing". -->
   <!-- A "drawing" is not an "image" but rather "all images used on a particular sheet". -->
   <!-- So there's one "drawing" per every "sheet" that contains images. -->

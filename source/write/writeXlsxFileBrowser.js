@@ -7,7 +7,10 @@ import FileSaver from 'file-saver'
 import generateWorkbookXml from './statics/workbook.xml.js'
 import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
 import rels from './statics/rels.js'
-import contentTypes from './statics/[Content_Types].xml.js'
+import generateContentTypesXml from './statics/[Content_Types].xml.js'
+import generateDrawingXml from './statics/drawing.xml.js'
+import generateDrawingXmlRels from './statics/drawing.xml.rels.js'
+import generateSheetXmlRels from './statics/sheet.xml.rels.js'
 
 import { generateSheets } from './writeXlsxFile.common.js'
 
@@ -45,7 +48,12 @@ function generateXlsxFile(data, {
   const zip = new JSZip()
 
   zip.file('_rels/.rels', rels)
-  zip.file('[Content_Types].xml', contentTypes)
+
+  zip.file('[Content_Types].xml', generateContentTypesXml({
+    // Get `fileExtensionContentTypes` from `images`:
+    // fileExtensionContentTypes: [{ fileExtension: 'jpeg', contentType: 'image/jpeg' }, ...]
+    fileExtensionContentTypes: []
+  }))
 
   const {
     sheets,
@@ -75,8 +83,14 @@ function generateXlsxFile(data, {
   xl.file('styles.xml', getStylesXml())
   xl.file('sharedStrings.xml', getSharedStringsXml())
 
-  for (const { id, data } of sheets) {
+  for (const { id, data, images } of sheets) {
     xl.file(`worksheets/sheet${id}.xml`, data)
+    xl.file(`worksheets/_rels/sheet${id}.xml.rels`, generateSheetXmlRels({ id, images: undefined }))
+    if (images) {
+      xl.file(`drawings/drawing${id}.xml`, generateDrawingXml({ images }))
+      xl.file(`drawings/_rels/drawing${id}.xml.rels`, generateDrawingXmlRels({ images }))
+    }
+    // ... Copy images to `xl/media` folder ...
   }
 
   return zip.generateAsync({

@@ -225,6 +225,50 @@ describe('writeXlsxFile', function() {
     await writeXlsxFile(data, { columns, filePath: path.join(OUTPUT_DIRECTORY, 'test-default-font.xlsx'), fontFamily: 'Arial', fontSize: 16 })
     await writeXlsxFile(data, { columns,  showGridLines: false, filePath: path.join(OUTPUT_DIRECTORY, 'test-hide-grid-lines.xlsx') })
 
+    await writeXlsxFile([data, data], {
+      sheets: ['Sheet One', 'Sheet Two'],
+      columns: [columns, columns],
+      filePath: path.join(OUTPUT_DIRECTORY, 'test-cells-multiple-sheets-with-images.xlsx'),
+      images: [
+        [
+          {
+            content: '...PathToJpgFile...',
+            contentType: 'image/jpeg',
+            width: 128,
+            height: 128,
+            anchor: {
+              row: 1,
+              cell: 1
+            }
+          },
+          {
+            content: '...Buffer...',
+            contentType: 'image/png',
+            width: 128,
+            height: 128,
+            anchor: {
+              row: 2,
+              cell: 5
+            }
+          }
+        ],
+        [
+          {
+            content: '...ReadableStream...',
+            contentType: 'image/png',
+            width: 128,
+            height: 128,
+            anchor: {
+              row: 1,
+              cell: 1
+            },
+            offsetX: 20,
+            offsetY: 20
+          }
+        ]
+      ]
+    })
+
     await shouldThrow('empty', async () => {
       await writeXlsxFile([data], { columns: [columns], filePath: path.join(OUTPUT_DIRECTORY, 'test-illegal-characters-in-sheet-name.xlsx'), sheets: [''] })
     })
