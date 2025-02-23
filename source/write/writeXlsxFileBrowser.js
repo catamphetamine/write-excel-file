@@ -6,13 +6,15 @@ import FileSaver from 'file-saver'
 
 import getImageFileName from './getImageFileName.js'
 
-import generateWorkbookXml from './statics/workbook.xml.js'
-import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
-import rels from './statics/rels.js'
-import generateContentTypesXml from './statics/[Content_Types].xml.js'
-import generateDrawingXml from './statics/drawing.xml.js'
-import generateDrawingXmlRels from './statics/drawing.xml.rels.js'
-import generateSheetXmlRels from './statics/sheet.xml.rels.js'
+import generateWorkbookXml from './files/workbook.xml.js'
+import generateWorkbookXmlRels from './files/workbook.xml.rels.js'
+import rels from './files/rels.js'
+import generateContentTypesXml from './files/[Content_Types].xml.js'
+import generateDrawingXml from './files/drawing.xml.js'
+import generateDrawingXmlRels from './files/drawing.xml.rels.js'
+import generateSheetXmlRels from './files/sheet.xml.rels.js'
+import generateSharedStringsXml from './files/sharedStrings.xml.js'
+import generateStylesXml from './files/styles.xml.js'
 
 import { generateSheets } from './writeXlsxFile.common.js'
 
@@ -52,8 +54,8 @@ function generateXlsxFile(data, {
 
   const {
     sheets,
-    getSharedStringsXml,
-    getStylesXml
+    getSharedStrings,
+    getStyles
   } = generateSheets({
     data,
     sheetName,
@@ -80,8 +82,8 @@ function generateXlsxFile(data, {
   const xl = zip.folder('xl')
   xl.file('_rels/workbook.xml.rels', generateWorkbookXmlRels({ sheets }))
   xl.file('workbook.xml', generateWorkbookXml({ sheets, stickyRowsCount, stickyColumnsCount }))
-  xl.file('styles.xml', getStylesXml())
-  xl.file('sharedStrings.xml', getSharedStringsXml())
+  xl.file('styles.xml', generateStylesXml(getStyles()))
+  xl.file('sharedStrings.xml', generateSharedStringsXml(getSharedStrings()))
 
   for (const { id, data, images } of sheets) {
     xl.file(`worksheets/sheet${id}.xml`, data)

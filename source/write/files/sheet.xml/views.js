@@ -1,5 +1,5 @@
 import generateCellNumber from './generateCellNumber.js'
-import getAttributesString from '../xml/getAttributesString.js'
+import getAttributesString from '../../../xml/getAttributesString.js'
 
 export default function generateViews({
 	stickyRowsCount,

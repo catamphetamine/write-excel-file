@@ -3,8 +3,6 @@
 
 import generateWorksheet from './worksheet.js'
 
-import SharedStrings from './sharedStrings.js'
-
 describe('generateWorksheet()', () => {
   it('Should generate XML Worksheet', () => {
   	const colsXML = '';

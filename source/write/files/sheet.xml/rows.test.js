@@ -1,7 +1,5 @@
 import generateRows from './rows.js'
 
-import SharedStrings from './sharedStrings.js'
-
 describe('generateRows()', () => {
   it('should generate rows', () => {
     expect(generateRows([[{

@@ -1,4 +1,4 @@
-import $attr from '../xml/sanitizeAttributeValue.js'
+import $attr from '../../../xml/sanitizeAttributeValue.js'
 
 export default function generateLayout({
 	sheetId,

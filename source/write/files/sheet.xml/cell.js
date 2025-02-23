@@ -2,8 +2,8 @@
 // import URL, { isURL } from '../types/URL.js'
 // import Email, { isEmail } from '../types/Email.js'
 
-import $text from '../xml/sanitizeText.js'
-import getAttributesString from '../xml/getAttributesString.js'
+import $text from '../../../xml/sanitizeText.js'
+import getAttributesString from '../../../xml/getAttributesString.js'
 
 import generateCellNumber from './generateCellNumber.js'
 import convertDateToExcelSerial from './convertDateToExcelSerial.js'

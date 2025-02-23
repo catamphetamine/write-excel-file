@@ -3,7 +3,7 @@
 
 import generateCell from './cell.js'
 import getCellStyleProperties from './getCellStyleProperties.js'
-import getAttributesString from '../xml/getAttributesString.js'
+import getAttributesString from '../../../xml/getAttributesString.js'
 
 // import Integer from '../types/Integer.js'
 

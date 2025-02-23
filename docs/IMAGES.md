@@ -314,9 +314,7 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 </xdr:wsDr>
 ```
 
-* Alternatively to `<xdr:oneCellAnchor/>` with `<xdr:from/>`, one could use `<xdr:twoCellAnchor editAs="oneCell">` with `<xdr:from/>` and `<xdr:to/>`.
-  * The difference seems to be that in the latter case, the function would have to somehow map the image's bottom right corner to the "to" cell's coordinates, which seems like a non-trivial task.
-  * It's not clear why would one choose the latter approach over the former one.
+* Alternatively to `<xdr:oneCellAnchor/>` with `<xdr:from/>`, one could use `<xdr:twoCellAnchor editAs="oneCell">` with `<xdr:from/>` and `<xdr:to/>` to "tie" both the top-left corner and the bottom-right corner of the image to two cells of a spreadsheet, the idea of which seems convenient in order to somehow auto-resize the image so that it automatically fits the given span of rows and columns. However, the behavior of this feature seems extremely clunky because the image's apect ratio become skewed, and there seems to be no way (?) of telling it to both automatically resize itself to those anchors while also preserving its original aspect ratio, analogous to CSS's [`object-fit: contain`](https://developer.mozilla.org/en-US/docs/Web/CSS/object-fit). Specification of `twoCellAnchor`: http://officeopenxml.com/drwPicInSpread-twoCell.php
 
 * Add the "drawing"'s "relationship" to `worksheets/_rels/sheet{numericId}.xml.rels`
   * The `rId{numericId}` should be unique within the `.xml.rels` file but not globally across multiple such files.

@@ -1,4 +1,4 @@
-import generateWorksheet from './worksheet.js'
+import generateWorksheet from './files/sheet.xml/worksheet.js'
 import initStyles from './styles.js'
 import initSharedStrings from './sharedStrings.js'
 import validateSheetName from './validateSheetName.js'
@@ -21,8 +21,8 @@ export function generateSheets({
   rightToLeft,
   dateFormat
 }) {
-  const { getSharedStringsXml, getSharedString } = initSharedStrings()
-  const { getStylesXml, getStyle } = initStyles({ fontFamily, fontSize })
+  const { getSharedStrings, getSharedString } = initSharedStrings()
+  const { getStyles, getStyle } = initStyles({ fontFamily, fontSize })
 
   // Versions before `1.3.4` had a bug:
   // In a "write multiple sheets" scenario, `columns` parameter
@@ -91,7 +91,7 @@ export function generateSheets({
       data: worksheets[i],
       images: images && images[i]
     })),
-    getSharedStringsXml,
-    getStylesXml
+    getSharedStrings,
+    getStyles
   }
 }

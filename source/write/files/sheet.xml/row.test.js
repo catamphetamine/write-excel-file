@@ -3,11 +3,8 @@
 
 import generateRow from './row.js'
 
-import SharedStrings from './sharedStrings.js'
-
 describe('generateRow()', () => {
   it('Should create one row from given data', () => {
-    const sharedStrings = new SharedStrings()
     expect(generateRow(
       [
         { value: 'Test', type: String },

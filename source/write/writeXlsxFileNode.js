@@ -6,13 +6,15 @@ import Stream, { Readable } from 'stream'
 import Archive from './archive.js'
 import getImageFileName from './getImageFileName.js'
 
-import generateWorkbookXml from './statics/workbook.xml.js'
-import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
-import rels from './statics/rels.js'
-import generateContentTypesXml from './statics/[Content_Types].xml.js'
-import generateDrawingXml from './statics/drawing.xml.js'
-import generateDrawingXmlRels from './statics/drawing.xml.rels.js'
-import generateSheetXmlRels from './statics/sheet.xml.rels.js'
+import generateWorkbookXml from './files/workbook.xml.js'
+import generateWorkbookXmlRels from './files/workbook.xml.rels.js'
+import rels from './files/rels.js'
+import generateContentTypesXml from './files/[Content_Types].xml.js'
+import generateDrawingXml from './files/drawing.xml.js'
+import generateDrawingXmlRels from './files/drawing.xml.rels.js'
+import generateSheetXmlRels from './files/sheet.xml.rels.js'
+import generateSharedStringsXml from './files/sharedStrings.xml.js'
+import generateStylesXml from './files/styles.xml.js'
 
 import { generateSheets } from './writeXlsxFile.common.js'
 
@@ -41,8 +43,8 @@ export default async function writeXlsxFile(data, {
 
 	const {
 		sheets,
-		getSharedStringsXml,
-		getStylesXml
+		getSharedStrings,
+		getStyles
 	} = generateSheets({
 		data,
 		sheetName,
@@ -77,8 +79,8 @@ export default async function writeXlsxFile(data, {
 	const promises = [
 		writeFile(path.join(_rels, 'workbook.xml.rels'), generateWorkbookXmlRels({ sheets })),
 		writeFile(path.join(xl, 'workbook.xml'), generateWorkbookXml({ sheets, stickyRowsCount, stickyColumnsCount })),
-		writeFile(path.join(xl, 'styles.xml'), getStylesXml()),
-		writeFile(path.join(xl, 'sharedStrings.xml'), getSharedStringsXml())
+		writeFile(path.join(xl, 'styles.xml'), generateStylesXml(getStyles())),
+		writeFile(path.join(xl, 'sharedStrings.xml'), generateSharedStringsXml(getSharedStrings()))
 	]
 
 	for (const { id, data, images } of sheets) {
