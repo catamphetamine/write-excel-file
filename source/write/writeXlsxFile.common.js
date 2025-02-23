@@ -9,6 +9,7 @@ export function generateSheets({
   sheetNames,
   schema,
   columns,
+  images,
   headerStyle,
   getHeaderStyle,
   fontFamily,
@@ -34,6 +35,9 @@ export function generateSheets({
     }
   }
 
+  // If only a single sheet is being written,
+  // convert parameters to arrays as if multiple sheets were being written.
+  // This way, the code after this wouldn't bother about the parameters being arrays or not.
   if (!sheetNames) {
     sheetNames = [sheetName || 'Sheet1']
     data = [data]
@@ -42,6 +46,9 @@ export function generateSheets({
     }
     if (schema) {
       schema = [schema]
+    }
+    if (images) {
+      images = [images]
     }
   }
 
@@ -61,6 +68,7 @@ export function generateSheets({
     worksheets.push(generateWorksheet(data[sheetIndex], {
       schema: schema && schema[sheetIndex],
       columns: columns && columns[sheetIndex],
+      images: images && images[sheetIndex],
       getHeaderStyle,
       getStyle,
       getSharedString,
@@ -80,7 +88,8 @@ export function generateSheets({
     sheets: sheetNames.map((sheetName, i) => ({
       id: i + 1,
       name: sheetName,
-      data: worksheets[i]
+      data: worksheets[i],
+      images: images && images[i]
     })),
     getSharedStringsXml,
     getStylesXml

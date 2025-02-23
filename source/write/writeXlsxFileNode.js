@@ -1,8 +1,10 @@
 import fs from 'fs'
 import path from 'path'
 import os from 'os'
+import Stream, { Readable } from 'stream'
 
 import Archive from './archive.js'
+import getImageFileName from './getImageFileName.js'
 
 import generateWorkbookXml from './statics/workbook.xml.js'
 import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
@@ -21,6 +23,7 @@ export default async function writeXlsxFile(data, {
 	sheets: sheetNames,
 	schema,
 	columns,
+	images,
 	headerStyle,
 	getHeaderStyle,
 	fontFamily,
@@ -32,6 +35,8 @@ export default async function writeXlsxFile(data, {
 	rightToLeft,
 	dateFormat
 } = {}) {
+	// I dunno why it uses `Archive` here instead of something like `JSZip`
+	// that is used in `writeXlsxFileBrowser.js`.
 	const archive = new Archive(filePath)
 
 	const {
@@ -44,6 +49,7 @@ export default async function writeXlsxFile(data, {
 		sheetNames,
 		schema,
 		columns,
+		images,
 		headerStyle,
 		getHeaderStyle,
 		fontFamily,
@@ -61,6 +67,7 @@ export default async function writeXlsxFile(data, {
 	// https://www.npmjs.com/package/archiver
 	const root = await createTempDirectory()
 	const xl = await createDirectory(path.join(root, 'xl'))
+	const mediaPath = await createDirectory(path.join(xl, 'media'))
 	const drawingsPath = await createDirectory(path.join(xl, 'drawings'))
 	const drawingsRelsPath = await createDirectory(path.join(drawingsPath, '_rels'))
 	const _rels = await createDirectory(path.join(xl, '_rels'))
@@ -79,9 +86,14 @@ export default async function writeXlsxFile(data, {
 		promises.push(writeFile(path.join(worksheetsRelsPath, `sheet${id}.xml.rels`), generateSheetXmlRels({ id, images })))
 		if (images) {
 			promises.push(writeFile(path.join(drawingsPath, `drawing${id}.xml`), generateDrawingXml({ images })))
-			promises.push(writeFile(path.join(drawingsRelsPath, `drawing${id}.xml.rels`), generateDrawingXmlRels({ images })))
+			promises.push(writeFile(path.join(drawingsRelsPath, `drawing${id}.xml.rels`), generateDrawingXmlRels({ images, sheetId: id })))
+			// Copy images to `xl/media` folder.
+			for (const image of images) {
+				const imageContentReadableStream = getReadableStream(image.content)
+				const imageFilePath = path.join(mediaPath, getImageFileName(image, { sheetId: id, sheetImages: images }))
+				promises.push(writeFileFromStream(imageFilePath, imageContentReadableStream))
+			}
 		}
-    // ... Copy images to `xl/media` folder ...
 	}
 
 	await Promise.all(promises)
@@ -90,11 +102,7 @@ export default async function writeXlsxFile(data, {
 
 	archive.append(rels, '_rels/.rels')
 
-  archive.append(generateContentTypesXml({
-  	// Get `fileExtensionContentTypes` from `images`:
-    // fileExtensionContentTypes: [{ fileExtension: 'jpeg', contentType: 'image/jpeg' }, ...]
-    fileExtensionContentTypes: []
-  }), '[Content_Types].xml')
+  archive.append(generateContentTypesXml({ images }), '[Content_Types].xml')
 
 	if (filePath) {
 		await archive.write()
@@ -106,6 +114,13 @@ export default async function writeXlsxFile(data, {
 	}
 }
 
+// According to Node.js docs:
+// https://nodejs.org/api/fs.html#fswritefilefile-data-options-callback
+// `contents` argument could be of type:
+// * string — File path
+// * Buffer
+// * TypedArray
+// * DataView
 function writeFile(path, contents) {
 	return new Promise((resolve, reject) => {
 		fs.writeFile(path, contents, 'utf-8', (error) => {
@@ -187,4 +202,34 @@ function streamToBuffer(stream) {
 		stream.on('end', () => resolve(Buffer.concat(chunks)))
 		stream.on('error', reject)
 	})
+}
+
+function copyFile(fromPath, toPath) {
+	return new Promise((resolve, reject) => {
+		fs.copyFile(fromPath, toPath, (error) => {
+			if (error) {
+				return reject(error)
+			}
+			resolve()
+		})
+	})
+}
+
+function getReadableStream(source) {
+	if (source instanceof Stream) {
+		return source
+	}
+	if (source instanceof Buffer) {
+		return Readable.from(source)
+	}
+	if (typeof source === 'string') {
+		return fs.createReadStream(source)
+	}
+	throw new Error('Unsupported content source: couldn\'t convert it to a readable stream')
+}
+
+function writeFileFromStream(filePath, readableStream) {
+	const writableStream = fs.createWriteStream(filePath)
+	readableStream.pipe(writableStream)
+	return new Promise(resolve => writableStream.on('finish', resolve))
 }

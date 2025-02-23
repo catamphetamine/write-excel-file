@@ -1,17 +1,17 @@
 # Images
 
-There have been requests of adding the ability to insert images in `*.xlsx` files.
+This document is a general guideline for implementing the feature in the package, or any other XLSX writer.
+
+## Preface
+
+Adding the ability to insert images in `*.xlsx` files has been requested multiple times.
 
 * https://github.com/catamphetamine/write-excel-file/issues/3
 * https://gitlab.com/catamphetamine/write-excel-file/-/issues/17
 * https://gitlab.com/catamphetamine/write-excel-file/-/issues/96
 * https://stackoverflow.com/questions/40486860/create-an-excel-file-with-a-few-styles-using-client-side-javascript-if-possible/68086665?noredirect=1#comment136555466_68086665
 
-[@Miniontoby](https://gitlab.com/Miniontoby) has forked the repo and submitted a [pull request](https://gitlab.com/catamphetamine/write-excel-file/-/merge_requests/5/) with the implementation of the feature. That pull request can be used as a reference when adding support for images in the original package. But the author of the original package is currently busy, so the progress could be slow. Until then, consider using [@Miniontoby](https://gitlab.com/Miniontoby)'s fork if the images feature is required.
-
-## Document
-
-This document is a general guideline for implementing the feature in the package, or any other XLSX writer.
+[@Miniontoby](https://gitlab.com/Miniontoby) has submitted a [pull request](https://gitlab.com/catamphetamine/write-excel-file/-/merge_requests/5/) with the implementation of the feature according to this guideline. The code from that pull request was eventually copy-pasted into the main branch with some modifications.
 
 ## Input
 
@@ -329,11 +329,3 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
 	<drawing r:id="rId{numericId}"/>
 </worksheet>
 ```
-
-## Implementation Notes
-
-* The image `content` could be passed in the following forms:
-  * On client: as a `File` or a `Blob`.
-    * Both `File` and `Blob` have a `type` property that corresponds to the assumed content type of the image, but that one [can't be relied on](https://developer.mozilla.org/en-US/docs/Web/API/Blob/type).
-  * On server: as a `String` path, or a `Buffer`, or a `Readable` stream.
-    * That would be analogous to the format [`read-excel-file`](https://gitlab.com/catamphetamine/read-excel-file) supports its input to be in, so the input handling code could be copypasted from that package, along with the TypeScript "typings".

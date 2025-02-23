@@ -112,6 +112,25 @@ type Column = {
 
 type Orientation = 'landscape';
 
+export interface ImageType<ImageContent> {
+	content: ImageContent;
+	contentType: string;
+	width: number;
+	height: number;
+	anchor: {
+		row: number;
+		column: number;
+	};
+	offsetX?: number;
+	offsetY?: number;
+	title?: string;
+	description?: string;
+}
+
+type ImageContent = File | Blob | ArrayBuffer;
+
+export type Image = ImageType<ImageContent>;
+
 export type Columns = Column[];
 
 export interface CommonOptions<Object = never> {
@@ -130,47 +149,61 @@ export interface CommonOptions<Object = never> {
 
 interface CommonOptionsWithoutFileName<Object = never> extends CommonOptions<Object> {}
 
-interface CommonOptionsWithFileName<Object = never> extends CommonOptions<Object> {
+interface CommonOptionsWriteToFile<Object = never> extends CommonOptions<Object> {
 	fileName: string;
 }
 
 // With Schema.
 
-interface WithSchemaWithoutFileNameOptions<Object> extends CommonOptionsWithoutFileName<Object> {
+export interface OptionsSchemaImagesSheet<Image> {
 	schema: Schema<Object>;
+  images?: Image[];
 	sheet?: string;
 }
 
-interface WithSchemaWithFileNameOptions<Object> extends CommonOptionsWithFileName<Object> {
-	schema: Schema<Object>;
-	sheet?: string;
-}
-
-interface WithSchemaWithoutFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithoutFileName<Object> {
+export interface OptionsSchemaImagesSheets<Image> {
 	schema: Schema<Object>[];
+  images?: Image[][];
 	sheets?: string[];
 }
 
-interface WithSchemaWithFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithFileName<Object> {
-	schema: Schema<Object>[];
-	sheets?: string[];
+interface WithSchemaWithoutFileNameOptions<Object> extends CommonOptionsWithoutFileName<Object>, OptionsSchemaImagesSheet<Image> {
 }
 
+interface WithSchemaWriteToFileOptions<Object> extends CommonOptionsWriteToFile<Object>, OptionsSchemaImagesSheet<Image> {
+}
+
+interface WithSchemaWithoutFileNameOptionsMultipleSheets<Object> extends CommonOptionsWithoutFileName<Object>, OptionsSchemaImagesSheets<Image> {
+}
+
+interface WithSchemaWriteToFileOptionsMultipleSheets<Object> extends CommonOptionsWriteToFile<Object>, OptionsSchemaImagesSheets<Image> {
+}
+
+// With `schema`.
+// Write to a file.
 declare function writeXlsxFile<Object>(
 	objects: Object[],
-	options: WithSchemaWithFileNameOptions<Object>
+	options: WithSchemaWriteToFileOptions<Object>
 ) : Promise<void>;
 
+// With `schema`.
+// Return `Blob`.
 declare function writeXlsxFile<Object>(
 	objects: Object[],
 	options: WithSchemaWithoutFileNameOptions<Object>
 ) : Promise<Blob>;
 
+// With `schema`.
+// Write to a file.
+// Multiple `sheets`.
 declare function writeXlsxFile<Object>(
 	objects: Object[][],
-	options: WithSchemaWithFileNameOptionsMultipleSheets<Object>
+	options: WithSchemaWriteToFileOptionsMultipleSheets<Object>
 ) : Promise<void>;
 
+// With `schema`.
+// Return `Blob`.
+// Multiple `sheets`.
 declare function writeXlsxFile<Object>(
 	objects: Object[][],
 	options: WithSchemaWithoutFileNameOptionsMultipleSheets<Object>
@@ -178,44 +211,54 @@ declare function writeXlsxFile<Object>(
 
 // Without Schema.
 
-interface WithoutSchemaWithoutFileNameOptions extends CommonOptionsWithoutFileName {
+export interface OptionsColumnsImagesSheet<Image> {
 	columns?: Columns;
+  images?: Image[];
 	sheet?: string;
 }
 
-interface WithoutSchemaWithFileNameOptions extends CommonOptionsWithFileName {
-	columns?: Columns;
-	sheet?: string;
-}
-
-interface WithoutSchemaWithoutFileNameOptionsMultipleSheets extends CommonOptionsWithoutFileName {
+export interface OptionsColumnsImagesSheets<Image> {
 	columns?: Columns[];
+  images?: Image[][];
 	sheets?: string[];
 }
 
-interface WithoutSchemaWithFileNameOptionsMultipleSheets extends CommonOptionsWithFileName {
-	columns?: Columns[];
-	sheets?: string[];
+interface WithoutSchemaWithoutFileNameOptions extends CommonOptionsWithoutFileName, OptionsColumnsImagesSheet<Image> {
 }
 
+interface WithoutSchemaWriteToFileOptions extends CommonOptionsWriteToFile, OptionsColumnsImagesSheet<Image> {
+}
+
+interface WithoutSchemaWithoutFileNameOptionsMultipleSheets extends CommonOptionsWithoutFileName, OptionsColumnsImagesSheets<Image> {
+}
+
+interface WithoutSchemaWriteToFileOptionsMultipleSheets extends CommonOptionsWriteToFile, OptionsColumnsImagesSheets<Image> {
+}
+
+// Return `Blob`.
 declare function writeXlsxFile(
 	data: SheetData,
 	options: WithoutSchemaWithoutFileNameOptions
 ) : Promise<Blob>;
 
+// Return `Blob`.
+// Multiple `sheets`.
 declare function writeXlsxFile(
 	data: SheetData[],
 	options: WithoutSchemaWithoutFileNameOptionsMultipleSheets
 ) : Promise<Blob>;
 
+// Wrtie to a file.
 declare function writeXlsxFile(
 	data: SheetData,
-	options: WithoutSchemaWithFileNameOptions
+	options: WithoutSchemaWriteToFileOptions
 ) : Promise<void>;
 
+// Wrtie to a file.
+// Multiple `sheets`.
 declare function writeXlsxFile(
 	data: SheetData[],
-	options: WithoutSchemaWithFileNameOptionsMultipleSheets
+	options: WithoutSchemaWriteToFileOptionsMultipleSheets
 ) : Promise<void>;
 
 export default writeXlsxFile;

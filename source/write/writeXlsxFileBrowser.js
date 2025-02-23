@@ -4,6 +4,8 @@
 import JSZip from 'jszip'
 import FileSaver from 'file-saver'
 
+import getImageFileName from './getImageFileName.js'
+
 import generateWorkbookXml from './statics/workbook.xml.js'
 import generateWorkbookXmlRels from './statics/workbook.xml.rels.js'
 import rels from './statics/rels.js'
@@ -34,6 +36,7 @@ function generateXlsxFile(data, {
   sheets: sheetNames,
   schema,
   columns,
+  images,
   headerStyle,
   getHeaderStyle,
   fontFamily,
@@ -47,14 +50,6 @@ function generateXlsxFile(data, {
 }) {
   const zip = new JSZip()
 
-  zip.file('_rels/.rels', rels)
-
-  zip.file('[Content_Types].xml', generateContentTypesXml({
-    // Get `fileExtensionContentTypes` from `images`:
-    // fileExtensionContentTypes: [{ fileExtension: 'jpeg', contentType: 'image/jpeg' }, ...]
-    fileExtensionContentTypes: []
-  }))
-
   const {
     sheets,
     getSharedStringsXml,
@@ -65,6 +60,7 @@ function generateXlsxFile(data, {
     sheetNames,
     schema,
     columns,
+    images,
     headerStyle,
     getHeaderStyle,
     fontFamily,
@@ -77,6 +73,10 @@ function generateXlsxFile(data, {
     dateFormat
   })
 
+  zip.file('_rels/.rels', rels)
+
+  zip.file('[Content_Types].xml', generateContentTypesXml({ images }))
+
   const xl = zip.folder('xl')
   xl.file('_rels/workbook.xml.rels', generateWorkbookXmlRels({ sheets }))
   xl.file('workbook.xml', generateWorkbookXml({ sheets, stickyRowsCount, stickyColumnsCount }))
@@ -88,9 +88,22 @@ function generateXlsxFile(data, {
     xl.file(`worksheets/_rels/sheet${id}.xml.rels`, generateSheetXmlRels({ id, images: undefined }))
     if (images) {
       xl.file(`drawings/drawing${id}.xml`, generateDrawingXml({ images }))
-      xl.file(`drawings/_rels/drawing${id}.xml.rels`, generateDrawingXmlRels({ images }))
+      xl.file(`drawings/_rels/drawing${id}.xml.rels`, generateDrawingXmlRels({ images, sheetId: id }))
+      // Copy images to `xl/media` folder.
+      for (const image of images) {
+        // According to `JSZip` docs:
+        // https://stuk.github.io/jszip/documentation/api_jszip/file_data.html
+        // `.file()` function supports `data` argument of type:
+        // * String
+        // * ArrayBuffer
+        // * Uint8Array
+        // * Buffer
+        // * Blob
+        // * Promise
+        // * Nodejs stream
+        xl.file(`media/${getImageFileName(image, { sheetId: id, sheetImages: images })}`, image.content)
+      }
     }
-    // ... Copy images to `xl/media` folder ...
   }
 
   return zip.generateAsync({

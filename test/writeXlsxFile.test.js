@@ -2,9 +2,11 @@
 
 import path from 'path'
 import fs from 'fs'
+import fsPromises from 'fs/promises'
 
 import writeXlsxFile from '../source/write/writeXlsxFileNode.js'
 
+const IMAGES_DIRECTORY = path.resolve('./test/images')
 const OUTPUT_DIRECTORY = path.resolve('./test-output')
 
 describe('writeXlsxFile', function() {
@@ -232,35 +234,38 @@ describe('writeXlsxFile', function() {
       images: [
         [
           {
-            content: '...PathToJpgFile...',
-            contentType: 'image/jpeg',
-            width: 128,
-            height: 128,
+            // File path.
+            content: path.join(IMAGES_DIRECTORY, '1.png'),
+            contentType: 'image/png',
+            width: 111,
+            height: 111,
             anchor: {
               row: 1,
-              cell: 1
+              column: 1
             }
           },
           {
-            content: '...Buffer...',
-            contentType: 'image/png',
-            width: 128,
-            height: 128,
+            // Buffer.
+            content: await fsPromises.readFile(path.join(IMAGES_DIRECTORY, '2.jpg')),
+            contentType: 'image/jpeg',
+            width: 111,
+            height: 111,
             anchor: {
               row: 2,
-              cell: 5
+              column: 5
             }
           }
         ],
         [
           {
-            content: '...ReadableStream...',
-            contentType: 'image/png',
-            width: 128,
-            height: 128,
+            // Readable stream.
+            content: fs.createReadStream(path.join(IMAGES_DIRECTORY, '3.jpg')),
+            contentType: 'image/jpeg',
+            width: 111,
+            height: 111,
             anchor: {
               row: 1,
-              cell: 1
+              column: 1
             },
             offsetX: 20,
             offsetY: 20
