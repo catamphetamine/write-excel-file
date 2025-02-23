@@ -296,8 +296,13 @@ Explanation of a "drawing" XML structure: http://officeopenxml.com/drwPicInSprea
         </xdr:cNvPicPr>
       </xdr:nvPicPr>
       <xdr:blipFill>
+        <!-- Link to the image. -->
         <a:blip
           xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" r:embed="rId{numericId}" cstate="print"/>
+        <!-- Allows scaling the image. -->
+        <a:stretch>
+          <a:fillRect/>
+        </a:stretch>
       </xdr:blipFill>
       <xdr:spPr>
         <a:prstGeom prst="rect">
