@@ -239,6 +239,7 @@ describe('writeXlsxFile', function() {
             contentType: 'image/png',
             width: 111,
             height: 111,
+            dpi: 72,
             anchor: {
               row: 1,
               column: 1
@@ -250,6 +251,8 @@ describe('writeXlsxFile', function() {
             contentType: 'image/jpeg',
             width: 111,
             height: 111,
+            // Incorrect `dpi`. The image has a DPI of `72`.
+            dpi: 96,
             anchor: {
               row: 2,
               column: 5
@@ -263,6 +266,8 @@ describe('writeXlsxFile', function() {
             contentType: 'image/jpeg',
             width: 111,
             height: 111,
+            // The image has a DPI of `72`.
+            dpi: 72,
             anchor: {
               row: 1,
               column: 1

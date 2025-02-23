@@ -545,8 +545,6 @@ await writeXlsxFile([data1, data2], {
 
 ## Images
 
-Warning: This feature is currently experimental and produces a somehow-incorrect `*.xlsx` file. See the details below in this section.
-
 Images reside in their own layer above any other data on a spreadsheet, each separate sheet having its own layer of images.
 
 To add images to a sheet, pass them as an `images` parameter to `writeXlsxFile()` function:
@@ -589,6 +587,11 @@ An image object should have properties:
 * `contentType` — MIME content type of the image. Example: `"image/jpeg"`.
 * `width` — Image width, in pixels.
 * `height` — Image height, in pixels.
+* `dpi` — Image "DPI" (aka "dots per inch").
+  * For legacy reasons described in the [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md#image-dimensions), images in XLSX documents are measured not pixels but in some other weird measurement units. Mapping image pixels to those weird measurement units requires knowing a "DPI" of an image.
+  * The usual "DPI" of an image is either `72` or `96`. Both values are equally meaningless. Pick one or the other.
+  * To find out an image's DPI in Windows, open file "Properties" and go to "Details" tab. There, it will say "Horizontal resolution" and "Vertical resolution".
+  * If, after writing an `*.xlsx` file, an image looks too large then try specifying a higher DPI. Conversely, if an image looks too small then try specifying a lower DPI.
 * `anchor` — The cell that the image is positioned against. In other words, the image's top left corner is tied to the anchor cell's top left corner.
   * `row` — Cell row number, starting with `1`.
   * `column` — Cell column number, starting with `1`.
@@ -598,18 +601,6 @@ An image object should have properties:
 * `description` — (optional) Image description.
 
 The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
-
-Using this feature currently produces a somehow-incorrect `*.xlsx` file. Perhaps there's something missing, or something like that. If someone would like, they could investigate:
-
-* Clone the repository
-* Run `npm install`
-* Run `npm test`
-* It will output a file at the `test-output` folder called `test-cells-multiple-sheets-with-images.xlsx`.
-* Open that file in Excel and see how it complains.
-* Unzip `test-cells-multiple-sheets-with-images.xlsx` and look at the files inside it.
-* Using Excel, create a sample `*.xlsx` file containing an image and unzip it too to be able to look at the files inside it.
-* Compare the both sets of files to potentially find the incorrect places.
-* Submit a pull request with a fix to this repository.
 
 ## TypeScript
 

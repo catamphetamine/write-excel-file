@@ -1,3 +1,8 @@
+2.3.0 / 23.02.2025
+==================
+
+* Added `images` feature. The original [pull request](https://gitlab.com/catamphetamine/write-excel-file/-/merge_requests/5) was submitted by [@Monotoby](https://gitlab.com/Miniontoby).
+
 2.0.11 / 16.01.2025
 ==================
 

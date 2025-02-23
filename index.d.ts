@@ -117,6 +117,7 @@ export interface ImageType<ImageContent> {
 	contentType: string;
 	width: number;
 	height: number;
+	dpi: number;
 	anchor: {
 		row: number;
 		column: number;

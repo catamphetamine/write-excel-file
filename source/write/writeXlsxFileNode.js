@@ -102,7 +102,7 @@ export default async function writeXlsxFile(data, {
 
 	archive.append(rels, '_rels/.rels')
 
-  archive.append(generateContentTypesXml({ images }), '[Content_Types].xml')
+  archive.append(generateContentTypesXml({ images, sheets }), '[Content_Types].xml')
 
 	if (filePath) {
 		await archive.write()
