@@ -1,4 +1,4 @@
-import generateCellNumber from './generateCellNumber.js'
+import generateCellNumber from './helpers/generateCellNumber.js'
 
 // Supports "merging cells" across columns and rows.
 // https://rdrr.io/cran/openxlsx/man/mergeCells.html

@@ -1,9 +1,9 @@
 // Copy-pasted from:
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/__test__/zipcelx.spec.js
 
-import generateWorksheet from './worksheet.js'
+import generateSheetXml from './sheet.xml.js'
 
-describe('generateWorksheet()', () => {
+describe('generateSheetXml()', () => {
   it('Should generate XML Worksheet', () => {
   	const colsXML = '';
   	const rowsXML = '<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>1000</v></c></row>';
@@ -14,7 +14,7 @@ describe('generateWorksheet()', () => {
     ].join('\n')
 
     expect(
-      generateWorksheet(
+      generateSheetXml(
         [
           [
             {

@@ -3,7 +3,7 @@
 // Or does it?
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/53#note_1245377052
 
-import { Readable } from 'stream';
+import Stream, { Readable } from 'stream'
 import { PathLike } from 'fs';
 
 import {

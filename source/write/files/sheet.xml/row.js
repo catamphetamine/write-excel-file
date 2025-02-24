@@ -2,7 +2,7 @@
 // https://github.com/davidramos-om/zipcelx-on-steroids/blob/master/src/formatters/rows/formatRow.js
 
 import generateCell from './cell.js'
-import getCellStyleProperties from './getCellStyleProperties.js'
+import getCellStyleProperties from './helpers/getCellStyleProperties.js'
 import getAttributesString from '../../../xml/getAttributesString.js'
 
 // import Integer from '../types/Integer.js'

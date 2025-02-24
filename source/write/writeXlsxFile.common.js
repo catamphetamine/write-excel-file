@@ -1,4 +1,4 @@
-import generateWorksheet from './files/sheet.xml/worksheet.js'
+import generateSheetXml from './files/sheet.xml/sheet.xml.js'
 import initStyles from './styles.js'
 import initSharedStrings from './sharedStrings.js'
 import validateSheetName from './validateSheetName.js'
@@ -62,10 +62,10 @@ export function generateSheets({
     validateSheetName(sheetName)
   }
 
-  const worksheets = []
+  const sheetsXml = []
   let sheetIndex = 0
   for (const sheet of sheetNames) {
-    worksheets.push(generateWorksheet(data[sheetIndex], {
+    sheetsXml.push(generateSheetXml(data[sheetIndex], {
       schema: schema && schema[sheetIndex],
       columns: columns && columns[sheetIndex],
       images: images && images[sheetIndex],
@@ -88,7 +88,7 @@ export function generateSheets({
     sheets: sheetNames.map((sheetName, i) => ({
       id: i + 1,
       name: sheetName,
-      data: worksheets[i],
+      data: sheetsXml[i],
       images: images && images[i]
     })),
     getSharedStrings,

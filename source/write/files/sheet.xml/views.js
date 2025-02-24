@@ -1,4 +1,4 @@
-import generateCellNumber from './generateCellNumber.js'
+import generateCellNumber from './helpers/generateCellNumber.js'
 import getAttributesString from '../../../xml/getAttributesString.js'
 
 export default function generateViews({

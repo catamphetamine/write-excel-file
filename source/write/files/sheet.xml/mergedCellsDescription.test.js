@@ -1,4 +1,4 @@
-import generateMergedCellsDescription from './generateMergedCellsDescription.js'
+import generateMergedCellsDescription from './mergedCellsDescription.js'
 import processMergedCells from './processMergedCells.js'
 
 describe('generateMergedCellsDescription()', () => {

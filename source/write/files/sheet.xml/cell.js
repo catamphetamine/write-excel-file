@@ -5,8 +5,8 @@
 import $text from '../../../xml/sanitizeText.js'
 import getAttributesString from '../../../xml/getAttributesString.js'
 
-import generateCellNumber from './generateCellNumber.js'
-import convertDateToExcelSerial from './convertDateToExcelSerial.js'
+import generateCellNumber from './helpers/generateCellNumber.js'
+import convertDateToExcelSerial from './helpers/convertDateToExcelSerial.js'
 
 export default function generateCell(
   rowNumber,
