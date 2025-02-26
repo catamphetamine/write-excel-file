@@ -1,5 +1,6 @@
 import $attr from '../../xml/sanitizeAttributeValue.js'
 
+// https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md
 export default function generateDrawingXml({ images }) {
 	let output = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 		'<xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">'
@@ -11,6 +12,12 @@ export default function generateDrawingXml({ images }) {
 
 		const pxToEmu = (px) => pxToEmu_(px, image.dpi)
 
+		// There're two ways an image could be "anchored" in a spreadsheet:
+		// * One-cell anchor — "anchors" the image's top-left corner to a top-left corner of a cell.
+		// * Two-cell anchor — "anchors" the image's top-left corner to a top-left corner of the first cell,
+		//   and then the image's bottom-right corner to the bottom-right corner of the second cell.
+		//   While doing so, it completely ignores the image's aspect ratio, so there seems to be
+		//   no equivalent for CSS's `object-fit: contain` behavior.
 		output += '<xdr:oneCellAnchor>'
 
 		output += '<xdr:from>'

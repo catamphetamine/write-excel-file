@@ -87,7 +87,7 @@ function generateXlsxFile(data, {
 
   for (const { id, data, images } of sheets) {
     xl.file(`worksheets/sheet${id}.xml`, data)
-    xl.file(`worksheets/_rels/sheet${id}.xml.rels`, generateSheetXmlRels({ id, images: undefined }))
+    xl.file(`worksheets/_rels/sheet${id}.xml.rels`, generateSheetXmlRels({ id, images }))
     if (images) {
       xl.file(`drawings/drawing${id}.xml`, generateDrawingXml({ images }))
       xl.file(`drawings/_rels/drawing${id}.xml.rels`, generateDrawingXmlRels({ images, sheetId: id }))
