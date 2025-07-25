@@ -94,7 +94,7 @@ function getXlsxType(type) {
       return 'b'
 
     case 'Formula':
-      return 'f'
+      return
 
     default:
       throw new Error(`Unknown schema type: ${type && type.name || type}`)

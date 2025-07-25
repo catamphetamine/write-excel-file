@@ -1,3 +1,9 @@
+2.3.3 / 25.07.2025
+==================
+
+* Merged a [pull request](https://gitlab.com/catamphetamine/write-excel-file/-/merge_requests/6) by
+[Daniel Bly](https://gitlab.com/dan672) that removes an incorrect `t="f"` attribute from `<c>`ells of type "Formula".
+
 2.3.0 / 23.02.2025
 ==================
 
