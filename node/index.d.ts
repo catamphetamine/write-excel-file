@@ -9,8 +9,6 @@ import { PathLike } from 'fs';
 import {
 	Schema,
 	SheetData,
-	Row,
-	Cell,
 	Columns,
 	CommonOptions,
 	ImageType

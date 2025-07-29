@@ -47,19 +47,19 @@ export default function generateCell(
     throw new Error('No "format" has been specified for a Date cell')
   }
 
-  value = getXlsxValue(type, value, getSharedString)
-  type = getXlsxType(type)
+  const xlsxValue = getXlsxValue(type, value, getSharedString)
+  const xlsxType = getXlsxType(type)
 
   // The default value for `t` is `"n"` (a number or a date).
-  if (type) {
-    cellAttributes.t = type
+  if (xlsxType) {
+    cellAttributes.t = xlsxType
   }
 
   const [openingTags, closingTags] = getOpeningAndClosingTags(type)
 
   return `<c${getAttributesString(cellAttributes)}>` +
     openingTags +
-    value +
+    xlsxValue +
     closingTags +
     '</c>'
 }
@@ -76,6 +76,8 @@ function getXlsxType(type) {
     // case Email:
     // case URL:
       return 's'
+      // I don't know why did I comment out the use of "inlineStr" XLSX type.
+      // Perhaps there were some issues with it. Or perhaps there weren't and everyone else just uses "s".
       // // "inlineStr" type is used instead of "s" to avoid creating a "shared strings" index.
       // return 'inlineStr'
 
@@ -160,17 +162,17 @@ function getXlsxValue(type, value, getSharedString) {
 
 const TAG_BRACKET_LEFT_REGEXP = /</g
 
-function getOpeningAndClosingTags(xlsxType) {
-  const openingTags = getOpeningTags(xlsxType)
+function getOpeningAndClosingTags(type) {
+  const openingTags = getOpeningTags(type)
   const closingTags = openingTags.replace(TAG_BRACKET_LEFT_REGEXP, '</')
   return [openingTags, closingTags]
 }
 
-function getOpeningTags(xlsxType) {
-  switch (xlsxType) {
-    case 'inlineStr':
-      return '<is><t>'
-    case 'f':
+function getOpeningTags(type) {
+  switch (type) {
+    // case 'inlineStr':
+    //   return '<is><t>'
+    case 'Formula':
       return '<f>'
     default:
       return '<v>'
