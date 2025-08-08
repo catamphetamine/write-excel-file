@@ -4,8 +4,9 @@ export default function generateViews(_ref) {
   var stickyRowsCount = _ref.stickyRowsCount,
     stickyColumnsCount = _ref.stickyColumnsCount,
     showGridLines = _ref.showGridLines,
-    rightToLeft = _ref.rightToLeft;
-  if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false) && !rightToLeft) {
+    rightToLeft = _ref.rightToLeft,
+    zoomScale = _ref.zoomScale;
+  if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false) && !rightToLeft && !zoomScale) {
     return '';
   }
   var views = '';
@@ -18,6 +19,9 @@ export default function generateViews(_ref) {
   }
   if (rightToLeft) {
     sheetViewAttributes.rightToLeft = 1;
+  }
+  if (zoomScale) {
+    sheetViewAttributes.zoomScale = zoomScale;
   }
   var paneAttributes = {
     ySplit: stickyRowsCount || 0,

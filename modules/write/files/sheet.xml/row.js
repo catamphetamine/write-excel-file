@@ -44,7 +44,7 @@ export default function generateRow(row, rowIndex, _ref) {
 
     // Validate `format` property.
     if (format) {
-      if (type !== Date && type !== Number && type !== String && type !== 'Formula') {
+      if (type !== Date && type !== "Date" && type !== Number && type !== "Number" && type !== String && type !== "String" && type !== "Formula") {
         // && type !== Integer) {
         throw new Error('`format` can only be used on `Date`, `Number`, `String` or `"Formula"` cells'); // or `Integer` cells')
       }

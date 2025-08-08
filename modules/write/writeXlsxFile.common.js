@@ -21,6 +21,7 @@ export function generateSheets(_ref) {
     stickyColumnsCount = _ref.stickyColumnsCount,
     showGridLines = _ref.showGridLines,
     rightToLeft = _ref.rightToLeft,
+    zoomScale = _ref.zoomScale,
     dateFormat = _ref.dateFormat;
   var _initSharedStrings = initSharedStrings(),
     getSharedStrings = _initSharedStrings.getSharedStrings,
@@ -90,6 +91,7 @@ export function generateSheets(_ref) {
       stickyColumnsCount: stickyColumnsCount,
       showGridLines: showGridLines,
       rightToLeft: rightToLeft,
+      zoomScale: zoomScale,
       sheetId: sheetIndex + 1
     }));
     sheetIndex++;

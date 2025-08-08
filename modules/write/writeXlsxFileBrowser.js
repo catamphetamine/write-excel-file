@@ -53,6 +53,7 @@ function generateXlsxFile(data, _ref2) {
     stickyColumnsCount = _ref2.stickyColumnsCount,
     showGridLines = _ref2.showGridLines,
     rightToLeft = _ref2.rightToLeft,
+    zoomScale = _ref2.zoomScale,
     dateFormat = _ref2.dateFormat;
   var zip = new JSZip();
   var _generateSheets = generateSheets({
@@ -71,6 +72,7 @@ function generateXlsxFile(data, _ref2) {
       stickyColumnsCount: stickyColumnsCount,
       showGridLines: showGridLines,
       rightToLeft: rightToLeft,
+      zoomScale: zoomScale,
       dateFormat: dateFormat
     }),
     sheets = _generateSheets.sheets,

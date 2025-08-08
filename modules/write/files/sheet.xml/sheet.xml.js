@@ -20,10 +20,11 @@ export default function generateSheetXml(data_, _ref) {
     customFont = _ref.customFont,
     dateFormat = _ref.dateFormat,
     orientation = _ref.orientation,
-    stickyRowsCount = _ref.stickyRowsCount,
-    stickyColumnsCount = _ref.stickyColumnsCount,
+    stickyRowsCount = Array.isArray(_ref.stickyRowsCount) ? _ref.stickyRowsCount[_ref.sheetId - 1] : _ref.stickyRowsCount,
+    stickyColumnsCount = Array.isArray(_ref.stickyColumnsCount) ? _ref.stickyColumnsCount[_ref.sheetId - 1] : _ref.stickyColumnsCount,
     showGridLines = _ref.showGridLines,
     rightToLeft = _ref.rightToLeft,
+    zoomScale = _ref.zoomScale,
     sheetId = _ref.sheetId;
   validateData(data_, {
     schema: schema
@@ -44,7 +45,8 @@ export default function generateSheetXml(data_, _ref) {
     stickyRowsCount: stickyRowsCount,
     stickyColumnsCount: stickyColumnsCount,
     showGridLines: showGridLines,
-    rightToLeft: rightToLeft
+    rightToLeft: rightToLeft,
+    zoomScale: zoomScale
   })).replace('{columnsDescription}', generateColumnsDescription({
     schema: schema,
     columns: columns
