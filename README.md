@@ -12,11 +12,11 @@ Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file
 npm install write-excel-file --save
 ```
 
-If you're not using a bundler then use a [standalone version from a CDN](#cdn).
+Alternatively, one could [include it on a web page directly via a `<script/>` tag](#cdn).
 
-## Data
+## Use
 
-To write an `*.xlsx` file, one should provide the `data` — an array of rows. Each row must be an array of cells.
+To write an `*.xlsx` file, one must provide the contents of a spreadsheet in the form of `data` — an array of rows. Each row must be an array of cells.
 
 Each cell should have a `value`, a `type`, and, optionally, other [cell parameters](#cell-parameters).
 
@@ -28,6 +28,8 @@ If a cell doesn't have a `type`, then it is automatically detected from the `val
 * `"Formula"`
 
 An empty cell could be represented by `null` or `undefined`.
+
+Here's an example of `data`.
 
 ```js
 const HEADER_ROW = [
@@ -79,6 +81,8 @@ const DATA_ROW_1 = [
 const data = [
   HEADER_ROW,
   DATA_ROW_1,
+  DATA_ROW_2,
+  DATA_ROW_3,
   ...
 ]
 ```
@@ -87,46 +91,53 @@ const data = [
 
 ### Browser
 
+Example 1: Write `data` to a file called `file.xlsx` and trigger a "Save as" file dialog so that the user could save the file to their disk.
+
 ```js
 import writeXlsxFile from 'write-excel-file'
 
 await writeXlsxFile(data, {
-  columns, // (optional) column widths, etc.
   fileName: 'file.xlsx'
 })
 ```
 
-Uses [`file-saver`](https://www.npmjs.com/package/file-saver) to save an `*.xlsx` file from a web browser.
+Under the hood, it uses [`file-saver`](https://www.npmjs.com/package/file-saver) package to save the `*.xlsx` file to disk.
 
-If `fileName` parameter is not passed then the returned `Promise` resolves to a ["blob"](https://github.com/egeriis/zipcelx/issues/68) with the contents of the `*.xlsx` file.
+Example 2: `fileName` parameter is not passed, so it returns a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
+
+```js
+const blob = await writeXlsxFile(data)
+```
 
 ### Node.js
 
+Example 1: Write `data` to a file at path `/path/to/file.xlsx`.
+
 ```js
+// Import from '/node' subpackage.
 const writeXlsxFile = require('write-excel-file/node')
 
 await writeXlsxFile(data, {
-  columns, // (optional) column widths, etc.
   filePath: '/path/to/file.xlsx'
 })
 ```
 
-If `filePath` parameter is not passed, but `buffer: true` parameter is passed, then it returns a `Buffer`:
+Example 2: `filePath` parameter is not passed, but `buffer: true` parameter is passed, so it returns a [`Buffer`](https://nodejs.org/api/buffer.html).
 
 ```js
 const buffer = await writeXlsxFile(data, { buffer: true })
 ```
 
-If neither `filePath` parameter nor `buffer: true` parameter are passed, then it returns a readable `Stream`:
+Example 3: Neither `filePath` nor `buffer: true` parameters are passed, so it returns a readable [`Stream`](https://nodejs.org/api/stream.html).
 
 ```js
-const output = fs.createWriteStream(...)
-const stream = await writeXlsxFile(data)
-stream.pipe(output)
+const writeStream = fs.createWriteStream('/path/to/file.xlsx')
+const readStream = await writeXlsxFile(data)
+readStream.pipe(writeStream)
 ```
 
 <details>
-<summary>AWS S3 might refuse to accept the <code>stream</code></summary>
+<summary>AWS S3 might refuse to accept the <code>stream</code> for output. How to fix that.</summary>
 
 #####
 
@@ -148,11 +159,12 @@ Workaround for AWS SDK v2: write to `Buffer` instead of a stream.
 Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packages-in-aws-sdk-for-javascript/): use [`Upload`](https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-868352176) operation.
 </details>
 
-## Schema
+## Data vs Objects
 
-Alternatively, instead of providing `data`, one could provide a list of `objects` and a `schema` describing each column:
+Alternatively, instead of providing `data`, one could provide a list of JSON `objects` and a `schema` describing each output column:
 
 ```js
+// Input data
 const objects = [
   {
     name: 'John Smith',
@@ -170,6 +182,7 @@ const objects = [
 ```
 
 ```js
+// Output columns
 const schema = [
   {
     column: 'Name',
@@ -196,11 +209,9 @@ const schema = [
 ]
 ```
 
-When using a `schema`, column `type`s are required (not autodetected).
+Each column should have a `column` title, a data `type`, a `value` "getter" function, and, optionally, other [cell parameters](#cell-parameters).
 
-### Schema API
-
-#### Browser
+### Browser
 
 ```js
 import writeXlsxFile from 'write-excel-file'
@@ -211,7 +222,7 @@ await writeXlsxFile(objects, {
 })
 ```
 
-#### Node.js
+### Node.js
 
 ```js
 const writeXlsxFile = require('write-excel-file/node')
@@ -219,6 +230,45 @@ const writeXlsxFile = require('write-excel-file/node')
 await writeXlsxFile(objects, {
   schema,
   filePath: '/path/to/file.xlsx'
+})
+```
+
+## Column Widths
+
+One could specify custom column widths (in "characters" rather than in "pixels").
+
+### Objects
+
+When passing `objects`/`schema`, column widths can be specified via `width` property in the `schema`.
+
+```js
+const schema = [
+  // Column #1
+  {
+    column: 'Name',
+    value: student => student.name,
+    width: 20 // Column width (in characters).
+  },
+  ...
+]
+```
+
+### Data
+
+When passing `data`, one can pass a separate `columns` parameter to specify column widths:
+
+```js
+// Set Column #3 width to "20 characters".
+const columns = [
+  {},
+  {},
+  { width: 20 }, // Width is in characters
+  {}
+]
+
+await writeXlsxFile(data, {
+  columns, // Pass it here.
+  fileName: 'file.xlsx'
 })
 ```
 
@@ -232,26 +282,24 @@ There're also some additional exported `type`s available:
 * `Email` for email addresses.
 -->
 
-Aside from having a `type` and a `value`, each cell (or schema column) can also specify:
+Regardless of whether you're passing `data` or `objects`/`schema`, each cell (or schema column) can also specify:
 
 * Custom [format](#format) — by specifying a `format` property.
 * Custom [style](#style)
-  * By specifying any style properties.
-  * (advanced) (only when using a `schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which allows specifying different style for different rows.
+  * By specifying any of the style-related properties.
+  * (advanced) (only when passing `objects`/`schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which allows specifying different cell style for different rows in the same column.
 
 ### Format
 
-A cell (or a schema column) could specify a `format` property:
+The optional `format` property can only be used on cells (or schema columns) with `type`: `Date`, `Number`, `String` or `"Formula"` <!-- or `Integer` -->. Its purpose is to display the "raw" cell value — for example, a number or a date — in a particular way: as a floating-point number with a specific number of decimal places, or as a percentage, or maybe as a date in a particular date format, etc.
 
 <!--
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
 -->
 
-* `format: string` — Cell data format. Can only be used on `Date`, `Number`, `String` or `"Formula"` <!-- or `Integer` --> cells. Its purpose is to show the "raw" cell data — for example, a number or a date — in a particular way: as a floating-point number with a specific number of decimal places, or as a percentage, or maybe as a date in a particular date format.
-
 There're many [standardized formats](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) to choose from.
 
-Some of the commonly used `Number` formats are:
+Below are some of the commonly used `Number` formats.
 
   * `0.00` — Floating-point number with 2 decimal places. Example: `1234.56`.
   * `0.000` — Floating-point number with 3 decimal places. Example: `1234.567`.
@@ -260,7 +308,7 @@ Some of the commonly used `Number` formats are:
   * `0%` — Percents. Example: `30%`.
   * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
 
-All `Date` cells (or schema columns) are required to specify a `format`, unless the [default `dateFormat`](#date-format) is set:
+All `Date` cells (or schema columns) are required to specify a `format`, unless a [default `dateFormat`](#date-format) option is specified.
 
   * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
   * `mmm d yyyy` — Example: `Dec 31 2000`.
@@ -282,11 +330,13 @@ All `Date` cells (or schema columns) are required to specify a `format`, unless 
     * `ss` — Seconds with a leading `0` (when less than `10`).
     * `AM/PM` — Either `AM` or `PM`, depending on the time.
 
-A `String` cell (or a schema column) could specify `@` format in order to explicitly declare itself being of "Text" type rather than the default "General" type. The point is, this way Excel won't attempt to "intelligently" interpret the cell data as a number or a date, as it would do when using the default "General" type.
+A `String` cell (or schema column) could also specify a `format`.
+
+  * It could specify `@` format in order to explicitly declare itself being of "Text" type rather than the default "General" type. The point is, this way Microsoft Excel won't attempt to "intelligently" interpret the `String` cell value as a number or a date, as it usually does by default. For example, by default, if a `String` cell value is `"123456"`, Microsoft Excel will try to display it as a `123,456` number rather than a `"123456"` string.
 
 ### Style
 
-Cell style includes the following properties:
+Cell style properties:
 
 * `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
 
@@ -331,13 +381,11 @@ Cell style includes the following properties:
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
-## Table Header
+## Objects: Table Header Style
 
-#### Schema
+When passing `objects`/`schema`, the output table will include a header row at the top. The header row can be customized by providing column titles and cell style.
 
-When using a `schema`, table header row can be customized by providing column titles and style.
-
-To set column title, specify a `column` property for the corresponding column in the `schema`.
+Column titles should be specified as `column` property values in the `schema`.
 
 ```js
 const schema = [
@@ -350,9 +398,9 @@ const schema = [
 ]
 ```
 
-When column title is not specified, there's gonna be no title at the top of the column.
+When `column` title is not specified, it's gonna be empty.
 
-The default style for a table header cell is:
+The default style for table header cells is:
 * `fontWeight` — `"bold"`
 * `align` — equal to the `schema` column's `align` property value
 
@@ -369,55 +417,6 @@ await writeXlsxFile(objects, {
   }),
   filePath: '/path/to/file.xlsx'
 })
-```
-
-#### Cell Data
-
-When not using a schema, one can print column titles by supplying them as the first row of the `data`:
-
-```js
-const data = [
-  [
-    { value: 'Name', fontWeight: 'bold' },
-    { value: 'Age', fontWeight: 'bold'},
-    ...
-  ],
-  ...
-]
-```
-
-## Column Width
-
-Column width can also be specified (in "characters").
-
-#### Schema
-
-To specify column width when using a `schema`, set a `width` on a schema column:
-
-```js
-const schema = [
-  // Column #1
-  {
-    column: 'Name',
-    value: student => student.name,
-    width: 20 // Column width (in characters).
-  },
-  ...
-]
-```
-
-#### Cell Data
-
-When not using a schema, one can provide a separate `columns` parameter to specify column widths:
-
-```js
-// Set Column #3 width to "20 characters".
-const columns = [
-  {},
-  {},
-  { width: 20 }, // in characters
-  {}
-]
 ```
 
 ## Font
@@ -511,9 +510,9 @@ await writeXlsxFile(data, {
 
 ## Multiple Sheets
 
-#### Schema
+### Objects
 
-To generate an `*.xlsx` file with multiple sheets:
+To generate an `*.xlsx` file with multiple sheets when passing `objects`/`schema`:
 
 * Pass a `sheets` parameter — an array of sheet names.
 * The `objects` argument should be an array of `objects` for each sheet.
@@ -527,9 +526,9 @@ await writeXlsxFile([objects1, objects2], {
 })
 ```
 
-#### Cell Data
+### Data
 
-To generate an `*.xlsx` file with multiple sheets:
+To generate an `*.xlsx` file with multiple sheets when passing `data`:
 
 * Pass a `sheets` parameter — an array of sheet names.
 * The `data` argument should be an array of `data` for each sheet.
@@ -545,33 +544,33 @@ await writeXlsxFile([data1, data2], {
 
 ## Images
 
-Images reside in their own layer above any other data on a spreadsheet, each separate sheet having its own layer of images.
+Images reside in their own layer above any other data on a spreadsheet. Each separate sheet has its own layer of images.
 
 To add images to a sheet, pass them as an `images` parameter to `writeXlsxFile()` function:
 
 ```js
 const images = [{ ... }, { ... }]
 
-// Without `schema`.
+// When passing `data`.
 await writeXlsxFile(data, { images })
 
-// With `schema`.
+// When passing `objects`/`schema`.
 await writeXlsxFile(objects, { schema, images })
 ```
 
-In case when an `*.xlsx` file has multiple sheets:
+When an `*.xlsx` file is written with multiple sheets, each separate sheet should specify its own `images`.
 
 ```js
 const images1 = [{ ... }, { ... }]
 const images2 = [{ ... }, { ... }]
 
-// Without `schema`.
+// When passing `data`.
 await writeXlsxFile([data1, data2], {
   images: [images1, images2],
   sheets: ['Sheet 1', 'Sheet 2']
 })
 
-// With `schema`.
+// When passing `objects`/`schema`.
 await writeXlsxFile([objects1, objects2], {
   schema: [schema1, schema2],
   images: [images1, images2],
@@ -602,13 +601,9 @@ An image object should have properties:
 
 The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
 
-## TypeScript
-
-This library comes with TypeScript "typings". If you happen to find any bugs in those, create an issue.
-
 ## CDN
 
-One can use any npm CDN service, e.g. [unpkg.com](https://unpkg.com) or [jsdelivr.net](https://jsdelivr.net)
+To include this library directly via a `<script/>` tag on a page, one can use any npm CDN service, e.g. [unpkg.com](https://unpkg.com) or [jsdelivr.net](https://jsdelivr.net)
 
 ```html
 <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
@@ -620,9 +615,11 @@ One can use any npm CDN service, e.g. [unpkg.com](https://unpkg.com) or [jsdeliv
 </script>
 ```
 
+<!--
 ## References
 
 This project was inspired by [`zipcelx`](https://medium.com/@Nopziiemoo/create-excel-files-using-javascript-without-all-the-fuss-2c4aa5377813) package.
+-->
 
 ## GitHub
 
@@ -631,4 +628,3 @@ On March 9th, 2020, GitHub, Inc. silently [banned](https://medium.com/@catamphet
 ## License
 
 [MIT](LICENSE)
-

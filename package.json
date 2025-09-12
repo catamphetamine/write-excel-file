@@ -1,6 +1,6 @@
 {
   "name": "write-excel-file",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "Write simple `*.xlsx` files in a browser or Node.js",
   "module": "index.js",
   "main": "index.cjs",
@@ -26,7 +26,7 @@
     "test-travis": "istanbul cover -x \"commonjs/**\" -x \"modules/**\" -x \"*.test.js\" node_modules/mocha/bin/_mocha --report lcovonly -- --compilers js:babel-core/register --colors --reporter spec --require ./test/setup.js \"./{,!(node_modules|commonjs|modules)/**/}*.test.js\" --recursive",
     "clean-for-build": "rimraf ./commonjs ./modules",
     "build-commonjs-modules": "npm-run-all build-commonjs-modules-client build-commonjs-modules-server build-commonjs-modules-package.json",
-    "build-commonjs-modules-package.json": "node runnable/create-commonjs-package-json.js",
+    "build-commonjs-modules-package.json": "node build-scripts/create-commonjs-package-json.js",
     "build-commonjs-modules-client": "cross-env BABEL_ENV=commonjs babel ./source --out-dir ./commonjs --source-maps --ignore ./source/write/writeXlsxFileNode.js",
     "build-commonjs-modules-server": "cross-env BABEL_ENV=commonjs/server babel ./source/write/writeXlsxFileNode.js --out-dir ./commonjs/write --source-maps",
     "build-es6-modules": "npm-run-all build-es6-modules-client build-es6-modules-server",
@@ -37,7 +37,6 @@
     "prepublishOnly": "npm-run-all build test browser-build"
   },
   "dependencies": {
-    "@babel/runtime": "^7.26.9",
     "archiver": "^7.0.1",
     "file-saver": "^2.0.5",
     "jszip": "^3.10.1"
@@ -50,6 +49,7 @@
     "@babel/plugin-transform-runtime": "^7.26.9",
     "@babel/preset-env": "^7.26.9",
     "@babel/register": "^7.25.9",
+    "@babel/runtime": "^7.26.9",
     "chai": "^5.2.0",
     "core-js": "^3.40.0",
     "cross-env": "^7.0.3",
