@@ -32,6 +32,9 @@ npm-debug.log
 # utility scripts used during the "build" phase
 /build-scripts/
 
+# tests output `*.xlsx` files
+/test-output/
+
 # Sublime
 *.sublime-workspace
 *.sublime-project
