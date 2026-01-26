@@ -49,7 +49,9 @@ function _writeXlsxFile() {
       stickyColumnsCount,
       showGridLines,
       rightToLeft,
+      selected,
       zoomScale,
+      conditionalStyles,
       dateFormat,
       archive,
       _generateSheets,
@@ -80,7 +82,7 @@ function _writeXlsxFile() {
     return _regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
-          _ref = _args.length > 1 && _args[1] !== undefined ? _args[1] : {}, filePath = _ref.filePath, buffer = _ref.buffer, sheetName = _ref.sheet, sheetNames = _ref.sheets, schema = _ref.schema, columns = _ref.columns, images = _ref.images, headerStyle = _ref.headerStyle, getHeaderStyle = _ref.getHeaderStyle, fontFamily = _ref.fontFamily, fontSize = _ref.fontSize, orientation = _ref.orientation, stickyRowsCount = _ref.stickyRowsCount, stickyColumnsCount = _ref.stickyColumnsCount, showGridLines = _ref.showGridLines, rightToLeft = _ref.rightToLeft, zoomScale = _ref.zoomScale, dateFormat = _ref.dateFormat;
+          _ref = _args.length > 1 && _args[1] !== undefined ? _args[1] : {}, filePath = _ref.filePath, buffer = _ref.buffer, sheetName = _ref.sheet, sheetNames = _ref.sheets, schema = _ref.schema, columns = _ref.columns, images = _ref.images, headerStyle = _ref.headerStyle, getHeaderStyle = _ref.getHeaderStyle, fontFamily = _ref.fontFamily, fontSize = _ref.fontSize, orientation = _ref.orientation, stickyRowsCount = _ref.stickyRowsCount, stickyColumnsCount = _ref.stickyColumnsCount, showGridLines = _ref.showGridLines, rightToLeft = _ref.rightToLeft, selected = _ref.selected, zoomScale = _ref.zoomScale, conditionalStyles = _ref.conditionalStyles, dateFormat = _ref.dateFormat;
           // I dunno why it uses `Archive` here instead of something like `JSZip`
           // that is used in `writeXlsxFileBrowser.js`.
           archive = new Archive(filePath);
@@ -101,6 +103,7 @@ function _writeXlsxFile() {
             showGridLines: showGridLines,
             rightToLeft: rightToLeft,
             zoomScale: zoomScale,
+            conditionalStyles: conditionalStyles,
             dateFormat: dateFormat
           }), sheets = _generateSheets.sheets, getSharedStrings = _generateSheets.getSharedStrings, getStyles = _generateSheets.getStyles; // There doesn't seem to be a way to just append a file into a subdirectory
           // in `archiver` library, hence using a hacky temporary directory workaround.

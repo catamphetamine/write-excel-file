@@ -17,6 +17,7 @@ export default function initStyles(_ref) {
   var formatsIndex = {};
   var styles = [];
   var stylesIndex = {};
+  var conditionalStyles = _ref.conditionalStyles;
   var fonts = [];
   var fontsIndex = {};
   var fills = [];
@@ -35,7 +36,6 @@ export default function initStyles(_ref) {
   // Default fill.
   fills.push({});
   fillsIndex['-'] = 0;
-  fillsIndex['darkDown'] = 6;
 
   // Default border.
   borders.push({
@@ -76,12 +76,13 @@ export default function initStyles(_ref) {
       topBorderStyle = _ref2.topBorderStyle,
       bottomBorderColor = _ref2.bottomBorderColor,
       bottomBorderStyle = _ref2.bottomBorderStyle;
+
     var format = _ref3.format;
     // Custom borders aren't supported.
     var border = undefined;
     // Look for an existing style.
     var fontKey = "".concat(fontFamily || '-', ":").concat(fontSize || '-', ":").concat(fontWeight || '-', ":").concat(fontStyle || '-', ":").concat(color || '-');
-    var fillKey = backgroundColor || '-';
+    var fillKey = "".concat(backgroundColor || '-', "/").concat(fillPattern || '-', "/").concat(patternColor || '-', "/");
     var borderKey = "".concat(topBorderColor || borderColor || '-', ":").concat(topBorderStyle || borderStyle || '-') + '/' + "".concat(rightBorderColor || borderColor || '-', ":").concat(rightBorderStyle || borderStyle || '-') + '/' + "".concat(bottomBorderColor || borderColor || '-', ":").concat(bottomBorderStyle || borderStyle || '-') + '/' + "".concat(leftBorderColor || borderColor || '-', ":").concat(leftBorderStyle || borderStyle || '-');
     var key = "".concat(align || '-', "/").concat(alignVertical || '-', "/").concat(textRotation || '-', "/").concat(indent || '-', "/").concat(wrap || '-', "/").concat(format || '-', "/").concat(fontKey, "/").concat(fillKey, "/").concat(borderKey);
     var styleId = stylesIndex[key];
@@ -116,22 +117,15 @@ export default function initStyles(_ref) {
     }
     // Get fill ID.
     var fillId;
-    if (backgroundColor) {
-      if (fillPattern) {
-        fillId = fillsIndex[fillPattern];
+    if (backgroundColor || fillPattern || patternColor) {
+      fillId = fillsIndex[fillKey];
+      if (fillId === undefined) {
+        fillId = fillsIndex[fillKey] = String(fills.length);
         fills.push({
           color: backgroundColor,
           fillPattern: fillPattern,
           patternColor: patternColor
         });
-      } else {
-        fillId = fillsIndex[fillKey];
-        if (fillId === undefined) {
-          fillId = fillsIndex[fillKey] = String(fills.length);
-          fills.push({
-            color: backgroundColor
-          });
-        }
       }
     }
     // Get border ID.
@@ -172,6 +166,7 @@ export default function initStyles(_ref) {
       wrap: wrap,
       formatId: formatId
     });
+
     return stylesIndex[key] = String(styles.length - 1);
   }
 
@@ -182,6 +177,7 @@ export default function initStyles(_ref) {
       return {
         formats: formats,
         styles: styles,
+        conditionalStyles: conditionalStyles,
         fonts: fonts,
         fills: fills,
         borders: borders

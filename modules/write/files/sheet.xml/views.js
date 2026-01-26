@@ -5,13 +5,15 @@ export default function generateViews(_ref) {
     stickyColumnsCount = _ref.stickyColumnsCount,
     showGridLines = _ref.showGridLines,
     rightToLeft = _ref.rightToLeft,
-    zoomScale = _ref.zoomScale;
-  if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false) && !rightToLeft && !zoomScale) {
+    zoomScale = _ref.zoomScale,
+    selected = _ref.selected,
+    sheetId = _ref.sheetId;
+  if (!stickyRowsCount && !stickyColumnsCount && !(showGridLines === false) && !rightToLeft && !zoomScale && !selected) {
     return '';
   }
   var views = '';
   var sheetViewAttributes = {
-    tabSelected: 1,
+    tabSelected: selected + 1 === sheetId ? 1 : 0,
     workbookViewId: 0
   };
   if (showGridLines === false) {

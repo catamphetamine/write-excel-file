@@ -6,6 +6,7 @@ import { FORMAT_ID_STARTS_FROM } from '../styles.js';
 export default function generateStylesXml(_ref) {
   var formats = _ref.formats,
     styles = _ref.styles,
+    conditionalStyles = _ref.conditionalStyles,
     fonts = _ref.fonts,
     fills = _ref.fills,
     borders = _ref.borders;
@@ -179,6 +180,28 @@ export default function generateStylesXml(_ref) {
     align || alignVertical || textRotation || indent || wrap ? '<alignment' + (align ? " horizontal=\"".concat($attr(align), "\"") : '') + (alignVertical ? " vertical=\"".concat($attr(alignVertical), "\"") : '') + (textRotation ? " textRotation=\"".concat(getTextRotation(validateTextRotation(textRotation)), "\"") : '') + (indent ? " indent=\"".concat($attr(String(indent)), "\"") : '') + (wrap ? " wrapText=\"1\"" : '') + '/>' : '') + '</xf>';
   }
   xml += "</cellXfs>";
+
+  if (conditionalStyles.length != 0) {
+    let totalStyles = 0;
+    for (let i = 0; i < Object.keys(conditionalStyles).length; i++) {
+      totalStyles += conditionalStyles[i].length;
+    }
+    xml += `<dxfs count="${totalStyles}">`
+
+    for (let i = 0; i < conditionalStyles.length; i++) {
+      for (let j = 0; j < conditionalStyles[i].length; j++) {
+        let conditionalStyle = conditionalStyles[i][j];
+        xml += "<dxf>";
+          if (conditionalStyle.fontColor) {
+            xml += `<font><color rgb="${conditionalStyle.fontColor}"/></font>`
+          }
+        xml += "</dxf>";
+      }
+    }
+
+    xml += "</dxfs>"
+  }
+
   xml += '</styleSheet>';
   return xml;
 }

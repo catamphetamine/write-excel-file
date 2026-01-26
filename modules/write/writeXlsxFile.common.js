@@ -22,13 +22,15 @@ export function generateSheets(_ref) {
     showGridLines = _ref.showGridLines,
     rightToLeft = _ref.rightToLeft,
     zoomScale = _ref.zoomScale,
+    conditionalStyles = _ref.conditionalStyles,
     dateFormat = _ref.dateFormat;
   var _initSharedStrings = initSharedStrings(),
     getSharedStrings = _initSharedStrings.getSharedStrings,
     getSharedString = _initSharedStrings.getSharedString;
   var _initStyles = initStyles({
       fontFamily: fontFamily,
-      fontSize: fontSize
+      fontSize: fontSize,
+      conditionalStyles: conditionalStyles
     }),
     getStyles = _initStyles.getStyles,
     getStyle = _initStyles.getStyle;
@@ -92,6 +94,7 @@ export function generateSheets(_ref) {
       showGridLines: showGridLines,
       rightToLeft: rightToLeft,
       zoomScale: zoomScale,
+      conditionalStyles: conditionalStyles,
       sheetId: sheetIndex + 1
     }));
     sheetIndex++;

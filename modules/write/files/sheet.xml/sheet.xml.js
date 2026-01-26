@@ -9,7 +9,7 @@ import generateMergedCellsDescription from './mergedCellsDescription.js';
 import generateLayout from './layout.js';
 import generateViews from './views.js';
 import generateDrawing from './drawing.js';
-var SHEET_XML_TEMPLATE = "<?xml version=\"1.0\" ?>\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:mv=\"urn:schemas-microsoft-com:mac:vml\" xmlns:mx=\"http://schemas.microsoft.com/office/mac/excel/2008/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\">{views}{columnsDescription}<sheetData>{data}</sheetData>{mergedCellsDescription}{layout}{drawing}</worksheet>";
+var SHEET_XML_TEMPLATE = "<?xml version=\"1.0\" ?>\n<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" xmlns:mv=\"urn:schemas-microsoft-com:mac:vml\" xmlns:mx=\"http://schemas.microsoft.com/office/mac/excel/2008/main\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:x14=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/main\" xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\" xmlns:xm=\"http://schemas.microsoft.com/office/excel/2006/main\">{views}{columnsDescription}<sheetData>{data}</sheetData>{mergedCellsDescription}{layout}{drawing}{conditionalStyles}</worksheet>";
 export default function generateSheetXml(data_, _ref) {
   var schema = _ref.schema,
     columns = _ref.columns,
@@ -24,7 +24,9 @@ export default function generateSheetXml(data_, _ref) {
     stickyColumnsCount = Array.isArray(_ref.stickyColumnsCount) ? _ref.stickyColumnsCount[_ref.sheetId - 1] : _ref.stickyColumnsCount,
     showGridLines = _ref.showGridLines,
     rightToLeft = _ref.rightToLeft,
+    selected = _ref.selected,
     zoomScale = _ref.zoomScale,
+    conditionalStyles = _ref.conditionalStyles,
     sheetId = _ref.sheetId;
   validateData(data_, {
     schema: schema
@@ -46,6 +48,8 @@ export default function generateSheetXml(data_, _ref) {
     stickyColumnsCount: stickyColumnsCount,
     showGridLines: showGridLines,
     rightToLeft: rightToLeft,
+    selected: selected,
+    sheetId: sheetId,
     zoomScale: zoomScale
   })).replace('{columnsDescription}', generateColumnsDescription({
     schema: schema,
@@ -55,7 +59,18 @@ export default function generateSheetXml(data_, _ref) {
     orientation: orientation
   })).replace('{drawing}', generateDrawing({
     images: images
-  }));
+  })).replace('{conditionalStyles}', () => {
+    let xml = "";
+    for (let i = 0; i < conditionalStyles[[sheetId - 1]].length; i++) {
+      let conditionalStyle = conditionalStyles[sheetId - 1][i];
+      xml += `<conditionalFormatting sqref="${conditionalStyle.range}">`;
+        xml += `<cfRule type="expression" dxfId="${i}" priority="${i + 1}">`;
+          xml += `<formula>${conditionalStyle.condition.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("'", "&apos;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")}</formula>`;
+        xml += "</cfRule>";
+      xml += "</conditionalFormatting>";
+    }
+    return xml;
+  });
 }
 function validateData(data, _ref2) {
   var schema = _ref2.schema;

@@ -54,6 +54,7 @@ function generateXlsxFile(data, _ref2) {
     showGridLines = _ref2.showGridLines,
     rightToLeft = _ref2.rightToLeft,
     zoomScale = _ref2.zoomScale,
+    conditionalStyles = _ref.conditionalStyles,
     dateFormat = _ref2.dateFormat;
   var zip = new JSZip();
   var _generateSheets = generateSheets({
@@ -73,6 +74,7 @@ function generateXlsxFile(data, _ref2) {
       showGridLines: showGridLines,
       rightToLeft: rightToLeft,
       zoomScale: zoomScale,
+      conditionalStyles: conditionalStyles,
       dateFormat: dateFormat
     }),
     sheets = _generateSheets.sheets,
