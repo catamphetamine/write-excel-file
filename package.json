@@ -39,7 +39,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "archiver-node": "^8.0.4",
+    "archiver-node": "^8.0.5",
     "fflate": "^0.8.2"
   },
   "devDependencies": {
