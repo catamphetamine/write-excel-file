@@ -1,7 +1,7 @@
 import generateCell from './cell.js'
 import getCellStyleProperties from './helpers/getCellStyleProperties.js'
 import getAttributesString from '../../../xml/getAttributesString.js'
-import isObject from '../../helpers/isObject.js'
+import isCellObject from '../../helpers/isCellObject.js'
 
 // import Integer from '../types/Integer.js'
 
@@ -22,21 +22,19 @@ export default function generateRow(row, rowIndex, {
 				return ''
 			}
 
-			if (!isObject(cell)) {
-				cell = { value: cell }
-			}
+			const cellObject = isCellObject(cell) ? cell : { value: cell }
 
-			const cellStyleProperties = getCellStyleProperties(cell, features)
+			const cellStyleProperties = getCellStyleProperties(cellObject, features)
 
 			const {
 				height
-			} = cell
+			} = cellObject
 
 			let {
 				type,
 				value,
 				format
-			} = cell
+			} = cellObject
 
 			if (isEmpty(value)) {
 				value = null
