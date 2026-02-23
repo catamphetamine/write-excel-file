@@ -1,12 +1,8 @@
-import conditionalFormatting from './features/conditionalFormatting.js'
 import images from './features/images.js'
 import stickyRowsOrColumns from './features/stickyRowsOrColumns.js'
 
 export default function getFeatures(customFeatures) {
 	let features = []
-
-	// Add "conditional formatting" feature implicitly.
-	features.push(conditionalFormatting)
 
 	// Add "images" feature implicitly.
 	features.push(images)

@@ -521,38 +521,6 @@ export default {
 		}
 	},
 
-	'conditional-formatting': {
-		args: () => [
-			data,
-			{
-				columns,
-				conditionalFormatting: [{
-					cellRange: {
-						from: {
-							row: 2,
-							column: 1
-						},
-						to: {
-							row: 3,
-							column: 1
-						}
-					},
-					condition: {
-						operator: '>',
-						value: 200
-					},
-					style: {
-						backgroundColor: '#cc0000',
-						fontStyle: 'italic',
-						textDecoration: {
-							underline: true
-						}
-					}
-				}]
-			}
-		]
-	},
-
 	'images-on-multiple-sheets': {
 		args: () => [
 			[data, data],

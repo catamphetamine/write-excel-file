@@ -15,7 +15,6 @@
 * (breaking change) Removed deprecated parameter called `headerStyle`. Use `getHeaderStyle()` parameter instead.
 * (breaking change) `images[]` parameter no longer accepts strings (file paths). Instead, use `fs.createReadStream()` function on a file path to create a readable `Stream` for each such image.
 * Added a system of custom `features` which allows writing "plug-ins" for making custom changes in the resulting `.xlsx` file. To use it, pass a new `features: Feature[]` parameter. See readme for more details.
-* Added "conditional formatting" feature. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
 * Added `zoomScale` option. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
 * Fixed a bug when all sheets' tabs were displayed as highlighted rather than just the initially-selected sheet's tab. This also avoids UI bugs such as certain buttons being disabled until one of the sheets' tabs is manually selected by the user. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
 

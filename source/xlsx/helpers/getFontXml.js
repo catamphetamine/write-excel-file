@@ -66,9 +66,6 @@ export default function getFontXml(font, { isDefaultGenericFont } = {}) {
 		}
 	}
 
-	// Sidenote: "subscript" and "superscript" text styles
-	// don't seem to work with "conditional formatting" feature.
-	//
 	// if (... === 'subscript') {
 	// 	xml += '<vertAlign val="subscript"/>'
 	// } else if (... === 'superscript') {

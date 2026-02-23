@@ -1,6 +1,5 @@
 import { Color, CommonStyleProperties } from './common.d.js'
 
-import { ConditionalFormattingParametersSingleSheet, ConditionalFormattingParametersMultipleSheets } from './features/conditionalFormatting.d.js'
 import { ImagesParametersSingleSheet, ImagesParametersMultipleSheets } from './features/images.d.js'
 import { StickyRowsOrColumnsOptions } from './features/stickyRowsOrColumns.d.js'
 
@@ -184,11 +183,11 @@ export interface Feature<FileContent> {
 
 // Options.
 
-interface CommonOptionsSingleSheet<FileContent> extends CommonOptions<FileContent>, ConditionalFormattingParametersSingleSheet, ImagesParametersSingleSheet<FileContent> {
+interface CommonOptionsSingleSheet<FileContent> extends CommonOptions<FileContent>, ImagesParametersSingleSheet<FileContent> {
 	sheet?: string;
 }
 
-interface CommonOptionsMultipleSheets<FileContent> extends CommonOptions<FileContent>, ConditionalFormattingParametersMultipleSheets, ImagesParametersMultipleSheets<FileContent> {
+interface CommonOptionsMultipleSheets<FileContent> extends CommonOptions<FileContent>, ImagesParametersMultipleSheets<FileContent> {
 	sheets?: string[];
 }
 

@@ -598,60 +598,6 @@ An image object should have properties:
 
 The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
 
-## Conditional Formatting
-
-Conditional formatting could be specified by passing a list of conditional formatting rules as `conditionalFormatting` parameter. When multiple rules apply to the same cell, the first one of them has the priority.
-
-```js
-import writeXlsxFile from 'write-excel-file'
-
-await writeXlsxFile(data, {
-  fileName: 'file.xlsx',
-  conditionalFormatting: [{
-    cellRange: {
-      from: {
-        row: 2,
-        column: 1
-      },
-      to: {
-        row: 3,
-        column: 1
-      }
-    },
-    condition: {
-      operator: '>',
-      value: 100
-    },
-    style: {
-      backgroundColor: '#cc0000'
-    }
-  }]
-})
-```
-
-A conditional formatting rule is defined by properties:
-
-* `cells` — an object specifying a cell range defined by a `from` cell and a `to` cell
-  * `row` is a row number (starting from `1`)
-  * `column` is a column number (starting from `1`)
-* `condition` — an object specifying a condition
-  * Cell value comparison:
-    * Comparison to `value`: `{ operator: '<', value: 100 }`
-    * Between `value` and `value2`: `{ operator: '...', value: 100, value2: 200 }`
-    * Available `operator`s: `<`, `>`, `<=`, `>=`, `=`, `!=`, `...`
-  * Custom formula: `{ formula: '=$A1="Complete"' }`
-* `style` — an object specifying a style to apply
-  * Supports a subset of [cell style](#style) properties:
-    * Font family
-    * Font size
-    * Font weight
-    * Font style
-    * Text decoration
-    * Text color
-    * Background color
-    * Fill
-    * Border
-
 ## Browser Support
 
 An `*.xlsx` file is just a `*.zip` archive with an `*.xslx` file extension. This package uses [`fflate`](https://www.npmjs.com/package/fflate) for `*.zip` compression. See `fflate`'s [browser support](https://www.npmjs.com/package/fflate#browser-support) for further details.
