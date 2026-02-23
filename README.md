@@ -16,11 +16,28 @@ Alternatively, one could include it on a web page [directly](#cdn) via a `<scrip
 
 ## Use
 
-To write an `*.xlsx` file, one must provide the contents of a spreadsheet in the form of `data` — an array of rows. Each row must be an array of cells.
+To write an `*.xlsx` file, one must provide the contents of a spreadsheet in the form of `data` — an array of rows. Each row must be an array of cells. Each cell should be represented by a value.
 
-Each cell should have a `value`, a `type`, and, optionally, other [cell parameters](#cell-parameters).
+Example:
 
-If a cell doesn't have a `type`, then it is automatically detected from the `value`, or defaults to a `String`. Possible `type`s are:
+```js
+const data = [
+  ['A','B','C'],
+  ['x',123,true],
+  ['y',456,false],
+]
+```
+
+Output:
+
+| A | B | C |
+| - | - | - |
+| x | 123 | TRUE |
+| y | 456 | FALSE |
+
+Each cell could also be represented by an object with properties: `value`, `type`, and, optionally, other [cell parameters](#cell-parameters).
+
+If a cell object doesn't have a `type` property, then it is automatically detected from the `value` property, or defaults to a `String`. Possible `type`s are:
 * `String`
 * `Number`
 * `Boolean`
@@ -29,7 +46,7 @@ If a cell doesn't have a `type`, then it is automatically detected from the `val
 
 An empty cell could be represented by `null` or `undefined`.
 
-Here's an example of `data`.
+Example of cell objects:
 
 ```js
 const HEADER_ROW = [
@@ -94,14 +111,12 @@ const data = [
 Example 1: Write `data` to a file called `file.xlsx` and trigger a "Save as" file dialog so that the user could save the file to their disk.
 
 ```js
-import writeXlsxFile from 'write-excel-file'
+import writeXlsxFile from 'write-excel-file/browser'
 
 await writeXlsxFile(data, {
   fileName: 'file.xlsx'
 })
 ```
-
-Under the hood, it uses [`file-saver`](https://www.npmjs.com/package/file-saver) package to save the `*.xlsx` file to disk.
 
 Example 2: `fileName` parameter is not passed, so it returns a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 
@@ -115,7 +130,7 @@ Example 1: Write `data` to a file at path `/path/to/file.xlsx`.
 
 ```js
 // Import from '/node' subpackage.
-const writeXlsxFile = require('write-excel-file/node')
+import writeXlsxFile from 'write-excel-file/node'
 
 await writeXlsxFile(data, {
   filePath: '/path/to/file.xlsx'
@@ -128,7 +143,15 @@ Example 2: `filePath` parameter is not passed, but `buffer: true` parameter is p
 const buffer = await writeXlsxFile(data, { buffer: true })
 ```
 
-Example 3: Neither `filePath` nor `buffer: true` parameters are passed, so it returns a readable [`Stream`](https://nodejs.org/api/stream.html).
+<!--
+Example 3: `filePath` parameter is not passed, but `blob: true` parameter is passed, so it returns a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
+
+```js
+const blob = await writeXlsxFile(data, { blob: true })
+```
+-->
+
+Example 3: Neither `filePath` nor `buffer: true` <!-- nor `blob: true` --> parameters are passed, so it returns a readable [`Stream`](https://nodejs.org/api/stream.html).
 
 ```js
 const writeStream = fs.createWriteStream('/path/to/file.xlsx')
@@ -137,7 +160,7 @@ readStream.pipe(writeStream)
 ```
 
 <details>
-<summary>AWS S3 might refuse to accept the <code>stream</code> for output. How to fix that.</summary>
+<summary>AWS S3 could refuse to read from the returned <code>stream</code>. Here's a fix.</summary>
 
 #####
 
@@ -158,6 +181,18 @@ Workaround for AWS SDK v2: write to `Buffer` instead of a stream.
 
 Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packages-in-aws-sdk-for-javascript/): use [`Upload`](https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-868352176) operation.
 </details>
+
+### Universal
+
+The one that works both in a web browser and Node.js. Only supports returning a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for some.
+
+```js
+// Import from '/universal' subpackage.
+import writeXlsxFile from 'write-excel-file/universal'
+
+// outputs a `Blob`.
+const blob = await writeXlsxFile(data)
+```
 
 ## Data vs Objects
 
@@ -214,7 +249,7 @@ Each column should have a `column` title, a data `type`, a `value` "getter" func
 ### Browser
 
 ```js
-import writeXlsxFile from 'write-excel-file'
+import writeXlsxFile from 'write-excel-file/browser'
 
 await writeXlsxFile(objects, {
   schema,
@@ -225,7 +260,7 @@ await writeXlsxFile(objects, {
 ### Node.js
 
 ```js
-const writeXlsxFile = require('write-excel-file/node')
+import writeXlsxFile from 'write-excel-file/node'
 
 await writeXlsxFile(objects, {
   schema,
@@ -237,7 +272,7 @@ await writeXlsxFile(objects, {
 
 One could specify custom column widths (in "characters" rather than in "pixels").
 
-### Objects
+### When Passing Objects
 
 When passing `objects`/`schema`, column widths can be specified via `width` property in the `schema`.
 
@@ -253,7 +288,7 @@ const schema = [
 ]
 ```
 
-### Data
+### When Passing Data
 
 When passing `data`, one can pass a separate `columns` parameter to specify column widths:
 
@@ -338,50 +373,108 @@ A `String` cell (or schema column) could also specify a `format`.
 
 Cell style properties:
 
-* `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
+* Dimensions
+  * `height: number` — Row height, in "points".
 
-* `alignVertical: string` — Vertical alignment of cell content. Available values: `"top"`, `"center"`, `"bottom"`.
+* Combine cells
+  * `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
 
-* `textRotation: number` — Text rotation angle. Values from `-90` to `90` are supported. Positive values rotate the text counterclockwise, and negative values rotate the text clockwise.
+  * `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
 
-* `height: number` — Row height, in "points".
+* Alignment
 
-* `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
+  * `align: string` — Horizontal alignment of cell content. Available values: `"left"`, `"center"`, `"right"`.
 
-* `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
+  * `alignVertical: string` — Vertical alignment of cell content. Available values: `"top"`, `"center"`, `"bottom"`.
 
-* `indent: number` — Horizontal indentation level for the cell content.
+  * `textRotation: number` — Text rotation angle. Values from `-90` to `90` are supported. Positive values rotate the text counterclockwise, and negative values rotate the text clockwise.
 
-* `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
+  * `indent: number` — Horizontal indentation level for the cell content.
 
-* `fontFamily: string` — Can be used to print text in a custom font family. Example: `"Calibri"`.
+  * `wrap: boolean` — Set to `true` to ["wrap"](https://www.excel-easy.com/examples/wrap-text.html) text when it overflows the cell.
 
-* `fontSize: number` — Can be used to print text in a custom font size. Example: `12`.
+* Font
+  * `fontFamily: string` — Can be used to print text in a custom font family. Example: `"Calibri"`.
+  * `fontSize: number` — Can be used to print text in a custom font size. Example: `12`.
+  * `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
+  * `fontStyle: string` — Can be used to make text appear italicized. Available values: `"italic"`.
 
-* `fontWeight: string` — Can be used to print text in bold. Available values: `"bold"`.
+* Text style
+  * `textColor: string` — Cell text color (in hexademical format). Example: `"#aabbcc"`.
+  * `textDecoration: object` — Can be used to decorate text.
+    * `underline: boolean` — Draws an underline below the text.
+    * `doubleUnderline: boolean` — Draws a double underline below the text.
+    * `strikethrough: boolean` — Draws a horizontal line through the middle of the text.
 
-* `fontStyle: string` — Can be used to make text appear italicized. Available values: `"italic"`.
+* Fill
+  * `backgroundColor: string` — Cell background color (in hexademical format). Example: `"#aabbcc"`.
+  * `fillPatternStyle: string` — Cell fill pattern style, when a certain fill pattern should be used. Example: `"lightGrid"`.
+  * `fillPatternColor: string` — Cell fill pattern color (in hexademical format), when a certain fill pattern should be used. Example: `"#aabbcc"`.
 
-* `color: string` — Cell text color (in hexademical format). Example: `"#aabbcc"`.
-
-* `backgroundColor: string` — Cell background color (in hexademical format). Example: `"#aabbcc"`.
-
-* `borderColor: string` — Cell border color. Example: `"#aabbcc"`.
-
-* `borderStyle: string` — Cell border style. Example: `"thick"`.
-
-  * `leftBorderColor`
-  * `leftBorderStyle`
-  * `rightBorderColor`
-  * `rightBorderStyle`
-  * `topBorderColor`
-  * `topBorderStyle`
-  * `bottomBorderColor`
-  * `bottomBorderStyle`
+* Border
+  * `borderColor: string` — Cell border color. Example: `"#aabbcc"`.
+  * `borderStyle: string` — Cell border style. Example: `"thick"`.
+    * `leftBorderColor`
+    * `leftBorderStyle`
+    * `rightBorderColor`
+    * `rightBorderStyle`
+    * `topBorderColor`
+    * `topBorderStyle`
+    * `bottomBorderColor`
+    * `bottomBorderStyle`
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
-## Objects: Table Header Style
+## Options
+
+The following options could be passed as part of the second argument to `writeXlsxFile()` function:
+
+* `sheet: string` — Sets the name of the sheet.
+* `fontFamily: string` — Sets the default font family. Example: `"Calibri"`.
+* `fontSize: number` — Sets the default font size. Example: `12`.
+* `orientation: string` — Sets the orientation for all sheets. Default is `"portrait"`. Possible values: `"portrait"`, `"landscape"`.
+* `dateFormat: string` — Sets the default format for outputting dates. Example: `"mm/dd/yyyy"`.
+* `stickyRowsCount: number` — Makes a given number of top rows "sticky" (Excel calls them "frozen").
+* `stickyColumnsCount: number` — Makes a given number of columns at the start "sticky" (Excel calls them "frozen").
+* `showGridLines: boolean` — Pass `false` to hide grid lines.
+* `rightToLeft: boolean` — Pass `true` to use right-to-left layout on all sheets.
+* `zoomScale: number` — Sets the initial zoom factor. Example: `1.5` scales the document to 150%.
+
+## Multiple Sheets
+
+### When Passing Objects
+
+To generate an `*.xlsx` file with multiple sheets when passing `objects`/`schema`:
+
+* Pass a `sheets` parameter — an array of sheet names.
+* The `objects` argument should be an array of `objects` for each sheet.
+* The `schema` parameter should be an array of `schema`s for each sheet.
+
+```js
+await writeXlsxFile([objects1, objects2], {
+  schema: [schema1, schema2],
+  sheets: ['Sheet 1', 'Sheet 2'],
+  filePath: '/path/to/file.xlsx'
+})
+```
+
+### When Passing Data
+
+To generate an `*.xlsx` file with multiple sheets when passing `data`:
+
+* Pass a `sheets` parameter — an array of sheet names.
+* The `data` argument should be an array of `data` for each sheet.
+* (optional) The `columns` parameter should be an array of `columns` for each sheet.
+
+```js
+await writeXlsxFile([data1, data2], {
+  columns: [columns1, columns2], // (optional)
+  sheets: ['Sheet 1', 'Sheet 2'],
+  filePath: '/path/to/file.xlsx'
+})
+```
+
+## Table Header Style When Passing Objects
 
 When passing `objects`/`schema`, the output table will include a header row at the top. The header row can be customized by providing column titles and cell style.
 
@@ -419,128 +512,32 @@ await writeXlsxFile(objects, {
 })
 ```
 
-## Font
+## Features
 
-The default font is `Calibri` at `12px`. To change the default font, pass `fontFamily` and `fontSize` parameters when calling `writeXlsxFile()`:
+This package is quite minimal but at the same time extensible by providing custom "feature" implementations.
 
 ```js
+// TypeScript "definition" of a "feature".
+import type { Feature } from 'write-excel-file/node'
+
+import writeXlsxFile from 'write-excel-file/node'
+
+// A custom feature should implement the `Feature` TypeScript interface.
+const myCustomFeature: Feature = {
+  ...
+}
+
 await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  fontFamily: 'Arial',
-  fontSize: 16
+  fileName: 'file.xlsx',
+  features: [myCustomFeature]
 })
 ```
 
-## Orientation
+A `*.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — and modify their content as required by either inserting some additional markup or transforming the entire existing markup.
 
-To specify custom orientation (for all sheets), pass `orientation` parameter when calling `writeXlsxFile()`:
+For an example of a "feature" implementation see `./source/xlsx/features` directory. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and see `./types/features` directory for TypeScript definitions of "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
 
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  orientation: 'landscape'
-})
-```
-
-## Date Format
-
-To set the default date format, pass `dateFormat` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  dateFormat: 'mm/dd/yyyy'
-})
-```
-
-## Sticky Rows
-
-To make some of the top rows "sticky" (Excel calls them "frozen"), pass `stickyRowsCount` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  stickyRowsCount: 1
-})
-```
-
-## Sticky Columns
-
-To make some of the columns at the start "sticky" (Excel calls them "frozen"), pass `stickyColumnsCount` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  stickyColumnsCount: 1
-})
-```
-
-## Hide Grid Lines
-
-To hide grid lines, pass `showGridLines: false` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  showGridLines: false
-})
-```
-
-## Right-to-Left
-
-To use right-to-left layout on all sheets, pass `rightToLeft: true` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  rightToLeft: true
-})
-```
-
-## Sheet Name
-
-To set the default sheet name, pass a `sheet` parameter when calling `writeXlsxFile()`:
-
-```js
-await writeXlsxFile(data, {
-  filePath: '/path/to/file.xlsx',
-  sheet: 'Data'
-})
-```
-
-## Multiple Sheets
-
-### Objects
-
-To generate an `*.xlsx` file with multiple sheets when passing `objects`/`schema`:
-
-* Pass a `sheets` parameter — an array of sheet names.
-* The `objects` argument should be an array of `objects` for each sheet.
-* The `schema` parameter should be an array of `schema`s for each sheet.
-
-```js
-await writeXlsxFile([objects1, objects2], {
-  schema: [schema1, schema2],
-  sheets: ['Sheet 1', 'Sheet 2'],
-  filePath: '/path/to/file.xlsx'
-})
-```
-
-### Data
-
-To generate an `*.xlsx` file with multiple sheets when passing `data`:
-
-* Pass a `sheets` parameter — an array of sheet names.
-* The `data` argument should be an array of `data` for each sheet.
-* (optional) The `columns` parameter should be an array of `columns` for each sheet.
-
-```js
-await writeXlsxFile([data1, data2], {
-  columns: [columns1, columns2], // (optional)
-  sheets: ['Sheet 1', 'Sheet 2'],
-  filePath: '/path/to/file.xlsx'
-})
-```
+P.S. When implementing a "feature", don't rely too much on the `.xlsx` file contents to have any particular shape or form (within reason). For example, don't really assume the XML markup in those files to have a certain fixed shape or to maintain a particular fixed order of elements or their attributes. That's because in future versions of this package, the XML markup inside those `.xml` files may potentially be refactored, with some elements considered "unnecessary" and being removed, or non-previously-existing elements being added by default. This means that `transform` functions shouldn't rely on a particular order of existing elements or attributes to find-and-replace those, nor should they presume any particular elements or attributes to not already exist when adding those, i.e. perhaps they should check before adding, in which case perhaps prefer using `transform` over `insert`. Analogous, `files.write` functions could use `read()` function to check if a file with such name already exists. And to avoid any potential conflicts when introducing a new "relationship ID", consider using a unique "namespace" so that it looks like `rId-${namespace}-1` rather than just `rId1`.
 
 ## Images
 
@@ -582,7 +579,7 @@ An image object should have properties:
 
 * `content` — Image content.
   * Browser: `File` or `Blob` or `ArrayBuffer`.
-  * Node: `String` file path or `Readable` stream or `Buffer`.
+  * Node: Readable `Stream` or `Buffer` or `Blob`.
 * `contentType` — MIME content type of the image. Example: `"image/jpeg"`.
 * `width` — Image width, in pixels.
 * `height` — Image height, in pixels.
@@ -600,6 +597,64 @@ An image object should have properties:
 * `description` — (optional) Image description.
 
 The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
+
+## Conditional Formatting
+
+Conditional formatting could be specified by passing a list of conditional formatting rules as `conditionalFormatting` parameter. When multiple rules apply to the same cell, the first one of them has the priority.
+
+```js
+import writeXlsxFile from 'write-excel-file'
+
+await writeXlsxFile(data, {
+  fileName: 'file.xlsx',
+  conditionalFormatting: [{
+    cellRange: {
+      from: {
+        row: 2,
+        column: 1
+      },
+      to: {
+        row: 3,
+        column: 1
+      }
+    },
+    condition: {
+      operator: '>',
+      value: 100
+    },
+    style: {
+      backgroundColor: '#cc0000'
+    }
+  }]
+})
+```
+
+A conditional formatting rule is defined by properties:
+
+* `cells` — an object specifying a cell range defined by a `from` cell and a `to` cell
+  * `row` is a row number (starting from `1`)
+  * `column` is a column number (starting from `1`)
+* `condition` — an object specifying a condition
+  * Cell value comparison:
+    * Comparison to `value`: `{ operator: '<', value: 100 }`
+    * Between `value` and `value2`: `{ operator: '...', value: 100, value2: 200 }`
+    * Available `operator`s: `<`, `>`, `<=`, `>=`, `=`, `!=`, `...`
+  * Custom formula: `{ formula: '=$A1="Complete"' }`
+* `style` — an object specifying a style to apply
+  * Supports a subset of [cell style](#style) properties:
+    * Font family
+    * Font size
+    * Font weight
+    * Font style
+    * Text decoration
+    * Text color
+    * Background color
+    * Fill
+    * Border
+
+## Browser Support
+
+An `*.xlsx` file is just a `*.zip` archive with an `*.xslx` file extension. This package uses [`fflate`](https://www.npmjs.com/package/fflate) for `*.zip` compression. See `fflate`'s [browser support](https://www.npmjs.com/package/fflate#browser-support) for further details.
 
 ## CDN
 
@@ -624,7 +679,7 @@ This project was inspired by [`zipcelx`](https://medium.com/@Nopziiemoo/create-e
 <!--
 ## Babel Runtime Dependency
 
-There's a `@babel/runtime` dependency specified in `package.json`. That dependency is only used in Node.js. Specifically, in `write-excel-file/modules/write/writeXlsxFileNode.js` file.
+There's a `@babel/runtime` dependency specified in `package.json`. That dependency is only used in Node.js. Specifically, in `write-excel-file/modules/export/writeXlsxFileNode.js` file.
 
 ```js
 import _asyncToGenerator from "@babel/runtime/helpers/asyncToGenerator";

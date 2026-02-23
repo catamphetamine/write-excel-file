@@ -4,23 +4,37 @@
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/53#note_1245377052
 
 import Stream, { Readable } from 'stream'
-import { PathLike } from 'fs';
+import { Blob } from 'buffer'
+
+import { ImageType } from '../types/features/images.d.js'
 
 import {
-	Schema,
 	SheetData,
-	Columns,
-	CommonOptions,
-	ImageType
-} from '../index.d.js';
+	OptionsSingleSheetWithSchema,
+	OptionsMultipleSheetsWithSchema,
+	OptionsSingleSheetWithoutSchema,
+	OptionsMultipleSheetsWithoutSchema
+} from '../types/api.d.js'
 
-export {
-	Schema
-} from '../index.d.js';
+export { ValueType, Cell, Row, SheetData, ColumnSchema, Schema, Feature } from '../types/api.d.js'
 
-type ImageContent = Stream | Buffer | PathLike;
+type FileContent = Stream | Buffer | Blob;
 
-export type Image = ImageType<ImageContent>;
+export type Image = ImageType<FileContent>;
+
+interface AdditionalOptionsReturnStream {}
+
+interface AdditionalOptionsReturnBuffer {
+	buffer: true;
+}
+
+// interface AdditionalOptionsReturnBlob {
+// 	blob: true;
+// }
+
+interface AdditionalOptionsWriteToFile {
+	filePath: string;
+}
 
 // export interface Stream {
 // 	pipe(output: Stream): void;
@@ -31,148 +45,90 @@ export type Image = ImageType<ImageContent>;
 
 // With Schema.
 
-interface WithSchemaCommonOptionsWriteToFile<Object> extends CommonOptions<Object> {
-	filePath: string;
-}
+interface OptionsSingleSheetWithSchemaWriteToFile<Object> extends OptionsSingleSheetWithSchema<Object, FileContent>, AdditionalOptionsWriteToFile {}
+interface OptionsMultipleSheetsWithSchemaWriteToFile<Object> extends OptionsMultipleSheetsWithSchema<Object, FileContent>, AdditionalOptionsWriteToFile {}
 
-interface WithSchemaCommonOptionsReturnBuffer<Object> extends CommonOptions<Object> {
-	buffer: true;
-}
+interface OptionsSingleSheetWithSchemaReturnBuffer<Object> extends OptionsSingleSheetWithSchema<Object, FileContent>, AdditionalOptionsReturnBuffer {}
+interface OptionsMultipleSheetsWithSchemaReturnBuffer<Object> extends OptionsMultipleSheetsWithSchema<Object, FileContent>, AdditionalOptionsReturnBuffer {}
 
-interface WithSchemaCommonOptionsReturnStream<Object> extends CommonOptions<Object> {
-}
+// interface OptionsSingleSheetWithSchemaReturnBlob<Object> extends OptionsSingleSheetWithSchema<Object, FileContent>, AdditionalOptionsReturnBlob {}
+// interface OptionsMultipleSheetsWithSchemaReturnBlob<Object> extends OptionsMultipleSheetsWithSchema<Object, FileContent>, AdditionalOptionsReturnBlob {}
 
-interface OptionsSchemaImagesSheet {
-	schema: Schema<Object>;
-  images?: Image[];
-	sheet?: string;
-}
-
-interface OptionsSchemaImagesSheets {
-	schema: Schema<Object>[];
-  images?: Image[][];
-	sheets?: string[];
-}
-
-interface WithSchemaOptionsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object>, OptionsSchemaImagesSheet {
-}
-
-interface WithSchemaOptionsMultipleSheetsWriteToFile<Object> extends WithSchemaCommonOptionsWriteToFile<Object>, OptionsSchemaImagesSheets {
-}
-
-interface WithSchemaOptionsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object>, OptionsSchemaImagesSheet {
-}
-
-interface WithSchemaOptionsMultipleSheetsReturnBuffer<Object> extends WithSchemaCommonOptionsReturnBuffer<Object>, OptionsSchemaImagesSheets {
-}
-
-interface WithSchemaOptionsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object>, OptionsSchemaImagesSheet {
-}
-
-interface WithSchemaOptionsMultipleSheetsReturnStream<Object> extends WithSchemaCommonOptionsReturnStream<Object>, OptionsSchemaImagesSheets {
-}
+interface OptionsSingleSheetWithSchemaReturnStream<Object> extends OptionsSingleSheetWithSchema<Object, FileContent>, AdditionalOptionsReturnStream {}
+interface OptionsMultipleSheetsWithSchemaReturnStream<Object> extends OptionsMultipleSheetsWithSchema<Object, FileContent>, AdditionalOptionsReturnStream {}
 
 // With `schema`.
 // Write to a file.
 declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
-	options: WithSchemaOptionsWriteToFile<Object> | WithSchemaOptionsMultipleSheetsWriteToFile<Object>
+	options: OptionsSingleSheetWithSchemaWriteToFile<Object> | OptionsMultipleSheetsWithSchemaWriteToFile<Object>
 ) : Promise<void>;
 
 // With `schema`.
 // Return `Buffer`.
 declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
-	options: WithSchemaOptionsReturnBuffer<Object> | WithSchemaOptionsMultipleSheetsReturnBuffer<Object>
+	options: OptionsSingleSheetWithSchemaReturnBuffer<Object> | OptionsMultipleSheetsWithSchemaReturnBuffer<Object>
 ) : Promise<Buffer>;
 
 // With `schema`.
 // Return `Stream`.
 declare function writeXlsxFile<Object>(
 	objects: Object[] | Object[][],
-	options: WithSchemaOptionsReturnStream<Object> | WithSchemaOptionsMultipleSheetsReturnStream<Object>
+	options: OptionsSingleSheetWithSchemaReturnStream<Object> | OptionsMultipleSheetsWithSchemaReturnStream<Object>
 ) : Promise<Readable>;
 
 // Without Schema.
 
-interface WithoutSchemaCommonOptionsWriteToFile extends CommonOptions {
-	filePath: string;
-}
+interface OptionsSingleSheetWithoutSchemaWriteToFile extends OptionsSingleSheetWithoutSchema<FileContent>, AdditionalOptionsWriteToFile {}
+interface OptionsMultipleSheetsWithoutSchemaWriteToFile extends OptionsMultipleSheetsWithoutSchema<FileContent>, AdditionalOptionsWriteToFile {}
 
-interface WithoutSchemaCommonOptionsReturnBuffer extends CommonOptions {
-	buffer: true;
-}
+interface OptionsSingleSheetWithoutSchemaReturnBuffer extends OptionsSingleSheetWithoutSchema<FileContent>, AdditionalOptionsReturnBuffer {}
+interface OptionsMultipleSheetsWithoutSchemaReturnBuffer extends OptionsMultipleSheetsWithoutSchema<FileContent>, AdditionalOptionsReturnBuffer {}
 
-interface WithoutSchemaCommonOptionsReturnStream extends CommonOptions {
-}
+// interface OptionsSingleSheetWithoutSchemaReturnBlob extends OptionsSingleSheetWithoutSchema<FileContent>, AdditionalOptionsReturnBlob {}
+// interface OptionsMultipleSheetsWithoutSchemaReturnBlob extends OptionsMultipleSheetsWithoutSchema<FileContent>, AdditionalOptionsReturnBlob {}
 
-interface OptionsColumnsImagesSheet {
-	columns?: Columns;
-  images?: Image[];
-	sheet?: string;
-}
-
-interface OptionsColumnsImagesSheets {
-	columns?: Columns[];
-  images?: Image[][];
-	sheets?: string[];
-}
-
-interface WithoutSchemaOptionsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile, OptionsColumnsImagesSheet {
-}
-
-interface WithoutSchemaOptionsMultipleSheetsWriteToFile extends WithoutSchemaCommonOptionsWriteToFile, OptionsColumnsImagesSheets {
-}
-
-interface WithoutSchemaOptionsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer, OptionsColumnsImagesSheet {
-}
-
-interface WithoutSchemaOptionsMultipleSheetsReturnBuffer extends WithoutSchemaCommonOptionsReturnBuffer, OptionsColumnsImagesSheets {
-}
-
-interface WithoutSchemaOptionsReturnStream extends WithoutSchemaCommonOptionsReturnStream, OptionsColumnsImagesSheet {
-}
-
-interface WithoutSchemaOptionsMultipleSheetsReturnStream extends WithoutSchemaCommonOptionsReturnStream, OptionsColumnsImagesSheets {
-}
+interface OptionsSingleSheetWithoutSchemaReturnStream extends OptionsSingleSheetWithoutSchema<FileContent>, AdditionalOptionsReturnStream {}
+interface OptionsMultipleSheetsWithoutSchemaReturnStream extends OptionsMultipleSheetsWithoutSchema<FileContent>, AdditionalOptionsReturnStream {}
 
 // Write to a file.
 declare function writeXlsxFile(
 	data: SheetData,
-	options: WithoutSchemaOptionsWriteToFile
+	options: OptionsSingleSheetWithoutSchemaWriteToFile
 ) : Promise<void>;
 
 // Write to a file.
 // Multiple `sheets`.
 declare function writeXlsxFile(
 	data: SheetData[],
-	options: WithoutSchemaOptionsMultipleSheetsWriteToFile
+	options: OptionsMultipleSheetsWithoutSchemaWriteToFile
 ) : Promise<void>;
 
 // Return `Buffer`.
 declare function writeXlsxFile(
 	data: SheetData,
-	options: WithoutSchemaOptionsReturnBuffer
+	options: OptionsSingleSheetWithoutSchemaReturnBuffer
 ) : Promise<Buffer>;
 
 // Return `Buffer`.
 // Multiple `sheets`.
 declare function writeXlsxFile(
 	data: SheetData[],
-	options: WithoutSchemaOptionsMultipleSheetsReturnBuffer
+	options: OptionsMultipleSheetsWithoutSchemaReturnBuffer
 ) : Promise<Buffer>;
 
 // Return `Stream`.
 declare function writeXlsxFile(
 	data: SheetData,
-	options?: WithoutSchemaOptionsReturnStream
+	options?: OptionsSingleSheetWithoutSchemaReturnStream
 ) : Promise<Readable>;
 
 // Return `Stream`.
 // Multiple `sheets`.
 declare function writeXlsxFile(
 	data: SheetData[],
-	options?: WithoutSchemaOptionsMultipleSheetsReturnStream
+	options?: OptionsMultipleSheetsWithoutSchemaReturnStream
 ) : Promise<Readable>;
 
 export default writeXlsxFile;

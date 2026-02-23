@@ -1,21 +1,23 @@
 {
   "name": "write-excel-file",
-  "version": "2.3.10",
+  "version": "3.0.0",
   "description": "Write simple `*.xlsx` files in a browser or Node.js",
-  "module": "index.js",
-  "main": "index.cjs",
   "type": "module",
-  "types": "./index.d.ts",
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "import": "./index.js",
-      "require": "./index.cjs"
-    },
     "./node": {
       "types": "./node/index.d.ts",
       "import": "./node/index.js",
       "require": "./node/index.cjs"
+    },
+    "./browser": {
+      "types": "./browser/index.d.ts",
+      "import": "./browser/index.js",
+      "require": "./browser/index.cjs"
+    },
+    "./universal": {
+      "types": "./universal/index.d.ts",
+      "import": "./universal/index.js",
+      "require": "./universal/index.cjs"
     },
     "./package.json": "./package.json"
   },
@@ -33,10 +35,12 @@
     "build": "npm-run-all build:clean build:commonjs build:esm build:bundle",
     "prepublishOnly": "npm-run-all build test"
   },
+  "engines": {
+    "node": ">=18"
+  },
   "dependencies": {
-    "archiver": "^7.0.1",
-    "file-saver": "^2.0.5",
-    "jszip": "^3.10.1"
+    "archiver-node": "^8.0.4",
+    "fflate": "^0.8.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.28.3",
