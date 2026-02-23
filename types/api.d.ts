@@ -1,4 +1,4 @@
-import { Color, CommonStyleProperties } from './common.d.js'
+import { CommonStyleProperties } from './common.d.js'
 
 import { ImagesParametersSingleSheet, ImagesParametersMultipleSheets } from './features/images.d.js'
 import { StickyRowsOrColumnsOptions } from './features/stickyRowsOrColumns.d.js'
@@ -11,11 +11,11 @@ export type ValueType =
 	Number |
 	Boolean;
 
-// It's unclear how to express something like `type? = Type` in TypeScript.
-// So instead it's defined as `type?: TypeConstructor<Type>`.
+// A way to define a `type = String` or `type = Number` variable in TypeScript
+// is by defining it as `type: StringConstructor` or `type: NumberConstructor`.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/4#note_715204034
 // https://www.typescriptlang.org/docs/handbook/2/conditional-types.html
-type TypeConstructor<Type> =
+type Constructor<Type> =
 	Type extends String
 		? StringConstructor
 		: Type extends Date
@@ -26,7 +26,7 @@ type TypeConstructor<Type> =
 					? BooleanConstructor
 					: never;
 
-type TypeOfType<Type> = TypeConstructor<Type> | 'Formula';
+type CellType<ValueType> = Constructor<ValueType> | 'Formula';
 
 interface CellStyle extends CommonStyleProperties {
 	align?: 'left' | 'center' | 'right';
@@ -39,37 +39,37 @@ interface CellStyle extends CommonStyleProperties {
 	textRotation?: number;
 }
 
-interface CellProps<Type> extends CellStyle {
-	// TypeScript interprets `type?: Type` as "`type` is an instance of `Type`",
-	// while in reality the definition of `type` is "`type` is `Type.constructor`".
-	type?: TypeOfType<Type>;
-
-	// A simpler (loose) variant:
-	// type?: ValueType;
-
+interface CellProps extends CellStyle {
 	// Data output format (for numbers or dates or strings).
 	format?: string;
 }
 
-interface CellOfType<Type> extends CellProps<Type> {
-	value?: Type;
+interface CellObjectOfType<ValueType> extends CellProps {
+	// Cell value.
+	value?: ValueType;
+	// Cell value type.
+	type?: CellType<ValueType>;
 }
 
-export type Cell = CellOfType<ValueType> | ValueType | null | undefined;
+export interface CellObject extends CellObjectOfType<ValueType> {}
+
+export type Cell = CellObject | ValueType | null | undefined;
 export type Row = Cell[];
 export type SheetData = Row[];
 
 // Some users have requested exporting `ColumnSchema` type.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/30
-export interface ColumnSchema<Object, Type> extends CellProps<Type> {
+export interface ColumnSchema<Object, ValueType> extends CellProps {
 	// Column title.
 	column?: string;
 	// Column width (in characters).
 	width?: number;
-	// Cell value getter.
-	value(object: Object): Type | undefined | null;
 	// Cell style getter.
 	getCellStyle?(object: Object): CellStyle | undefined;
+	// Cell value getter.
+	value(object: Object): ValueType | undefined | null;
+	// Cell value type.
+	type?: CellType<ValueType>;
 }
 
 export type Schema<Object> = ColumnSchema<Object, ValueType>[];

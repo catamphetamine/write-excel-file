@@ -8,7 +8,7 @@ import {
 	OptionsMultipleSheetsWithoutSchema
 } from '../types/api.d.js'
 
-export { ValueType, Cell, Row, SheetData, ColumnSchema, Schema, Feature } from '../types/api.d.js'
+export { ValueType, Cell, CellObject, Row, SheetData, ColumnSchema, Schema, Feature } from '../types/api.d.js'
 
 type FileContent = Blob;
 
