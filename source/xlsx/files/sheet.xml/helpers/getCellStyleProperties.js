@@ -1,8 +1,9 @@
 import addProperties from '../../../helpers/features/addProperties.js'
 
 import hasAlignment from '../../../helpers/hasAlignment.js'
-import hasFont from '../../../helpers/hasFont.js'
+import hasBorder from '../../../helpers/hasBorder.js'
 import hasFill from '../../../helpers/hasFill.js'
+import hasFont from '../../../helpers/hasFont.js'
 
 export default function getCellStyleProperties(cell, features) {
 	const {
@@ -55,7 +56,9 @@ export default function getCellStyleProperties(cell, features) {
 		hasFill({
 			backgroundColor,
 			fillPatternStyle,
-			fillPatternColor,
+			fillPatternColor
+		}) ||
+		hasBorder({
 			borderColor,
 			borderStyle,
 			leftBorderColor,

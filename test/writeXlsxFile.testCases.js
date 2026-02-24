@@ -350,6 +350,32 @@ export default {
 		}
 	},
 
+	'column-span': {
+		args: () => {
+			// Create `data` with `span`.
+			const dataSpan = data.slice()
+			let i = 0
+			while (i < dataSpan.length) {
+				dataSpan[i] = dataSpan[i].slice()
+				i++
+			}
+			dataSpan[1][0] = {
+				value: 'Column Span',
+				span: 2,
+				// Add test styles.
+				// https://gitlab.com/catamphetamine/write-excel-file/-/issues/43
+				borderStyle: 'thick',
+				borderColor: '#cc0000'
+			}
+			dataSpan[1][1] = null
+
+			return [
+				dataSpan,
+				{ columns }
+			]
+		}
+	},
+
 	'orientation-landscape': {
 		args: () => [
 			data,
