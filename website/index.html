@@ -154,6 +154,20 @@
         font-family : monospace;
         text-decoration : none;
       }
+
+      code
+      {
+         color: #fd8900;
+         font-size: 1.25em;
+      }
+
+      hr
+      {
+         opacity: 0.5;
+         border-color: #fd8900;
+         border-width: 1px;
+         border-top-width: 0px;
+      }
     </style>
 
     <link href="lib/prism.css" rel="stylesheet" />
@@ -177,37 +191,7 @@
       <div class="supersection-content">
         <section>
           <header>
-            <h1>Objects</h1>
-            <button id="objects-edit">Edit</button>
-          </header>
-          <textarea id="objects" style="display: none"></textarea>
-          <pre><code class="language-js" id="objects-view"></code></pre>
-        </section>
-
-        <section>
-          <header>
-            <h1>Schema</h1>
-            <button id="schema-edit">Edit</button>
-          </header>
-          <textarea readonly id="schema" style="display: none"></textarea>
-          <pre><code class="language-js" id="schema-view"></code></pre>
-        </section>
-      </div>
-
-      <button id="write-xlsx-file-button-schema">
-        Write *.xlsx file
-      </button>
-    </div>
-
-    <br/>
-    <br/>
-    <br/>
-
-    <div class="supersection">
-      <div class="supersection-content">
-        <section>
-          <header>
-            <h1>Cell data</h1>
+            <h2>Data</h2>
             <button id="every-cell-data-edit">Edit</button>
           </header>
           <textarea id="every-cell-data" style="display: none"></textarea>
@@ -216,13 +200,53 @@
 
         <section>
           <header>
-            <h1>Columns config</h1>
+            <h2>Column Settings</h2>
           </header>
           <pre><code class="language-js" id="every-cell-data-columns-view"></code></pre>
         </section>
       </div>
 
       <button id="write-xlsx-file-button-cells">
+        Write *.xlsx file
+      </button>
+    </div>
+
+    <br/>
+    <br/>
+    <br/>
+
+    <hr/>
+
+    <br/>
+
+    <h2>
+      When passing <code>objects</code> and <code>schema</code>
+    </h2>
+
+    <br/>
+
+    <div class="supersection">
+      <div class="supersection-content">
+        <section>
+          <header>
+            <h2>Objects</h2>
+            <button id="objects-edit">Edit</button>
+          </header>
+          <textarea id="objects" style="display: none"></textarea>
+          <pre><code class="language-js" id="objects-view"></code></pre>
+        </section>
+
+        <section>
+          <header>
+            <h2>Schema</h2>
+            <button id="schema-edit">Edit</button>
+          </header>
+          <textarea readonly id="schema" style="display: none"></textarea>
+          <pre><code class="language-js" id="schema-view"></code></pre>
+        </section>
+      </div>
+
+      <button id="write-xlsx-file-button-schema">
         Write *.xlsx file
       </button>
     </div>
@@ -437,7 +461,15 @@
               }
             }
           }
-          writeXlsxFile(objects, { schema, fileName: 'with-schema.xlsx' })
+          writeXlsxFile(objects, { schema, fileName: 'objects-and-schema.xlsx' }).then(
+            () => {
+              // console.log('File created')
+            },
+            (error) => {
+              console.error(error)
+              alert('There was an error. See console output for the error stack trace.')
+            }
+          )
         } catch (error) {
           console.error(error)
           alert("There was an error. See console output for the error stack trace.")
@@ -472,7 +504,15 @@
               }
             }
           }
-          writeXlsxFile(data, { columns, fileName: 'cells.xlsx' })
+          writeXlsxFile(data, { columns, fileName: 'data.xlsx' }).then(
+            () => {
+              // console.log('File created')
+            },
+            (error) => {
+              console.error(error)
+              alert('There was an error. See console output for the error stack trace.')
+            }
+          )
         } catch (error) {
           console.error(error)
           alert("There was an error. See console output for the error stack trace.")

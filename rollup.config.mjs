@@ -4,8 +4,9 @@ import commonjs from '@rollup/plugin-commonjs'
 import terser from '@rollup/plugin-terser'
 
 export default [
+  // Main export.
   {
-    input: './index',
+    input: './browser/index',
     plugins: [
       json(),
       terser(),
@@ -27,6 +28,25 @@ export default [
         // 'react': 'React',
         // 'prop-types': 'PropTypes'
       }
+    }
+  },
+
+  // Test cases.
+  {
+    input: './test/writeXlsxFile.testCases.js',
+    plugins: [
+      json(),
+      terser(),
+      nodeResolve({
+        browser: true
+      }),
+      commonjs()
+    ],
+    output: {
+      format: 'umd',
+      name: 'TEST_CASES',
+      file: 'bundle/test-cases.js',
+      sourcemap: true
     }
   }
 ]

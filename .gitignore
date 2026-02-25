@@ -14,7 +14,7 @@ npm-debug.log
 
 # builds
 /commonjs/
-/source/
+/modules/
 
 # Sublime
 *.sublime-workspace

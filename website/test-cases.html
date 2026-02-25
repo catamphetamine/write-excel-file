@@ -1,0 +1,151 @@
+<html>
+  <head>
+    <title>write-excel-file</title>
+
+    <meta charset="utf-8">
+
+    <script src="./write-excel-file.min.js"></script>
+    <script src="./test-cases.js"></script>
+
+    <script src="./lib/promise-polyfill.min.js"></script>
+
+    <script src="./lib/prism.js"></script>
+
+    <style>
+      body
+      {
+        margin : 20px;
+        font-family : Arial, Helvetica;
+        background: #434343;
+        color: #dddddd;
+      }
+
+      #main-link
+      {
+        display     : block;
+        font-size   : 24px;
+        color       : #fd8900;
+        font-family : monospace;
+        text-decoration : none;
+      }
+
+      code
+      {
+         color: #fd8900;
+         font-size: 1.25em;
+      }
+
+      button
+      {
+        padding: 1rem;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        background: none;
+        /*background: #fd8900;*/
+        border: none;
+        cursor: pointer;
+        color: #fd8900;
+        margin-left: 0.5rem;
+        font-size: 1rem;
+        border-radius: 5px;
+        border: 2px solid #fd8900;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+      }
+
+      button:active
+      {
+        background: #fd8900;
+        color: black;
+        font-weight: bolder;
+      }
+
+      /* https://computy.ru/blog/stilizacija-select-kak-budto-jeto-2019/ */
+      select
+      {
+        font-size: 16px;
+        font-family: sans-serif;
+        font-weight: 700;
+        color: #444;
+        line-height: 1.3;
+        padding: .6em 1.4em .5em .8em;
+        box-sizing: border-box;
+        margin: 0;
+        margin-left: 0.5rem;
+        border: 1px solid #aaa;
+        box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+        border-radius: .5em;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background-color: #fff;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'), linear-gradient(to bottom, #ffffff 0%,#e5e5e5 100%);
+        background-repeat: no-repeat, repeat;
+        background-position: right .7em top 50%, 0 0;
+        background-size: .65em auto, 100%;
+      }
+    </style>
+  </head>
+
+  <body>
+    <a id="main-link" href="https://gitlab.com/catamphetamine/write-excel-file">
+      write-excel-file
+    </a>
+
+    <br/>
+
+    <div>
+      Generate sample <code>*.xlsx</code> files according to the pre-defined "test cases"
+    </div>
+
+    <br/>
+    <br/>
+
+    <label>
+      Test Case:
+      <select id="testCasesSelect"></select>
+    </label>
+
+    <button id="runTestCaseButton">
+      Run
+    </button>
+
+    <br/>
+    <br/>
+
+    <script>
+      const testCasesSelect = document.getElementById('testCasesSelect')
+
+      for (const testCaseId of Object.keys(TEST_CASES.default)) {
+        const testCase = TEST_CASES.default[testCaseId]
+
+        const option = document.createElement('option')
+        option.textContent = testCaseId
+        option.value = testCaseId
+
+        testCasesSelect.appendChild(option)
+      }
+
+      const runTestCaseButton = document.getElementById('runTestCaseButton')
+
+      runTestCaseButton.addEventListener('click', function() {
+        const testCaseId = testCasesSelect.value
+        const testCase = TEST_CASES.default[testCaseId]
+        let [arg1, arg2, ...argsRest] = testCase.args()
+        arg2 = {
+          ...arg2,
+          fileName: 'spreadsheet.xlsx'
+        }
+        writeXlsxFile.apply(this, [arg1, arg2, ...argsRest]).then(
+          () => {
+            // console.log('File created')
+          },
+          (error) => {
+            console.error(error)
+            alert('There was an error. See console output for the error stack trace.')
+          }
+        )
+      })
+    </script>
+  </body>
+</html>

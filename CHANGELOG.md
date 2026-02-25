@@ -1,3 +1,24 @@
+3.0.0 / 23.02.2026
+==================
+
+* Refactored the code.
+* (breaking change) The minimum required Node.js version is now >= 18.
+* (breaking change) The default export has been removed in order to not confuse people.
+* (breaking change) `/browser` export uses [Web Workers](https://developer.mozilla.org/docs/Web/API/Web_Workers_API/Using_web_workers) now to avoid blocking the main thread. I dunno if Internet Explorer is supported now.
+* Added new exports: `/browser` and `/universal`.
+	* `/universal` works both in a web browser and Node.js. Only outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
+	* `/browser` works in a web browser. It replaced what used to be the default export. It also replaces [`jszip`](https://www.npmjs.com/package/jszip) dependency with [`fflate`](https://www.npmjs.com/package/fflate) because they claim it to be fast and small. It also removes [`file-saver`](https://www.npmjs.com/package/file-saver) dependency replacing it with a simple function.
+	* `/node` stayed the same but replaced [`archiver`](https://www.npmjs.com/package/archiver) with a fork called [`archiver-node`](https://npmjs.org/package/archiver-node) that fixes a few of issues in `archiver` package.
+	<!-- * The default export stayed the same. It's basically same as `/browser` but still uses [`jszip`](https://www.npmjs.com/package/jszip) instead of [`fflate`](https://www.npmjs.com/package/fflate). -->
+<!-- * Added `blob: true` option to `/node` subpackage. It outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob). -->
+* (breaking change) Renamed `color` property of a cell to `textColor`.
+* (breaking change) Removed deprecated parameter called `headerStyle`. Use `getHeaderStyle()` parameter instead.
+* (breaking change) `images[]` parameter no longer accepts strings (file paths). Instead, use `fs.createReadStream()` function on a file path to create a readable `Stream` for each such image.
+* Added a system of custom `features` which allows writing "plug-ins" for making custom changes in the resulting `.xlsx` file. To use it, pass a new `features: Feature[]` parameter. See readme for more details.
+* Added "conditional formatting" feature. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
+* Added `zoomScale` option. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
+* Fixed a bug when all sheets' tabs were displayed as highlighted rather than just the initially-selected sheet's tab. This also avoids UI bugs such as certain buttons being disabled until one of the sheets' tabs is manually selected by the user. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
+
 2.3.3 / 25.07.2025
 ==================
 
