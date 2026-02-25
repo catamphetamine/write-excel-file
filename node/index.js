@@ -1,4 +1,4 @@
-export { default as default } from '../source/export/writeXlsxFileNode.js'
-// export { default as Integer } from '../source/types/Integer.js'
-// export { default as Email } from '../source/types/Email.js'
-// export { default as URL } from '../source/types/URL.js'
+export { default as default } from '../modules/export/writeXlsxFileNode.js'
+// export { default as Integer } from '../modules/types/Integer.js'
+// export { default as Email } from '../modules/types/Email.js'
+// export { default as URL } from '../modules/types/URL.js'
