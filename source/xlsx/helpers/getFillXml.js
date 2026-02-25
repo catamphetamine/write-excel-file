@@ -3,7 +3,7 @@ import getXlsxColorForHexColor from './getXlsxColorForHexColor.js'
 
 import hasFill from './hasFill.js'
 
-export default function getFillXml(fill, {} = {}) {
+export default function getFillXml(fill, { conditionalFormatting } = {}) {
 	const {
 		backgroundColor,
 		fillPatternStyle,
@@ -28,10 +28,15 @@ export default function getFillXml(fill, {} = {}) {
 	//   * `<patternFill patternType="...something-other-than-solid..."/>`
 	//   * `<fgColor rgb="..."/>` — Pattern color
 	//   * `<bgColor rgb="..."/>` — Background color
+	//
+	// As weird as it is, it gets more weird when it comes to "conditional formatting":
+	// for some weird reason, it doesn't work same way in case of "conditional formatting".
+	// Specifically, `<bgColor indexed="64"/>` should not be used and instead it should specify
+	// `<bgColor rgb="..."/>` same as `<fgColor rgb="..."/>`.
 
 	xml += `<patternFill patternType="${isSolidFill ? 'solid' : fillPatternStyle}">`
 	xml += `<fgColor rgb="${$attributeValue(getXlsxColorForHexColor(isSolidFill ? backgroundColor : fillPatternColor))}"/>`
-	xml += `<bgColor ${isSolidFill ? 'indexed="64"' : 'rgb="' + $attributeValue(getXlsxColorForHexColor(backgroundColor)) + '"'}/>`
+	xml += `<bgColor ${isSolidFill && !conditionalFormatting ? 'indexed="64"' : 'rgb="' + $attributeValue(getXlsxColorForHexColor(backgroundColor)) + '"'}/>`
 	xml += '</patternFill>'
 
 	// Close the `<fill>` element.
