@@ -23,7 +23,8 @@
   },
   "sideEffects": false,
   "scripts": {
-    "test": "mocha --colors --bail --reporter spec --require ./test/setup.js \"./{,!(node_modules|commonjs|modules)/**/}*.test.js\" --recursive",
+    "test": "mocha --bail \"source/**/*.test.js\" \"test/*.test.js\" \"test/!(exports)/**/*.test.js\"",
+    "test:exports": "mocha --bail \"test/exports/**/*.test.js\"",
     "test-coverage": "istanbul cover -x \"commonjs/**\" -x \"modules/**\" -x \"*.test.js\" node_modules/mocha/bin/_mocha -- --compilers js:babel-core/register --colors --reporter dot --require ./test/setup.js \"./{,!(node_modules|commonjs|modules)/**/}*.test.js\" --recursive",
     "test-travis": "istanbul cover -x \"commonjs/**\" -x \"modules/**\" -x \"*.test.js\" node_modules/mocha/bin/_mocha --report lcovonly -- --compilers js:babel-core/register --colors --reporter spec --require ./test/setup.js \"./{,!(node_modules|commonjs|modules)/**/}*.test.js\" --recursive",
     "build:clean": "rimraf ./commonjs ./modules",
@@ -33,7 +34,7 @@
     "build:esm": "cross-env BABEL_ENV=esm babel ./source --out-dir ./modules --source-maps",
     "build:bundle": "rollup --config rollup.config.mjs",
     "build": "npm-run-all build:clean build:commonjs build:esm build:bundle",
-    "prepublishOnly": "npm-run-all build test"
+    "prepublishOnly": "npm-run-all build test test:exports"
   },
   "engines": {
     "node": ">=18"
@@ -43,8 +44,8 @@
     "fflate": "^0.8.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.28.6",
-    "@babel/core": "^7.29.0",
+    "@babel/cli": "^7.28.3",
+    "@babel/core": "^7.28.4",
     "@babel/plugin-transform-for-of": "^7.27.1",
     "@babel/plugin-transform-runtime": "^7.28.3",
     "@babel/preset-env": "^7.28.3",

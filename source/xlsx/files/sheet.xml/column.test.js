@@ -1,3 +1,6 @@
+import { describe, it } from 'mocha'
+import { expect } from 'chai'
+
 import generateColumnDescription from './column.js'
 
 describe('generateColumnDescription()', () => {

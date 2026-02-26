@@ -1,3 +1,6 @@
+import { describe, it } from 'mocha'
+import { expect } from 'chai'
+
 import generateRow from './row.js'
 
 describe('generateRow()', () => {
