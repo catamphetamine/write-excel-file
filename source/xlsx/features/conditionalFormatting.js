@@ -226,6 +226,15 @@ function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
 			}
 
 			if (hasFont(font)) {
+				// It seems that the "conditional formatting" feature in the XLSX specification
+				// doesn't support setting custom `fontFamily` or `fontSize` for some weird reason.
+				// https://github.com/catamphetamine/write-excel-file/pull/10#issuecomment-3960778016
+				if (fontFamily) {
+					throw new Error('Conditional formatting can\'t be used to override font family')
+				}
+				if (typeof fontSize === 'number') {
+					throw new Error('Conditional formatting can\'t be used to override font size')
+				}
 				xml += getFontXml(font)
 			}
 

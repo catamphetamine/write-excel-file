@@ -41,7 +41,10 @@ export type ConditionalFormattingCondition =
 	ConditionalFormattingConditionWithOperatorAndOneNumericValue |
 	ConditionalFormattingConditionWithOperatorAndTwoNumericValues
 
-interface ConditionalFormattingStyle extends CommonStyleProperties {}
+// It seems that the "conditional formatting" feature in the XLSX specification
+// doesn't support setting custom `fontFamily` or `fontSize` for some weird reason.
+// https://github.com/catamphetamine/write-excel-file/pull/10#issuecomment-3960778016
+interface ConditionalFormattingStyle extends Exclude<CommonStyleProperties, 'fontFamily' | 'fontSize'> {}
 
 export interface ConditionalFormatting {
 	cellRange: {

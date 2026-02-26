@@ -642,8 +642,8 @@ A conditional formatting rule is defined by properties:
   * Custom formula: `{ formula: '=$A1="Complete"' }`
 * `style` — an object specifying a style to apply
   * Supports a subset of [cell style](#style) properties:
-    * Font family
-    * Font size
+    <!-- * Font family -->
+    <!-- * Font size -->
     * Font weight
     * Font style
     * Text decoration
