@@ -1,6 +1,7 @@
 import generateCell from './cell.js'
 import getCellStyleProperties from './helpers/getCellStyleProperties.js'
-import getAttributesString from '../../../xml/getAttributesString.js'
+import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
+import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
 import isCellObject from '../../helpers/isCellObject.js'
 
 // import Integer from '../types/Integer.js'
@@ -104,9 +105,7 @@ export default function generateRow(row, rowIndex, {
 		rowAttributes.customHeight = 1
 	}
 
-	return `<row${getAttributesString(rowAttributes)}>` +
-		rowCells +
-		'</row>'
+	return getOpeningTagMarkup('row', rowAttributes) + rowCells + getClosingTagMarkup('row')
 }
 
 function isEmpty(value) {

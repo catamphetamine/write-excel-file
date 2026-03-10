@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/sanitizeAttributeValue.js'
+import $attributeValue from '../../xml/escapeAttributeValue.js'
 import getXlsxColorForHexColor from './getXlsxColorForHexColor.js'
 
 import hasFill from './hasFill.js'

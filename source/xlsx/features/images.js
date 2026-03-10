@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/sanitizeAttributeValue.js'
+import $attributeValue from '../../xml/escapeAttributeValue.js'
 import getFileExtensionForContentType from '../helpers/getFileExtensionForContentType.js'
 
 function normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex }) {

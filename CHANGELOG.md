@@ -1,3 +1,10 @@
+3.0.6 / 10.03.2026
+==================
+
+* Fixed a [bug](https://gitlab.com/catamphetamine/write-excel-file/-/issues/110) when on Windows a new sheet couldn't be created when opening the file in Excel with error message "This command cannot be used on multiple selections". On MacOS the error when attempting to copy spreadsheet data was: "This action won't work on multiple selections".
+
+* Added a new subpackage `write-excel-file/utility` that exports some utility functions for use in custom "features".
+
 3.0.0 / 23.02.2026
 ==================
 

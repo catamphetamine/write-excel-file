@@ -1,23 +1,18 @@
-import getAttributesString from '../../../xml/getAttributesString.js'
+import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
 
 export default function generateViews({
-	showGridLines,
-	rightToLeft,
-	zoomScale,
-	sheetIndex
+	sheetIndex,
+	...viewProperties
 }) {
-	// Custom "plug-ins" might modify the `<views/>` element contents.
-	// Because of that, `<views/>` element is always created.
-	//
-	// if (
-	// 	!stickyRowsCount &&
-	// 	!stickyColumnsCount &&
-	// 	!(showGridLines === false) &&
-	// 	!rightToLeft &&
-	//  typeof zoomScale !== 'number'
-	// ) {
-	// 	return ''
-	// }
+	if (!hasView(viewProperties)) {
+		return ''
+	}
+
+	const {
+		showGridLines,
+		rightToLeft,
+		zoomScale
+	} = viewProperties
 
 	let views = ''
 
@@ -44,9 +39,18 @@ export default function generateViews({
 	}
 
 	views += '<sheetViews>'
-	views += `<sheetView${getAttributesString(sheetViewAttributes)}>`
-	views += '</sheetView>'
+	views += getSelfClosingTagMarkup('sheetView', sheetViewAttributes)
 	views += '</sheetViews>'
 
 	return views
+}
+
+function hasView({
+	showGridLines,
+	rightToLeft,
+	zoomScale
+}) {
+	return showGridLines === false ||
+		rightToLeft ||
+		typeof zoomScale === 'number'
 }

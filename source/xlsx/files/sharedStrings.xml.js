@@ -1,4 +1,4 @@
-import $textContent from '../../xml/sanitizeTextContent.js'
+import $textContent from '../../xml/escapeTextContent.js'
 
 export default function generateSharedStringsXml(sharedStrings) {
 	let xml = '<?xml version="1.0"?>'

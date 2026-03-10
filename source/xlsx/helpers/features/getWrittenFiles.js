@@ -1,5 +1,5 @@
-import attributeValue from '../../../xml/sanitizeAttributeValue.js'
-import textContent from '../../../xml/sanitizeTextContent.js'
+import attributeValue from '../../../xml/escapeAttributeValue.js'
+import textContent from '../../../xml/escapeTextContent.js'
 
 export default function getWrittenFiles(
 	features,

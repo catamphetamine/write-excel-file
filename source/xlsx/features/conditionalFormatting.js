@@ -1,4 +1,4 @@
-import escapeXmlCharacters from '../../xml/escapeXmlCharacters.js'
+import escapeTextContent from '../../xml/escapeTextContent.js'
 
 import hasFill from '../helpers/hasFill.js'
 import getFillXml from '../helpers/getFillXml.js'
@@ -110,13 +110,13 @@ function getConditionalFormattingRulesXml({
 
 		if (formula) {
 			xml += `<cfRule type="expression" dxfId="${dxfId}" priority="${priority}">`
-			xml += `<formula>${escapeXmlCharacters(formula, { attribute: false })}</formula>`
+			xml += `<formula>${escapeTextContent(formula)}</formula>`
 			xml += '</cfRule>'
 		} else if (operator) {
 			xml += `<cfRule type="cellIs" operator="${getXlsxOperatorName(operator)}" dxfId="${dxfId}" priority="${priority}">`
-			xml += `<formula>${escapeXmlCharacters(formatValue(value), { attribute: false })}</formula>`
+			xml += `<formula>${escapeTextContent(formatValue(value))}</formula>`
 			if (getXlsxOperatorName(operator) === 'between') {
-				xml += `<formula>${escapeXmlCharacters(formatValue(value2), { attribute: false })}</formula>`
+				xml += `<formula>${escapeTextContent(formatValue(value2))}</formula>`
 			}
 			xml += '</cfRule>'
 		} else {
@@ -181,7 +181,9 @@ function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
 	let totalConditionalFormattingRulesCount = 0
 
 	for (const conditionalFormattingOfSheet of conditionalFormattingPerSheet) {
-		totalConditionalFormattingRulesCount += conditionalFormattingOfSheet.length
+		if (conditionalFormattingOfSheet) {
+			totalConditionalFormattingRulesCount += conditionalFormattingOfSheet.length
+		}
 	}
 
 	let xml = ''
@@ -189,18 +191,67 @@ function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
 	xml += `<dxfs count="${totalConditionalFormattingRulesCount}">`
 
 	for (const conditionalFormattingOfSheet of conditionalFormattingPerSheet) {
-		for (const conditionalFormattingRule of conditionalFormattingOfSheet) {
-			const {
-				style: {
+		if (conditionalFormattingOfSheet) {
+			for (const conditionalFormattingRule of conditionalFormattingOfSheet) {
+				const {
+					style: {
+						fontFamily,
+						fontSize,
+						fontWeight,
+						fontStyle,
+						textDecoration,
+						textColor,
+						backgroundColor,
+						fillPatternStyle,
+						fillPatternColor,
+						borderColor,
+						borderStyle,
+						leftBorderColor,
+						leftBorderStyle,
+						rightBorderColor,
+						rightBorderStyle,
+						topBorderColor,
+						topBorderStyle,
+						bottomBorderColor,
+						bottomBorderStyle
+					}
+				} = conditionalFormattingRule
+
+				xml += '<dxf>'
+
+				const font = {
 					fontFamily,
 					fontSize,
 					fontWeight,
 					fontStyle,
 					textDecoration,
-					textColor,
+					textColor
+				}
+
+				if (hasFont(font)) {
+					// It seems that the "conditional formatting" feature in the XLSX specification
+					// doesn't support setting custom `fontFamily` or `fontSize` for some weird reason.
+					// https://github.com/catamphetamine/write-excel-file/pull/10#issuecomment-3960778016
+					if (fontFamily) {
+						throw new Error('Conditional formatting can\'t be used to override font family')
+					}
+					if (typeof fontSize === 'number') {
+						throw new Error('Conditional formatting can\'t be used to override font size')
+					}
+					xml += getFontXml(font)
+				}
+
+				const fill = {
 					backgroundColor,
 					fillPatternStyle,
-					fillPatternColor,
+					fillPatternColor
+				}
+
+				if (hasFill(fill)) {
+					xml += getFillXml(fill, { conditionalFormatting: true })
+				}
+
+				const border = {
 					borderColor,
 					borderStyle,
 					leftBorderColor,
@@ -212,60 +263,13 @@ function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
 					bottomBorderColor,
 					bottomBorderStyle
 				}
-			} = conditionalFormattingRule
 
-			xml += '<dxf>'
-
-			const font = {
-				fontFamily,
-				fontSize,
-				fontWeight,
-				fontStyle,
-				textDecoration,
-				textColor
-			}
-
-			if (hasFont(font)) {
-				// It seems that the "conditional formatting" feature in the XLSX specification
-				// doesn't support setting custom `fontFamily` or `fontSize` for some weird reason.
-				// https://github.com/catamphetamine/write-excel-file/pull/10#issuecomment-3960778016
-				if (fontFamily) {
-					throw new Error('Conditional formatting can\'t be used to override font family')
+				if (hasBorder(border)) {
+					xml += getBorderXml(border)
 				}
-				if (typeof fontSize === 'number') {
-					throw new Error('Conditional formatting can\'t be used to override font size')
-				}
-				xml += getFontXml(font)
-			}
 
-			const fill = {
-				backgroundColor,
-				fillPatternStyle,
-				fillPatternColor
+				xml += '</dxf>'
 			}
-
-			if (hasFill(fill)) {
-				xml += getFillXml(fill, { conditionalFormatting: true })
-			}
-
-			const border = {
-				borderColor,
-				borderStyle,
-				leftBorderColor,
-				leftBorderStyle,
-				rightBorderColor,
-				rightBorderStyle,
-				topBorderColor,
-				topBorderStyle,
-				bottomBorderColor,
-				bottomBorderStyle
-			}
-
-			if (hasBorder(border)) {
-				xml += getBorderXml(border)
-			}
-
-			xml += '</dxf>'
 		}
 	}
 

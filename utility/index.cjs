@@ -1,0 +1,15 @@
+exports.findElement = require('../commonjs/xml/findElement.js').default
+exports.findElements = require('../commonjs/xml/findElements.js').default
+exports.findElementInsideElement = require('../commonjs/xml/findElementInsideElement.js').default
+exports.findElementsInsideElement = require('../commonjs/xml/findElementsInsideElement.js').default
+exports.getOpeningTagMarkup = require('../commonjs/xml/getOpeningTagMarkup.js').default
+exports.getClosingTagMarkup = require('../commonjs/xml/getClosingTagMarkup.js').default
+exports.getSelfClosingTagMarkup = require('../commonjs/xml/getSelfClosingTagMarkup.js').default
+exports.replaceElement = require('../commonjs/xml/replaceElement.js').default
+exports.getMarkupInsideElement = require('../commonjs/xml/getMarkupInsideElement.js').default
+exports.setMarkupInsideElement = require('../commonjs/xml/setMarkupInsideElement.js').default
+exports.prependMarkupInsideElement = require('../commonjs/xml/prependMarkupInsideElement.js').default
+exports.appendMarkupInsideElement = require('../commonjs/xml/appendMarkupInsideElement.js').default
+exports.escapeAttributeName = require('../commonjs/xml/escapeAttributeName.js').default
+exports.escapeAttributeValue = require('../commonjs/xml/escapeAttributeValue.js').default
+exports.escapeTextContent = require('../commonjs/xml/escapeTextContent.js').default

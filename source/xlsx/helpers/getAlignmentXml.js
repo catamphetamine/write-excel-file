@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/sanitizeAttributeValue.js'
+import $attributeValue from '../../xml/escapeAttributeValue.js'
 
 export default function getAlignmentXml({
 	align,

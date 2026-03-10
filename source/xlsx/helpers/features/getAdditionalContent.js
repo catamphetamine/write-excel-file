@@ -1,5 +1,5 @@
-import attributeValue from '../../../xml/sanitizeAttributeValue.js'
-import textContent from '../../../xml/sanitizeTextContent.js'
+import attributeValue from '../../../xml/escapeAttributeValue.js'
+import textContent from '../../../xml/escapeTextContent.js'
 
 // Returns the content that should be inserted by `features` when performing a `transformName` transform.
 export default function getAdditionalContent(

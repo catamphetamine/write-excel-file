@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/sanitizeAttributeValue.js'
+import $attributeValue from '../../xml/escapeAttributeValue.js'
 import getFillXml from '../helpers/getFillXml.js'
 import getBorderXml from '../helpers/getBorderXml.js'
 import getFontXml from '../helpers/getFontXml.js'

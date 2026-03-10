@@ -2,8 +2,10 @@
 // import URL, { isURL } from '../types/URL.js'
 // import Email, { isEmail } from '../types/Email.js'
 
-import $textContent from '../../../xml/sanitizeTextContent.js'
-import getAttributesString from '../../../xml/getAttributesString.js'
+import $textContent from '../../../xml/escapeTextContent.js'
+import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
+import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
+import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
 
 import getCellCoordinate from '../../helpers/getCellCoordinate.js'
 import convertDateToExcelSerial from './helpers/convertDateToExcelSerial.js'
@@ -39,7 +41,7 @@ export default function generateCell(
   }
 
   if (value === null) {
-    return `<c${getAttributesString(cellAttributes)}/>`
+    return getSelfClosingTagMarkup('c', cellAttributes)
   }
 
   // Validate date format.
@@ -57,11 +59,11 @@ export default function generateCell(
 
   const [openingTags, closingTags] = getOpeningAndClosingTags(type)
 
-  return `<c${getAttributesString(cellAttributes)}>` +
+  return getOpeningTagMarkup('c', cellAttributes) +
     openingTags +
     xlsxValue +
     closingTags +
-    '</c>'
+    getClosingTagMarkup('c')
 }
 
 function getXlsxType(type) {
