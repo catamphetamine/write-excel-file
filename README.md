@@ -1,10 +1,24 @@
 # `write-excel-file`
 
-Write `*.xlsx` files in a browser or Node.js
+Write `.xlsx` files in a browser or Node.js
 
 [Demo](https://catamphetamine.gitlab.io/write-excel-file/)
 
-Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file) for reading `*.xlsx` files.
+Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file) for reading `.xlsx` files.
+
+<details>
+<summary>Migrating from <code>2.x</code> to <code>3.x</code></summary>
+
+######
+
+* Renamed the default export `"write-excel-file"` to `"write-excel-file/browser"`, and it uses [Web Workers](https://developer.mozilla.org/docs/Web/API/Web_Workers_API/Using_web_workers) now.
+  * Old: `import writeExcelFile from "write-excel-file"`
+  * New: `import writeExcelFile from "write-excel-file/browser"`
+* The minimum required Node.js version is 18.
+* Renamed cell property `color` to `textColor`.
+* Removed `headerStyle` parameter. Pass `getHeaderStyle()` parameter instead.
+* `images[]` parameter no longer accepts string values (i.e. file paths). Instead, use `fs.createReadStream(filePath)` function to convert file paths to `Stream`s.
+</details>
 
 ## Install
 
@@ -16,15 +30,21 @@ Alternatively, one could include it on a web page [directly](#cdn) via a `<scrip
 
 ## Use
 
-To write an `*.xlsx` file, one must provide the contents of a spreadsheet in the form of `data` — an array of rows. Each row must be an array of cells. Each cell should be represented by a value.
+The default exported function — let's call it `writeExcelFile()` — creates an `.xslx` file from sheet data.
+
+```js
+await writeExcelFile(data, { filePath: '/path/to/file.xlsx' })
+```
+
+Sheet data must be an array of rows. Each row must be an array of cells. Each cell should be represented by a value — `string`, `number`, `boolean` or `Date` — or be `null` in case it's empty.
 
 Example:
 
 ```js
 const data = [
-  ['A','B','C'],
-  ['x',123,true],
-  ['y',456,false]
+  ['A','B','C'], // 1st row
+  ['x',123,true], // 2nd row
+  ['y',456,false] // 3rd row
 ]
 ```
 
@@ -35,74 +55,31 @@ Output:
 | x | 123 | TRUE |
 | y | 456 | FALSE |
 
-Each cell could also be represented by an object with properties: `value`, `type`, and, optionally, other [cell parameters](#cell-parameters).
+A cell could also be represented by an object with properties: `value`, (optional) `type`, and, optionally, other [cell parameters](#cell-parameters) such as style or a specific `format`:
 
-If a cell object doesn't have a `type` property, then it is automatically detected from the `value` property, or defaults to a `String`. Possible `type`s are:
+```js
+[
+  ['Order ID', 'Amount'],
+  [1, { value: 1234.56, format: "[$$-409]#,##0.00" }],
+  [2, { value: 789, format: "[$$-409]#,##0.00" }]
+]
+```
+
+Output:
+
+| Order ID | Amount |
+| - | - |
+| 1 | $1,234.56 |
+| 2 | $789.00 |
+
+The aforementioned `type` property is optional because it is automatically detected from the `value` property, or defaults to `String` if the `value` is empty or not supported.
+
+Possible `type`:
 * `String`
 * `Number`
 * `Boolean`
 * `Date`
 * `"Formula"`
-
-An empty cell could be represented by `null` or `undefined`.
-
-Example of cell objects:
-
-```js
-const HEADER_ROW = [
-  {
-    value: 'Name',
-    fontWeight: 'bold'
-  },
-  {
-    value: 'Date of Birth',
-    fontWeight: 'bold'
-  },
-  {
-    value: 'Cost',
-    fontWeight: 'bold'
-  },
-  {
-    value: 'Paid',
-    fontWeight: 'bold'
-  }
-]
-
-const DATA_ROW_1 = [
-  // "Name"
-  {
-    type: String,
-    value: 'John Smith'
-  },
-
-  // "Date of Birth"
-  {
-    type: Date,
-    value: new Date(),
-    format: 'mm/dd/yyyy'
-  },
-
-  // "Cost"
-  {
-    type: Number,
-    value: 1800
-  },
-
-  // "Paid"
-  {
-    type: Boolean,
-    value: true
-  }
-]
-
-const data = [
-  HEADER_ROW,
-  DATA_ROW_1,
-  DATA_ROW_2,
-  DATA_ROW_3,
-  ...
-]
-```
 
 ## API
 
@@ -111,9 +88,9 @@ const data = [
 Example 1: Write `data` to a file called `file.xlsx` and trigger a "Save as" file dialog so that the user could save the file to their disk.
 
 ```js
-import writeXlsxFile from 'write-excel-file/browser'
+import writeExcelFile from 'write-excel-file/browser'
 
-await writeXlsxFile(data, {
+await writeExcelFile(data, {
   fileName: 'file.xlsx'
 })
 ```
@@ -121,7 +98,7 @@ await writeXlsxFile(data, {
 Example 2: `fileName` parameter is not passed, so it returns a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 
 ```js
-const blob = await writeXlsxFile(data)
+const blob = await writeExcelFile(data)
 ```
 
 ### Node.js
@@ -129,10 +106,9 @@ const blob = await writeXlsxFile(data)
 Example 1: Write `data` to a file at path `/path/to/file.xlsx`.
 
 ```js
-// Import from '/node' subpackage.
-import writeXlsxFile from 'write-excel-file/node'
+import writeExcelFile from 'write-excel-file/node'
 
-await writeXlsxFile(data, {
+await writeExcelFile(data, {
   filePath: '/path/to/file.xlsx'
 })
 ```
@@ -140,27 +116,27 @@ await writeXlsxFile(data, {
 Example 2: `filePath` parameter is not passed, but `buffer: true` parameter is passed, so it returns a [`Buffer`](https://nodejs.org/api/buffer.html).
 
 ```js
-const buffer = await writeXlsxFile(data, { buffer: true })
+const buffer = await writeExcelFile(data, { buffer: true })
 ```
 
 <!--
 Example 3: `filePath` parameter is not passed, but `blob: true` parameter is passed, so it returns a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
 
 ```js
-const blob = await writeXlsxFile(data, { blob: true })
+const blob = await writeExcelFile(data, { blob: true })
 ```
 -->
 
 Example 3: Neither `filePath` nor `buffer: true` <!-- nor `blob: true` --> parameters are passed, so it returns a readable [`Stream`](https://nodejs.org/api/stream.html).
 
 ```js
+const readStream = await writeExcelFile(data)
 const writeStream = fs.createWriteStream('/path/to/file.xlsx')
-const readStream = await writeXlsxFile(data)
 readStream.pipe(writeStream)
 ```
 
 <details>
-<summary>AWS S3 could refuse to read from the returned <code>stream</code>. Here's a fix.</summary>
+<summary>AWS S3 could refuse to read from the returned stream. Here's a fix.</summary>
 
 #####
 
@@ -187,11 +163,10 @@ Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packa
 The one that works both in a web browser and Node.js. Only supports returning a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for some.
 
 ```js
-// Import from '/universal' subpackage.
-import writeXlsxFile from 'write-excel-file/universal'
+import writeExcelFile from 'write-excel-file/universal'
 
 // outputs a `Blob`.
-const blob = await writeXlsxFile(data)
+const blob = await writeExcelFile(data)
 ```
 
 ## Data vs Objects
@@ -249,9 +224,9 @@ Each column should have a `column` title, a data `type`, a `value` "getter" func
 ### Browser
 
 ```js
-import writeXlsxFile from 'write-excel-file/browser'
+import writeExcelFile from 'write-excel-file/browser'
 
-await writeXlsxFile(objects, {
+await writeExcelFile(objects, {
   schema,
   fileName: 'file.xlsx'
 })
@@ -260,9 +235,9 @@ await writeXlsxFile(objects, {
 ### Node.js
 
 ```js
-import writeXlsxFile from 'write-excel-file/node'
+import writeExcelFile from 'write-excel-file/node'
 
-await writeXlsxFile(objects, {
+await writeExcelFile(objects, {
   schema,
   filePath: '/path/to/file.xlsx'
 })
@@ -301,7 +276,7 @@ const columns = [
   {}
 ]
 
-await writeXlsxFile(data, {
+await writeExcelFile(data, {
   columns, // Pass it here.
   fileName: 'file.xlsx'
 })
@@ -322,7 +297,7 @@ Regardless of whether you're passing `data` or `objects`/`schema`, each cell (or
 * Custom [format](#format) — by specifying a `format` property.
 * Custom [style](#style)
   * By specifying any of the style-related properties.
-  * (advanced) (only when passing `objects`/`schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which allows specifying different cell style for different rows in the same column.
+  * (only when passing `objects`/`schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which will define the style of each different cell in the given column (except header).
 
 ### Format
 
@@ -427,7 +402,7 @@ Cell style properties:
 
 ## Options
 
-The following options could be passed as part of the second argument to `writeXlsxFile()` function:
+The following options could be passed as part of the second argument to `writeExcelFile()` function:
 
 * `sheet: string` — Sets the name of the sheet.
 * `fontFamily: string` — Sets the default font family. Example: `"Calibri"`.
@@ -444,14 +419,14 @@ The following options could be passed as part of the second argument to `writeXl
 
 ### When Passing Objects
 
-To generate an `*.xlsx` file with multiple sheets when passing `objects`/`schema`:
+To generate an `.xlsx` file with multiple sheets when passing `objects`/`schema`:
 
 * Pass a `sheets` parameter — an array of sheet names.
 * The `objects` argument should be an array of `objects` for each sheet.
 * The `schema` parameter should be an array of `schema`s for each sheet.
 
 ```js
-await writeXlsxFile([objects1, objects2], {
+await writeExcelFile([objects1, objects2], {
   schema: [schema1, schema2],
   sheets: ['Sheet 1', 'Sheet 2'],
   filePath: '/path/to/file.xlsx'
@@ -460,14 +435,14 @@ await writeXlsxFile([objects1, objects2], {
 
 ### When Passing Data
 
-To generate an `*.xlsx` file with multiple sheets when passing `data`:
+To generate an `.xlsx` file with multiple sheets when passing `data`:
 
 * Pass a `sheets` parameter — an array of sheet names.
 * The `data` argument should be an array of `data` for each sheet.
 * (optional) The `columns` parameter should be an array of `columns` for each sheet.
 
 ```js
-await writeXlsxFile([data1, data2], {
+await writeExcelFile([data1, data2], {
   columns: [columns1, columns2], // (optional)
   sheets: ['Sheet 1', 'Sheet 2'],
   filePath: '/path/to/file.xlsx'
@@ -500,7 +475,7 @@ The default style for table header cells is:
 To override that default style, provide a `getHeaderStyle(columnSchema)` function:
 
 ```js
-await writeXlsxFile(objects, {
+await writeExcelFile(objects, {
   schema,
   getHeaderStyle: (columnSchema) => ({
     backgroundColor: '#eeeeee',
@@ -520,20 +495,20 @@ This package is quite minimal but at the same time extensible by providing custo
 // TypeScript "definition" of a "feature".
 import type { Feature } from 'write-excel-file/node'
 
-import writeXlsxFile from 'write-excel-file/node'
+import writeExcelFile from 'write-excel-file/node'
 
 // A custom feature should implement the `Feature` TypeScript interface.
 const myCustomFeature: Feature = {
   ...
 }
 
-await writeXlsxFile(data, {
+await writeExcelFile(data, {
   fileName: 'file.xlsx',
   features: [myCustomFeature]
 })
 ```
 
-A `*.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — to transform their content in any desired way.
+A `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — to transform their content in any desired way.
 
 Sidenote: When doing that, one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) available for import from `write-excel-file/utility` subpackage: `findElement()`, `findElements()`, `findElementInsideElement()`, `findElementsInsideElement()`, `getOpeningTagMarkup()`, `getClosingTagMarkup()`, `getSelfClosingTagMarkup()`, `replaceElement()`, `getMarkupInsideElement()`, `setMarkupInsideElement()`, `prependMarkupInsideElement()`, `appendMarkupInsideElement()`, `escapeAttributeName()`, `escapeAttributeValue()`, `escapeTextContent()`.
 
@@ -545,32 +520,32 @@ P.S. When implementing a "feature", don't rely too much on the `.xlsx` file cont
 
 Images reside in their own layer above any other data on a spreadsheet. Each separate sheet has its own layer of images.
 
-To add images to a sheet, pass them as an `images` parameter to `writeXlsxFile()` function:
+To add images to a sheet, pass them as an `images` parameter to `writeExcelFile()` function:
 
 ```js
 const images = [{ ... }, { ... }]
 
 // When passing `data`.
-await writeXlsxFile(data, { images })
+await writeExcelFile(data, { images })
 
 // When passing `objects`/`schema`.
-await writeXlsxFile(objects, { schema, images })
+await writeExcelFile(objects, { schema, images })
 ```
 
-When an `*.xlsx` file is written with multiple sheets, each separate sheet should specify its own `images`.
+When an `.xlsx` file is written with multiple sheets, each separate sheet should specify its own `images`.
 
 ```js
 const images1 = [{ ... }, { ... }]
 const images2 = [{ ... }, { ... }]
 
 // When passing `data`.
-await writeXlsxFile([data1, data2], {
+await writeExcelFile([data1, data2], {
   images: [images1, images2],
   sheets: ['Sheet 1', 'Sheet 2']
 })
 
 // When passing `objects`/`schema`.
-await writeXlsxFile([objects1, objects2], {
+await writeExcelFile([objects1, objects2], {
   schema: [schema1, schema2],
   images: [images1, images2],
   sheets: ['Sheet 1', 'Sheet 2']
@@ -589,7 +564,7 @@ An image object should have properties:
   * For legacy reasons described in the [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md#image-dimensions), images in XLSX documents are measured not pixels but in some other weird measurement units. Mapping image pixels to those weird measurement units requires knowing a "DPI" of an image.
   * The usual "DPI" of an image is either `72` or `96`. Both values are equally meaningless. Pick one or the other.
   * To find out an image's DPI in Windows, open file "Properties" and go to "Details" tab. There, it will say "Horizontal resolution" and "Vertical resolution".
-  * If, after writing an `*.xlsx` file, an image looks too large then try specifying a higher DPI. Conversely, if an image looks too small then try specifying a lower DPI.
+  * If, after writing an `.xlsx` file, an image looks too large then try specifying a higher DPI. Conversely, if an image looks too small then try specifying a lower DPI.
 * `anchor` — The cell that the image is positioned against. In other words, the image's top left corner is tied to the anchor cell's top left corner.
   * `row` — Cell row number, starting with `1`.
   * `column` — Cell column number, starting with `1`.
@@ -605,9 +580,9 @@ The implementation details are described in a [document](https://gitlab.com/cata
 Conditional formatting could be specified by passing a list of conditional formatting rules as `conditionalFormatting` parameter. When multiple rules apply to the same cell, the first one of them has the priority.
 
 ```js
-import writeXlsxFile from 'write-excel-file'
+import writeExcelFile from 'write-excel-file'
 
-await writeXlsxFile(data, {
+await writeExcelFile(data, {
   fileName: 'file.xlsx',
   conditionalFormatting: [{
     cellRange: {
@@ -656,7 +631,7 @@ A conditional formatting rule is defined by properties:
 
 ## Browser Support
 
-An `*.xlsx` file is just a `*.zip` archive with an `*.xslx` file extension. This package uses [`fflate`](https://www.npmjs.com/package/fflate) for `*.zip` compression. See `fflate`'s [browser support](https://www.npmjs.com/package/fflate#browser-support) for further details.
+An `.xlsx` file is just a `.zip` archive with an `.xslx` file extension. This package uses [`fflate`](https://www.npmjs.com/package/fflate) for `.zip` compression. See `fflate`'s [browser support](https://www.npmjs.com/package/fflate#browser-support) for further details.
 
 ## CDN
 
@@ -666,7 +641,7 @@ To include this library directly via a `<script/>` tag on a page, one can use an
 <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
 
 <script>
-  writeXlsxFile(objects, schema, {
+  writeExcelFile(objects, schema, {
     fileName: 'file.xlsx'
   })
 </script>
@@ -681,7 +656,7 @@ This project was inspired by [`zipcelx`](https://medium.com/@Nopziiemoo/create-e
 <!--
 ## Babel Runtime Dependency
 
-There's a `@babel/runtime` dependency specified in `package.json`. That dependency is only used in Node.js. Specifically, in `write-excel-file/modules/export/writeXlsxFileNode.js` file.
+There's a `@babel/runtime` dependency specified in `package.json`. That dependency is only used in Node.js. Specifically, in `write-excel-file/modules/export/writeExcelFileNode.js` file.
 
 ```js
 import _asyncToGenerator from "@babel/runtime/helpers/asyncToGenerator";
@@ -690,7 +665,7 @@ import _regeneratorRuntime from "@babel/runtime/regenerator";
 
 There, `@babel/runtime` is only used to `import` the "generator"/"regenerator" thing which polyfills `async`/`await` support in older versions of Node.js.
 
-This dependency could be removed if `writeXlsxFileNode.js` file was rewritten without the use of `async`/`await`.
+This dependency could be removed if `writeExcelFileNode.js` file was rewritten without the use of `async`/`await`.
 -->
 
 ## GitHub

@@ -45,14 +45,14 @@ export default function generateStylesXml(parameters, multipleSheetsParameters, 
   }
   xml += '</fonts>'
 
-  // MS Office 2007 Excel seems to require a `<fills/>` element to exist.
+  // MS Office 2007 Excel seems to require a `<fills/>` element to always exist.
   // without it, MS Office 2007 Excel thinks that the file is broken.
   xml += `<fills count="${fills.length}">`
   for (const fill of fills) {
     if (fill.gray125) {
       // "gray125" fill.
-      // For some weird reason, MS Office 2007 Excel seems to require that to be present.
-      // Otherwise, if absent, it would replace the first `backgroundColor`.
+      // For some weird reason, MS Office 2007 Excel seems to require "gray125" fill to be present in styles.
+      // Otherwise, if it's absent, it would replace the first custom `<fill/>` with a "gray125" fill.
       xml += '<fill>'
       xml += '<patternFill patternType="gray125"/>'
       xml += '</fill>'

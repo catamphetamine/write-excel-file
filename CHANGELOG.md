@@ -18,9 +18,9 @@
 	* `/node` stayed the same but replaced [`archiver`](https://www.npmjs.com/package/archiver) with a fork called [`archiver-node`](https://npmjs.org/package/archiver-node) that fixes a few of issues in `archiver` package.
 	<!-- * The default export stayed the same. It's basically same as `/browser` but still uses [`jszip`](https://www.npmjs.com/package/jszip) instead of [`fflate`](https://www.npmjs.com/package/fflate). -->
 <!-- * Added `blob: true` option to `/node` subpackage. It outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob). -->
-* (breaking change) Renamed `color` property of a cell to `textColor`.
-* (breaking change) Removed deprecated parameter called `headerStyle`. Use `getHeaderStyle()` parameter instead.
-* (breaking change) `images[]` parameter no longer accepts strings (file paths). Instead, use `fs.createReadStream()` function on a file path to create a readable `Stream` for each such image.
+* (breaking change) Renamed cell property `color` to `textColor`.
+* (breaking change) Removed `headerStyle` parameter. Pass `getHeaderStyle()` parameter instead.
+* (breaking change) `images[]` parameter no longer accepts string values (i.e. file paths). Instead, use `fs.createReadStream(filePath)` function to convert file paths to `Stream`s.
 * Added a system of custom `features` which allows writing "plug-ins" for making custom changes in the resulting `.xlsx` file. To use it, pass a new `features: Feature[]` parameter. See readme for more details.
 * Added "conditional formatting" feature. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).
 * Added `zoomScale` option. Pull request was [submitted](https://github.com/catamphetamine/write-excel-file/pull/10) by [Isaac Laquerre](https://github.com/IsaacLaquerre).

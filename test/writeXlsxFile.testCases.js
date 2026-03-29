@@ -110,7 +110,9 @@ export const data = [
 			value: 'Alice Brown\nNew line',
 			type: String,
 			textColor: '#ff0000',
-			backgroundColor: '#eeeeee',
+			backgroundColor: '#ffffff',
+			fillPatternStyle: 'darkGray',
+			fillPatternColor: '#eeeeee',
 			align: 'left',
 			wrap: true
 		},

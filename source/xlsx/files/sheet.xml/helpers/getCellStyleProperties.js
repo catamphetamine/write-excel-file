@@ -74,18 +74,24 @@ export default function getCellStyleProperties(cell, features) {
 	) {
 		return omitUndefinedProperties({
 			...additionalProperties,
+			// alignment
 			align,
 			alignVertical,
 			textRotation,
 			indent,
 			wrap,
+			// font
 			fontFamily,
 			fontSize,
 			fontWeight,
 			fontStyle,
 			textDecoration,
 			textColor,
+			// fill
 			backgroundColor,
+			fillPatternStyle,
+			fillPatternColor,
+			// border
 			borderColor,
 			borderStyle,
 			leftBorderColor,
