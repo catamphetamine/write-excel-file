@@ -641,7 +641,7 @@ To include this library directly via a `<script/>` tag on a page, one can use an
 <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
 
 <script>
-  writeExcelFile(objects, schema, {
+  writeXlsxFile(objects, schema, {
     fileName: 'file.xlsx'
   })
 </script>
