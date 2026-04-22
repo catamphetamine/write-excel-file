@@ -130,7 +130,7 @@ For some data cells, it might be required to customize their appearance or outpu
 * (optional) `type` — cell value type; if not specified, will be derived from `value`
 * (optional) [cell options](#cell-options) such as style properties or output `format`
 
-Here's an example where "Amount" column values are displayed as "US Dollar" currency, and highlighted in yellow where the value exceeds $1000.
+Here's an example where "Amount" column values are displayed as US Dollar currency, and highlighted in yellow where the value exceeds $1000.
 
 ```js
 [
@@ -218,7 +218,7 @@ await writeExcelFile(sheetData).toStream(writeStream)
 ```
 
 <details>
-<summary>AWS S3 could refuse to read from the returned stream. Here's a fix.</summary>
+<summary>AWS S3 could refuse to read from the returned readable stream. Here's a fix.</summary>
 
 #####
 
@@ -233,29 +233,28 @@ await new AWS.S3().putObject({
 }).promise()
 ```
 
-The reason is that AWS S3 [only accepts streams of known length](https://github.com/aws/aws-sdk-js/issues/2961), and the length of a zip file can't be known in advance.
+The reason is that AWS S3 [only accepts streams of known length](https://github.com/aws/aws-sdk-js/issues/2961), and the length of a `.zip` file can't be known in advance.
 
-Workaround for AWS SDK v2: write to `Buffer` instead of a stream.
+Workaround for AWS SDK v2: write `sheetData` to a `Buffer` instead of a `Stream`, and then pass it as `Body`.
 
-Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packages-in-aws-sdk-for-javascript/): use [`Upload`](https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-868352176) operation.
+Workaround for AWS SDK v3: use [`Upload`](https://github.com/aws/aws-sdk-js/issues/2961#issuecomment-868352176) class from `@aws-sdk/lib-storage` package instead of `PutObjectCommand` from `@aws-sdk/client-s3` package.
 </details>
 
 ### Universal
 
 `write-excel-file/universal`
 
-The one that works both in a web browser and Node.js. Only supports returning a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for general use.
+This one works both in a web browser and Node.js. It can only write `sheetData` to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for general use.
 
 ```js
 import writeExcelFile from 'write-excel-file/universal'
 
-// outputs a `Blob`.
 const blob = await writeExcelFile(sheetData).toBlob()
 ```
 
 ## Column Widths
 
-One could specify column widths (in "characters" rather than in "pixels") by passing `columns` option:
+One could set column widths (in "characters" rather than in "pixels") by passing `columns` option:
 
 ```js
 // Set Column #3 width to "20 characters".
@@ -584,10 +583,10 @@ P.S. When implementing a "feature", don't rely too much on the `.xlsx` file cont
 
 ## Images
 
-Images reside in their own layer above any other data on a spreadsheet. Each separate sheet has its own layer of images.
+An `.xlsx` file could include images. Images reside in their own layer above any other data in a sheet. Each separate sheet has its own separate layer of images.
 
 <details>
-<summary>To add images to a sheet, pass them as an <code>images</code> parameter to <code>writeExcelFile()</code> function.</summary>
+<summary>To add images to a sheet, pass them as <code>images</code> option.</summary>
 
 ######
 
@@ -626,8 +625,10 @@ An image object should have properties:
 
 ## Conditional Formatting
 
+[Conditional Formatting](https://www.w3schools.com/excel/excel_conditional_formatting.php) is an `.xlsx` standard feature that applies a given style to cells that meet a certain condition.
+
 <details>
-<summary>To apply conditional formatting to a sheet, pass a list of conditional formatting rules as <code>conditionalFormatting</code> parameter to <code>writeExcelFile()</code> function.</summary>
+<summary>To apply conditional formatting to a sheet, pass a list of conditional formatting rules as <code>conditionalFormatting</code> option.</summary>
 
 ######
 
