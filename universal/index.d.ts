@@ -25,15 +25,15 @@ export type Image = ImageType<FileContent>;
 declare function writeXlsxFile(
 	sheetData: SheetData,
 	sheetOptions?: SheetOptions<FileContent>,
-	options?: Options
-) : Promise<ReturnType>;
+	options?: Options<FileContent>
+): ReturnType;
 
 // Multiple sheets
 declare function writeXlsxFile(
 	sheets: Sheet<FileContent>[],
-	options?: Options
-) : Promise<ReturnType>;
+	options?: Options<FileContent>
+): ReturnType;
 
 export default writeXlsxFile;
 
-export function getSheetData<Object>(objects: Object[], columns: Column[]): SheetData;
+export function getSheetData<Object>(objects: Object[], columns: Column<Object>[]): SheetData;

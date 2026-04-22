@@ -1,4 +1,4 @@
-import { SheetOptions } from './SheetData.js'
+import { SheetOptions } from './SheetOptions.js'
 
 // `feature.files.transform` type
 
