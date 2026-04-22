@@ -23,7 +23,7 @@ describe('generateSheetXml()', () => {
         '<drawing r:id="rId-drawing-1"/>' +
       '</worksheet>'
 
-    const data = [
+    const sheetData = [
       [
         {
           value: 'Test',
@@ -44,9 +44,10 @@ describe('generateSheetXml()', () => {
           findOrCreateSharedString(string) {
             return 0
           },
-          data,
+          sheetData,
+          sheetIndex: 0,
           sheetId: 1,
-          multipleSheetsParameters: true
+          sheetOptions: {}
         },
         []
       )
@@ -60,7 +61,7 @@ describe('generateSheetXml()', () => {
           findOrCreateSharedString(string) {
             return 0
           },
-          data: [
+          sheetData: [
             [
               {
                 value: 'Text',
@@ -72,8 +73,9 @@ describe('generateSheetXml()', () => {
               }
             ]
           ],
+          sheetIndex: 0,
           sheetId: 1,
-          multipleSheetsParameters: true
+          sheetOptions: {}
         },
         []
       )

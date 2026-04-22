@@ -13,15 +13,27 @@ import downloadBlob from './downloadBlob.js'
 
 /**
  * Creates an `*.xlsx` file.
- * @param {SheetData|object[]} data
- * @param {object} options
- * @returns {Promise<Blob|void>} Returns a `Blob` or automatically downloads the file.
+ * @param {SheetData|Sheet[]} arg1
+ * @param {object} arg2 — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
+ * @param {object} [arg3] — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
+ * @returns {object} Returns an object with `async` methods: `toBlob()`, `toFile(fileName)`.
  */
-export default function writeXlsxFile(data, { fileName, ...options } = {}) {
-  return generateXlsxFileAsync(data, options, convertFileContentToUint8Array).then((blob) => {
-    if (fileName) {
-      return downloadBlob(blob, fileName)
+export default function writeXlsxFile(arg1, arg2, arg3) {
+  const createBlob = () => {
+    return generateXlsxFileAsync(arg1, arg2, arg3, convertFileContentToUint8Array)
+  }
+
+  return {
+    toBlob() {
+      return createBlob()
+    },
+
+    toFile(fileName) {
+      return createBlob().then((blob) => {
+        downloadBlob(blob, fileName)
+      })
     }
-    return blob
-  })
+  }
+
+
 }

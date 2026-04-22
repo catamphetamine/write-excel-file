@@ -3,9 +3,8 @@ import transformContent from '../helpers/features/transformContent.js'
 
 export default function generateWorkbookXmlRels({
 	sheetIds,
-	multipleSheetsParameters,
 	features,
-	...restParameters
+	sheetsOptions
 }) {
 	let xml = '<?xml version="1.0" ?>' +
 		'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -16,8 +15,7 @@ export default function generateWorkbookXmlRels({
 			getAdditionalContent(
 				'xl/workbook.xml',
 				features,
-				restParameters,
-				{ multipleSheetsParameters }
+				sheetsOptions
 			) +
 		'</Relationships>'
 
@@ -26,8 +24,7 @@ export default function generateWorkbookXmlRels({
 		xml,
 		'xl/workbook.xml',
 		features,
-		restParameters,
-		{ multipleSheetsParameters }
+		sheetsOptions
 	)
 
 	return xml

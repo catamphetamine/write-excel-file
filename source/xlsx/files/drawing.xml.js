@@ -3,11 +3,10 @@ import transformContent from '../helpers/features/transformContent.js'
 
 // https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md
 export default function generateDrawingXml({
-	multipleSheetsParameters,
 	sheetIndex,
 	sheetId,
-	features,
-	...restParameters
+	sheetOptions,
+	features
 }) {
 	let xml =
 		DRAWING_XML_START +
@@ -15,8 +14,8 @@ export default function generateDrawingXml({
 			getAdditionalContent(
 				'xl/drawings/drawing{id}.xml',
 				features,
-				restParameters,
-				{ multipleSheetsParameters, sheetIndex, sheetId }
+				sheetOptions,
+				{ sheetIndex, sheetId }
 			) +
 		DRAWING_XML_END
 
@@ -25,8 +24,8 @@ export default function generateDrawingXml({
 		xml,
 		'xl/drawings/drawing{id}.xml',
 		features,
-		restParameters,
-		{ multipleSheetsParameters, sheetIndex, sheetId }
+		sheetOptions,
+		{ sheetIndex, sheetId }
 	)
 
 	return xml

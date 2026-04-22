@@ -88,14 +88,14 @@
   </head>
 
   <body>
-    <a id="main-link" href="https://gitlab.com/catamphetamine/write-excel-file">
+    <a id="main-link" href="https://www.npmjs.com/package/write-excel-file">
       write-excel-file
     </a>
 
     <br/>
 
     <div>
-      Write sample <code>*.xlsx</code> files according to the pre-defined "test cases"
+      Write sample <code style="color: inherit">.xlsx</code> files according to the pre-defined "test cases"
     </div>
 
     <br/>
@@ -131,12 +131,8 @@
       runTestCaseButton.addEventListener('click', function() {
         const testCaseId = testCasesSelect.value
         const testCase = TEST_CASES.default[testCaseId]
-        let [arg1, arg2, ...argsRest] = testCase.args()
-        arg2 = {
-          ...arg2,
-          fileName: 'spreadsheet.xlsx'
-        }
-        writeXlsxFile.apply(this, [arg1, arg2, ...argsRest]).then(
+        const [arg1, arg2, ...argsRest] = testCase.args()
+        writeXlsxFile.apply(this, [arg1, arg2, ...argsRest]).toFile('spreadsheet.xlsx').then(
           () => {
             // console.log('File created')
           },

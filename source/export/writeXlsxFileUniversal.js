@@ -11,26 +11,32 @@ import generateXlsxFileContents from '../xlsx/generateXlsxFileContents.js'
 
 /**
  * Creates an `*.xlsx` file.
- * @param {SheetData|object[]} data
- * @param {object} options
- * @returns {Promise<Blob|void>} Returns a `Blob` or automatically downloads the file.
+ * @param {SheetData|Sheet[]} arg1
+ * @param {object} arg2 — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
+ * @param {object} [arg3] — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
+ * @returns {object} Returns an object with `async` methods: `toBlob()`.
  */
-export default function writeXlsxFile(data, parameters) {
-	return generateXlsxFileAsync(data, parameters, convertFileContentToUint8Array)
+export default function writeXlsxFile(arg1, arg2, arg3) {
+	return {
+		toBlob() {
+			return generateXlsxFileAsync(arg1, arg2, arg3, convertFileContentToUint8Array)
+		}
+	}
 }
 
 /**
  * @return {Promise<Blob>}
  */
 function generateXlsxFile(
-	data,
-	parameters,
+	arg1,
+	arg2,
+	arg3,
 	convertFileContentToUint8Array,
 	createZipArchiveAsArrayBuffer,
 	isAsyncZip
 ) {
 	// Generate the sub-files inside the `.xlsx` file.
-	const files = generateXlsxFileContents(data, parameters)
+	const files = generateXlsxFileContents(arg1, arg2, arg3)
 
 	// Convert files' content to `Uint8Array`s.
 	return convertFilesContentToUint8Arrays(files, convertFileContentToUint8Array).then((files) => {
@@ -58,14 +64,14 @@ function convertArrayBufferToBlob(arrayBuffer) {
  * Generates an *.xlsx file "synchronously".
  * @return {Promise<Blob>}
  */
-export function generateXlsxFileSync(data, parameters, convertFileContentToUint8Array) {
-	return generateXlsxFile(data, parameters, convertFileContentToUint8Array, zipToArrayBufferSync, false)
+export function generateXlsxFileSync(arg1, arg2, arg3, convertFileContentToUint8Array) {
+	return generateXlsxFile(arg1, arg2, arg3, convertFileContentToUint8Array, zipToArrayBufferSync, false)
 }
 
 /**
  * Generates an *.xlsx file "asynchronously".
  * @return {Promise<Blob>}
  */
-export function generateXlsxFileAsync(data, parameters, convertFileContentToUint8Array) {
-	return generateXlsxFile(data, parameters, convertFileContentToUint8Array, zipToArrayBuffer, true)
+export function generateXlsxFileAsync(arg1, arg2, arg3, convertFileContentToUint8Array) {
+	return generateXlsxFile(arg1, arg2, arg3, convertFileContentToUint8Array, zipToArrayBuffer, true)
 }

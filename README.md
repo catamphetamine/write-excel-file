@@ -20,48 +20,123 @@ Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file
 * `images[]` parameter no longer accepts string values (i.e. file paths). Instead, use `fs.createReadStream(filePath)` function to convert file paths to `Stream`s.
 </details>
 
+<details>
+<summary>Migrating from <code>3.x</code> to <code>4.x</code></summary>
+
+######
+
+* Changed the arguments of `writeExcelFile()` function.
+  * The following options are now passed as part of a separate (third) argument: `fontFamily`, `fontSize`, `features`.
+
+* Changed the arguments of `writeExcelFile()` function when writing a file with mulitiple sheets.
+  * Old — two arguments:
+    * `[data1, data2]`
+    * `{ sheets: ['Sheet1', 'Sheet2'], columns: [columns1, columns2], ... }`
+  * New — one argument:
+    * `[`
+      * `{ data: data1, sheet: 'Sheet1', columns: columns1, ... },`
+      * `{ data: data2, sheet: 'Sheet2', columns: columns2, ... }`
+    * `]`
+
+* Changed the result of `writeExcelFile()` function.
+  * Instead of receiving options such as `fileName` or `filePath` or `buffer: true`, etc, and then adjusting the return type based on those options, it now returns an object with several `async toXxx()` methods.
+    * Old: `await writeExcelFile(data, { filePath: '/path/to/output-file.xlsx' })`
+    * New: `await writeExcelFile(data).toFile('/path/to/output-file.xlsx')`
+
+* If you were using `schema` parameter:
+  * Removed `schema` parameter from `writeExcelFile()` function.
+    * Use the new exported function `getSheetData()` instead.
+      * Old: `await writeExcelFile(objects, { schema })`
+      * New: `await writeExcelFile(getSheetData(objects, schema))`
+  * In a `schema`, `column` property was renamed to `header`.
+    * Old: `[{ column: 'First Name', value: (person) => person.firstName }]`
+    * New: `[{ header: 'First Name', value: (person) => person.firstName }]`
+  * In a `schema`, `header` property now represents a column header cell, so it can be not just a string but also an object with a `value` property and any optional cell style properties.
+    * This means that the header style for each different column can be specified directly in a `schema` entry for that column.
+  * In a `schema`, any cell properties such as `value`, `type`, `format`, `fontWeight`, etc were moved to a nested object called `cell`. Specifically, this `cell` property is a function of two arguments — `object` and `objectIndex` — which returns an object with the aforementioned cell properties. And the `value` property is no longer a "getter" function, it's a regular `value`.
+  * Previously, it used to apply the default `width: 14` to `type: Date` columns. It no longer does that.
+    * Specify the `width` of such columns manually in a `schema`.
+  * Removed `getHeaderStyle` parameter from `writeExcelFile()` function.
+    * Use the new `header` property on each column in a `schema` to set the style for that column's header cell.
+  * Previously, it used to apply bold font to the header row by default. It no longer does that.
+    * Use the new `header` property on each column in a `schema` to set the style for that column's header cell.
+  * If you were using `getCellStyle()` option:
+    * Removed `getCellStyle()` option. It was replaced by the new `cell()` property in a column definition in a `schema`.
+
+* If you were using `features` parameter:
+  * The `features` parameter was moved from the second argument to the third argument (in case of a file with a single sheet).
+  * If you implemented `file.transform` property of a feature:
+    * Changed the first argument of `files.transform.insert()` / `files.transform.transform()` — it's now an array with each separate sheet's options.
+    * Changed the second argument of `files.transform.insert()` / `files.transform.transform()`:
+      * Removed `multipleSheetsParameters` property because now all sheets' options are separate.
+      * Removed `attributeValue()` and `textContent()` properties because they can be imported directly from `write-excel-file/utility` subpackage.
+    * Removed `files.transform.parameters()` function. Any sheet options are now available to any feature.
+  * If you implemented `files.write` property of a feature:
+    * Changed the first argument of `files.write.files()` — it's now an array with each separate sheet's options.
+    * Changed the second argument of `files.write.files()`:
+      * Removed `multipleSheetsParameters` property because now all sheets' options are separate.
+      * Removed `attributeValue()` and `textContent()` properties because they can be imported directly from `write-excel-file/utility` subpackage.
+    * Removed `files.write.parameters()` function. Any sheet options are now available to any feature.
+
+* If you were using TypeScript:
+  * Renamed some TypeScript types:
+    * `ColumnSchema<Object, ValueType>` → `Column<Object>`
+    * `Schema` → `Column[]`
+    * `ValueType` → `Value`
+</details>
+
 ## Install
 
 ```js
 npm install write-excel-file --save
 ```
 
-Alternatively, one could include it on a web page [directly](#cdn) via a `<script/>` tag.
+Alternatively, it could be included on a web page [directly](#cdn) via a `<script/>` tag.
 
 ## Use
 
-The default exported function — let's call it `writeExcelFile()` — creates an `.xslx` file from sheet data.
-
-```js
-await writeExcelFile(data, { filePath: '/path/to/file.xlsx' })
-```
+The default exported function creates an `.xslx` file from sheet data.
 
 Sheet data must be an array of rows. Each row must be an array of cells. Each cell should be represented by a value — `string`, `number`, `boolean` or `Date` — or be `null` in case it's empty.
 
 Example:
 
 ```js
-const data = [
+const sheetData = [
   ['A','B','C'], // 1st row
   ['x',123,true], // 2nd row
   ['y',456,false] // 3rd row
 ]
 ```
 
-Output:
+Output file:
 
 | A | B | C |
 | - | - | - |
 | x | 123 | TRUE |
 | y | 456 | FALSE |
 
-A cell could also be represented by an object with properties: `value`, (optional) `type`, and, optionally, other [cell parameters](#cell-parameters) such as style or a specific `format`:
+Code (Node.js):
+
+```js
+import writeExcelFile from 'write-excel-file/node'
+
+await writeExcelFile(sheetData).toFile('/path/to/output-file.xlsx')
+```
+
+For some data cells, it might be required to customize their appearance or output format. In that case, a cell could be represented by an object with properties:
+
+* `value` — cell value
+* (optional) `type` — cell value type; if not specified, will be derived from `value`
+* (optional) [cell options](#cell-options) such as style properties or output `format`
+
+Here's an example where "Amount" column values are displayed as "US Dollar" currency, and highlighted in yellow where the value exceeds $1000.
 
 ```js
 [
   ['Order ID', 'Amount'],
-  [1, { value: 1234.56, format: "[$$-409]#,##0.00" }],
-  [2, { value: 789, format: "[$$-409]#,##0.00" }]
+  [1, { value: 1234.56, format: '[$$-409]#,##0.00', backgroundColor: '#FFFF00' }],
+  [2, { value: 789, format: '[$$-409]#,##0.00' }]
 ]
 ```
 
@@ -72,67 +147,74 @@ Output:
 | 1 | $1,234.56 |
 | 2 | $789.00 |
 
-The aforementioned `type` property is optional because it is automatically detected from the `value` property, or defaults to `String` if the `value` is empty or not supported.
+The `type` property of a cell object is optional because it will be automatically derived from the `value` property, or will default to `String` if the `value` is empty or not supported.
 
 Possible `type`:
-* `String`
-* `Number`
-* `Boolean`
-* `Date`
-* `"Formula"`
+* `String` — `type: String` and `value: 'Text'`
+* `Number` — `type: Number` and `value: 123`
+* `Boolean` — `type: Boolean` and `value: true`
+* `Date` — `type: Date` and `value: new Date()`
+* `'Formula'` — `type: 'Formula'` and `value: '=AVERAGE(A1:A10)'`
 
-## API
+## Import
+
+This package provides a separate `import` path for each different environment, as described below.
 
 ### Browser
 
-Example 1: Write `data` to a file called `file.xlsx` and trigger a "Save as" file dialog so that the user could save the file to their disk.
+`write-excel-file/browser`
+
+Example 1: Write `sheetData` to a file called `file.xlsx` and trigger a "Save as" file dialog so that the user could save the file to their disk.
 
 ```js
 import writeExcelFile from 'write-excel-file/browser'
 
-await writeExcelFile(data, {
-  fileName: 'file.xlsx'
-})
+await writeExcelFile(sheetData).toFile('file.xlsx')
 ```
 
-Example 2: `fileName` parameter is not passed, so it returns a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
+Example 2: Write `sheetData` to a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob).
 
 ```js
-const blob = await writeExcelFile(data)
+const blob = await writeExcelFile(sheetData).toBlob()
 ```
 
 ### Node.js
 
-Example 1: Write `data` to a file at path `/path/to/file.xlsx`.
+`write-excel-file/node`
+
+Example 1: Write `sheetData` to a file at path `/path/to/output-file.xlsx`.
 
 ```js
 import writeExcelFile from 'write-excel-file/node'
 
-await writeExcelFile(data, {
-  filePath: '/path/to/file.xlsx'
-})
+await writeExcelFile(sheetData).toFile('/path/to/output-file.xlsx')
 ```
 
-Example 2: `filePath` parameter is not passed, but `buffer: true` parameter is passed, so it returns a [`Buffer`](https://nodejs.org/api/buffer.html).
+Example 2: Write `sheetData` to a [`Buffer`](https://nodejs.org/api/buffer.html).
 
 ```js
-const buffer = await writeExcelFile(data, { buffer: true })
+const buffer = await writeExcelFile(sheetData).toBuffer()
 ```
 
 <!--
 Example 3: `filePath` parameter is not passed, but `blob: true` parameter is passed, so it returns a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
 
 ```js
-const blob = await writeExcelFile(data, { blob: true })
+const blob = await writeExcelFile(sheetData).toBlob()
 ```
 -->
 
-Example 3: Neither `filePath` nor `buffer: true` <!-- nor `blob: true` --> parameters are passed, so it returns a readable [`Stream`](https://nodejs.org/api/stream.html).
+Example 3: Write `sheetData` as a readable [`Stream`](https://nodejs.org/api/stream.html).
 
 ```js
-const readStream = await writeExcelFile(data)
-const writeStream = fs.createWriteStream('/path/to/file.xlsx')
-readStream.pipe(writeStream)
+const readStream = await writeExcelFile(sheetData).toStream()
+```
+
+Example 4: Write `sheetData` to a writable [`Stream`](https://nodejs.org/api/stream.html).
+
+```js
+const writeStream = fs.createWriteStream('/path/to/output-file.xlsx')
+await writeExcelFile(sheetData).toStream(writeStream)
 ```
 
 <details>
@@ -146,7 +228,7 @@ AWS S3 might throw `Cannot determine length of [object Object]`:
 await new AWS.S3().putObject({
   Bucket: ...,
   Key: ...,
-  Body: stream,
+  Body: readStream,
   ContentType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 }).promise()
 ```
@@ -160,148 +242,150 @@ Workaround for AWS SDK [v3](https://aws.amazon.com/blogs/developer/modular-packa
 
 ### Universal
 
-The one that works both in a web browser and Node.js. Only supports returning a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for some.
+`write-excel-file/universal`
+
+The one that works both in a web browser and Node.js. Only supports returning a [`Blob`](https://developer.mozilla.org/en-US/docs/Web/API/Blob), which could be a bit less convenient for general use.
 
 ```js
 import writeExcelFile from 'write-excel-file/universal'
 
 // outputs a `Blob`.
-const blob = await writeExcelFile(data)
-```
-
-## Data vs Objects
-
-Alternatively, instead of providing `data`, one could provide a list of JSON `objects` and a `schema` describing each output column:
-
-```js
-// Input data
-const objects = [
-  {
-    name: 'John Smith',
-    dateOfBirth: new Date(),
-    cost: 1800,
-    paid: true
-  },
-  {
-    name: 'Alice Brown',
-    dateOfBirth: new Date(),
-    cost: 2600,
-    paid: false
-  }
-]
-```
-
-```js
-// Output columns
-const schema = [
-  {
-    column: 'Name',
-    type: String,
-    value: student => student.name
-  },
-  {
-    column: 'Date of Birth',
-    type: Date,
-    format: 'mm/dd/yyyy',
-    value: student => student.dateOfBirth
-  },
-  {
-    column: 'Cost',
-    type: Number,
-    format: '#,##0.00',
-    value: student => student.cost
-  },
-  {
-    column: 'Paid',
-    type: Boolean,
-    value: student => student.paid
-  }
-]
-```
-
-Each column should have a `column` title, a data `type`, a `value` "getter" function, and, optionally, other [cell parameters](#cell-parameters).
-
-### Browser
-
-```js
-import writeExcelFile from 'write-excel-file/browser'
-
-await writeExcelFile(objects, {
-  schema,
-  fileName: 'file.xlsx'
-})
-```
-
-### Node.js
-
-```js
-import writeExcelFile from 'write-excel-file/node'
-
-await writeExcelFile(objects, {
-  schema,
-  filePath: '/path/to/file.xlsx'
-})
+const blob = await writeExcelFile(sheetData).toBlob()
 ```
 
 ## Column Widths
 
-One could specify custom column widths (in "characters" rather than in "pixels").
-
-### When Passing Objects
-
-When passing `objects`/`schema`, column widths can be specified via `width` property in the `schema`.
-
-```js
-const schema = [
-  // Column #1
-  {
-    column: 'Name',
-    value: student => student.name,
-    width: 20 // Column width (in characters).
-  },
-  ...
-]
-```
-
-### When Passing Data
-
-When passing `data`, one can pass a separate `columns` parameter to specify column widths:
+One could specify column widths (in "characters" rather than in "pixels") by passing `columns` option:
 
 ```js
 // Set Column #3 width to "20 characters".
 const columns = [
   {},
   {},
-  { width: 20 }, // Width is in characters
+  { width: 20 }, // in characters
   {}
 ]
 
-await writeExcelFile(data, {
-  columns, // Pass it here.
-  fileName: 'file.xlsx'
-})
+await writeExcelFile(sheetData, { columns }).toFile(...)
 ```
 
-## Cell Parameters
+## Convert Objects To Sheet Data
 
-<!--
-There're also some additional exported `type`s available:
+Usually, there's a list of `objects` that should be written to an `.xlsx` file.
 
-* `Integer` for integer `Number`s.
-* `URL` for URLs.
-* `Email` for email addresses.
--->
+One could easily convert those `objects` to `sheetData` by using `getSheetData()` function.
 
-Regardless of whether you're passing `data` or `objects`/`schema`, each cell (or schema column) can also specify:
+```js
+// JSON objects
+const objects = [
+  {
+    name: 'John Smith',
+    dateOfBirth: new Date(Date.UTC(2000, 1 - 1, 5)),
+    income: 120000,
+    married: true
+  },
+  {
+    name: 'Alice Brown',
+    dateOfBirth: new Date(Date.UTC(2005, 4 - 1, 3)),
+    income: 60000,
+    married: false
+  }
+]
+```
 
-* Custom [format](#format) — by specifying a `format` property.
-* Custom [style](#style)
-  * By specifying any of the style-related properties.
-  * (only when passing `objects`/`schema`) By specifying a `getCellStyle(object)` function for a column in the `schema`, which will define the style of each different cell in the given column (except header).
+```js
+// Creates a header cell object
+const getHeader = (text) => ({
+  value: text,
+  fontWeight: 'bold'
+})
+
+// A list of columns in the output sheet
+const columns = [
+  {
+    header: getHeader('Name'),
+    cell: (person) => ({
+      value: person.name
+    }),
+    width: 20 // `width` is optional and is measured in characters
+  },
+  {
+    header: getHeader('Date of Birth'),
+    cell: (person) => ({
+      value: person.dateOfBirth,
+      type: Date, // `type` is optional and will be derived from `value`
+      format: 'mm/dd/yyyy'
+    })
+  },
+  {
+    header: getHeader('Income'),
+    cell: (person) => ({
+      value: person.income,
+      type: Number, // `type` is optional and will be derived from `value`
+      format: '#,##0.00'
+    })
+  },
+  {
+    header: getHeader('Married'),
+    cell: (person) => ({
+      value: person.married,
+      type: Boolean // `type` is optional and will be derived from `value`
+    })
+  }
+]
+```
+
+```js
+import writeExcelFile, { getSheetData } from 'write-excel-file/node'
+
+const sheetData = getSheetData(objects, columns)
+
+sheetData ===
+[
+  [
+    { value: 'Name', fontWeight: 'bold' },
+    { value: 'Date of Birth', fontWeight: 'bold' },
+    { value: 'Income', fontWeight: 'bold' },
+    { value: 'Married', fontWeight: 'bold' }
+  ],
+  [
+    { value: 'John Smith' },
+    { value: 2000-01-05T00:00:00.000Z, type: Date, format: 'mm/dd/yyyy' },
+    { value: 120000, type: Number, format: '#,##0.00' },
+    { value: true, type: Boolean }
+  ],
+  [
+    { value: 'Alice Brown' },
+    { value: 2005-04-03T00:00:00.000Z, type: Date, format: 'mm/dd/yyyy' },
+    { value: 60000, type: Number, format: '#,##0.00' },
+    { value: false, type: Boolean }
+  ]
+]
+
+// Pass the `columns` to `writeExcelFile()` in order to apply the column `width`.
+await writeExcelFile(sheetData, { columns }).toFile(...)
+```
+
+The `columns` argument should describe a list of columns in the output sheet data.
+
+Each column should be an object with properties:
+
+* (optional) `header` — describes the column header cell
+  * Either a string or a cell object
+* `cell` — describes each (non-header) cell in this column
+  * A function of two arguments — `object` and `objectIndex` — that returns a cell object
+* (optional) `width` (in characters)
+
+## Cell Options
+
+Each cell object could specify:
+
+* Custom [format](#format) property
+* Custom [style](#style) properties
 
 ### Format
 
-The optional `format` property can only be used on cells (or schema columns) with `type`: `Date`, `Number`, `String` or `"Formula"` <!-- or `Integer` -->. Its purpose is to display the "raw" cell value — for example, a number or a date — in a particular way: as a floating-point number with a specific number of decimal places, or as a percentage, or maybe as a date in a particular date format, etc.
+A custom output `format` could be specified for cells with `type`: `Date`, `Number`, `String` or `"Formula"`. Its purpose is to display the "raw" cell value — for example, a number or a date — in a particular way: as a floating-point number with a specific number of decimal places, or as a percentage, or maybe as a date in a particular date format, etc.
 
 <!--
 * `formatId: number` — A [built-in](https://xlsxwriter.readthedocs.io/format.html#format-set-num-format) Excel data format ID (like a date or a currency). Example: `4` for formatting `12345.67` as `12,345.67`.
@@ -318,7 +402,7 @@ Below are some of the commonly used `Number` formats.
   * `0%` — Percents. Example: `30%`.
   * `0.00%` — Percents with 2 decimal places. Example: `30.00%`.
 
-All `Date` cells (or schema columns) are required to specify a `format`, unless a [default `dateFormat`](#date-format) option is specified.
+All `Date` cells are required to specify a `format`, unless a default [`dateFormat`](#sheet-options) option has been specified.
 
   * `mm/dd/yy` — US date format. Example: `12/31/00` for December 31, 2000.
   * `mmm d yyyy` — Example: `Dec 31 2000`.
@@ -340,7 +424,7 @@ All `Date` cells (or schema columns) are required to specify a `format`, unless 
     * `ss` — Seconds with a leading `0` (when less than `10`).
     * `AM/PM` — Either `AM` or `PM`, depending on the time.
 
-A `String` cell (or schema column) could also specify a `format`.
+A `String` cell could also specify a `format`.
 
   * It could specify `@` format in order to explicitly declare itself being of "Text" type rather than the default "General" type. The point is, this way Microsoft Excel won't attempt to "intelligently" interpret the `String` cell value as a number or a date, as it usually does by default. For example, by default, if a `String` cell value is `"123456"`, Microsoft Excel will try to display it as a `123,456` number rather than a `"123456"` string.
 
@@ -352,9 +436,9 @@ Cell style properties:
   * `height: number` — Row height, in "points".
 
 * Combine cells
-  * `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
+  * `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `sheetData`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
 
-  * `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `data`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
+  * `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `sheetData`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
 
 * Alignment
 
@@ -400,156 +484,120 @@ Cell style properties:
 
 <!-- * `width: number` — Approximate column width (in characters). Example: `20`. -->
 
-## Options
+## Sheet Options
 
-The following options could be passed as part of the second argument to `writeExcelFile()` function:
+The following sheet-specific options could be passed as part of the second argument to `writeExcelFile()` function:
 
-* `sheet: string` — Sets the name of the sheet.
-* `fontFamily: string` — Sets the default font family. Example: `"Calibri"`.
-* `fontSize: number` — Sets the default font size. Example: `12`.
-* `orientation: string` — Sets the orientation for all sheets. Default is `"portrait"`. Possible values: `"portrait"`, `"landscape"`.
-* `dateFormat: string` — Sets the default format for outputting dates. Example: `"mm/dd/yyyy"`.
+* `sheet: string` — The name of the sheet.
+* `columns: object[]` — Column widths.
+* `orientation: string` — Sheet orientation. Default is `"portrait"`. Possible values: `"portrait"`, `"landscape"`.
+* `dateFormat: string` — Default `format` that will be used for all `Date` cells. Example: `"mm/dd/yyyy"`.
 * `stickyRowsCount: number` — Makes a given number of top rows "sticky" (Excel calls them "frozen").
 * `stickyColumnsCount: number` — Makes a given number of columns at the start "sticky" (Excel calls them "frozen").
 * `showGridLines: boolean` — Pass `false` to hide grid lines.
-* `rightToLeft: boolean` — Pass `true` to use right-to-left layout on all sheets.
-* `zoomScale: number` — Sets the initial zoom factor. Example: `1.5` scales the document to 150%.
+* `rightToLeft: boolean` — Pass `true` to use right-to-left layout. This is used in right-to-left languages like Arabic.
+* `zoomScale: number` — Initial zoom factor. For example, `1.5` would scale the sheet to 150%.
+
+## Global Options
+
+The following options are not specific to any particular sheet and apply to the entire `.xlsx` file:
+
+* `fontFamily: string` — Default font family for all sheets. Example: `"Calibri"`.
+* `fontSize: number` — Default font size for all sheets. Example: `11`.
+* `features: Feature[]` — Additional third-party ["features"](#features) that may extend the functionality of this package in any custom way.
+
+These options can be passed after any other arguments, i.e. as a third argument when writing a single-sheet file or as a second argument when writing a multi-sheet file.
 
 ## Multiple Sheets
 
-### When Passing Objects
-
-To generate an `.xlsx` file with multiple sheets when passing `objects`/`schema`:
-
-* Pass a `sheets` parameter — an array of sheet names.
-* The `objects` argument should be an array of `objects` for each sheet.
-* The `schema` parameter should be an array of `schema`s for each sheet.
+To create an `.xlsx` file with multiple sheets, instead of passing `sheetData` as the first argument and `sheetOptions` as the second argument, pass an array of objects of shape `{ data: SheetData, ...options?: SheetOptions }` as the first argument.
 
 ```js
-await writeExcelFile([objects1, objects2], {
-  schema: [schema1, schema2],
-  sheets: ['Sheet 1', 'Sheet 2'],
-  filePath: '/path/to/file.xlsx'
-})
-```
-
-### When Passing Data
-
-To generate an `.xlsx` file with multiple sheets when passing `data`:
-
-* Pass a `sheets` parameter — an array of sheet names.
-* The `data` argument should be an array of `data` for each sheet.
-* (optional) The `columns` parameter should be an array of `columns` for each sheet.
-
-```js
-await writeExcelFile([data1, data2], {
-  columns: [columns1, columns2], // (optional)
-  sheets: ['Sheet 1', 'Sheet 2'],
-  filePath: '/path/to/file.xlsx'
-})
-```
-
-## Table Header Style When Passing Objects
-
-When passing `objects`/`schema`, the output table will include a header row at the top. The header row can be customized by providing column titles and cell style.
-
-Column titles should be specified as `column` property values in the `schema`.
-
-```js
-const schema = [
-  // Column #1
+await writeExcelFile([
   {
-    column: 'Name', // Column title
-    value: student => student.name
+    data: data1,
+    sheet: 'Sheet 1',
+    columns: columns1,
+    stickyRowsCount: 1
   },
-  ...
-]
-```
-
-When `column` title is not specified, it's gonna be empty.
-
-The default style for table header cells is:
-* `fontWeight` — `"bold"`
-* `align` — equal to the `schema` column's `align` property value
-
-To override that default style, provide a `getHeaderStyle(columnSchema)` function:
-
-```js
-await writeExcelFile(objects, {
-  schema,
-  getHeaderStyle: (columnSchema) => ({
-    backgroundColor: '#eeeeee',
-    fontWeight: 'bold',
-    align: columnSchema.align,
-    indent: columnSchema.indent
-  }),
-  filePath: '/path/to/file.xlsx'
-})
+  {
+    data: data2,
+    sheet: 'Sheet 2',
+    columns: columns2,
+    stickyColumnsCount: 1
+  }
+]).toFile(...)
 ```
 
 ## Features
 
-This package is quite minimal but at the same time extensible by providing custom "feature" implementations.
+This package is quite minimal but at the same time quite extensible by providing custom "feature" implementations.
 
 ```js
-// TypeScript "definition" of a "feature".
+// Import a TypeScript interface called `Feature`.
 import type { Feature } from 'write-excel-file/node'
 
-import writeExcelFile from 'write-excel-file/node'
-
-// A custom feature should implement the `Feature` TypeScript interface.
+// This is an implementation of a custom "feature".
+// It must implement the `Feature` TypeScript interface.
 const myCustomFeature: Feature = {
   ...
 }
 
-await writeExcelFile(data, {
-  fileName: 'file.xlsx',
-  features: [myCustomFeature]
-})
+await writeExcelFile(
+  data,
+  { sheet: 'Sheet Name' },
+  { features: [myCustomFeature] }
+).toFile(...)
 ```
 
-A `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — to transform their content in any desired way.
+So what can it do?
 
-Sidenote: When doing that, one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) available for import from `write-excel-file/utility` subpackage: `findElement()`, `findElements()`, `findElementInsideElement()`, `findElementsInsideElement()`, `getOpeningTagMarkup()`, `getClosingTagMarkup()`, `getSelfClosingTagMarkup()`, `replaceElement()`, `getMarkupInsideElement()`, `setMarkupInsideElement()`, `prependMarkupInsideElement()`, `appendMarkupInsideElement()`, `escapeAttributeName()`, `escapeAttributeValue()`, `escapeTextContent()`.
+An `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — to transform their content in any desired way.
 
-For an example of a "feature" implementation see [`./source/xlsx/features`](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xlsx/features) directory of the code repository. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and see `./types/features` directory for TypeScript definitions of "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
+<details>
+<summary>Read more</summary>
+
+######
+
+Sidenote: When implementing a "feature", one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage (the built-in "features" use these helper functions):
+
+* `findElement()`
+* `findElements()`
+* `findElementInsideElement()`
+* `findElementsInsideElement()`
+* `getOpeningTagMarkup()`
+* `getClosingTagMarkup()`
+* `getSelfClosingTagMarkup()`
+* `replaceElement()`
+* `getMarkupInsideElement()`
+* `setMarkupInsideElement()`
+* `prependMarkupInsideElement()`
+* `appendMarkupInsideElement()`
+* `escapeAttributeName()`
+* `escapeAttributeValue()`
+* `escapeTextContent()`
+
+For an example of a "feature" implementation see [`./source/xlsx/features`](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xlsx/features) directory of the code repository. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and also see `./types/features` directory for TypeScript definitions of the built-in "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
 
 P.S. When implementing a "feature", don't rely too much on the `.xlsx` file contents to have any particular shape or form (within reason). For example, don't really assume the XML markup in those files to have a certain fixed shape or to maintain a particular fixed order of elements or their attributes. That's because in future versions of this package, the XML markup inside those `.xml` files may potentially be refactored, with some elements considered "unnecessary" and being removed, or non-previously-existing elements being added by default. This means that `transform` functions shouldn't rely on a particular order of existing elements or attributes to find-and-replace those, nor should they presume any particular elements or attributes to not already exist when adding those, i.e. perhaps they should check before adding, in which case perhaps prefer using `transform` over `insert` (see [`stickyRowsOrColumns`](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/source/xlsx/features/stickyRowsOrColumns.js) feature code for an example). Analogous, `files.write` functions could use `read()` function to check if a file with such name already exists. And to avoid any potential conflicts when introducing a new "relationship ID", consider using a unique "namespace" so that it looks like `rId-${namespace}-1` rather than just `rId1`.
+</details>
 
 ## Images
 
 Images reside in their own layer above any other data on a spreadsheet. Each separate sheet has its own layer of images.
 
-To add images to a sheet, pass them as an `images` parameter to `writeExcelFile()` function:
+<details>
+<summary>To add images to a sheet, pass them as an <code>images</code> parameter to <code>writeExcelFile()</code> function.</summary>
+
+######
 
 ```js
-const images = [{ ... }, { ... }]
+const images = [
+  { width: 100, ... },
+  { width: 200, ... }
+]
 
-// When passing `data`.
-await writeExcelFile(data, { images })
-
-// When passing `objects`/`schema`.
-await writeExcelFile(objects, { schema, images })
-```
-
-When an `.xlsx` file is written with multiple sheets, each separate sheet should specify its own `images`.
-
-```js
-const images1 = [{ ... }, { ... }]
-const images2 = [{ ... }, { ... }]
-
-// When passing `data`.
-await writeExcelFile([data1, data2], {
-  images: [images1, images2],
-  sheets: ['Sheet 1', 'Sheet 2']
-})
-
-// When passing `objects`/`schema`.
-await writeExcelFile([objects1, objects2], {
-  schema: [schema1, schema2],
-  images: [images1, images2],
-  sheets: ['Sheet 1', 'Sheet 2']
-})
+await writeExcelFile(sheetData, { images }).toFile(...)
 ```
 
 An image object should have properties:
@@ -573,51 +621,60 @@ An image object should have properties:
 * `title` — (optional) Image title.
 * `description` — (optional) Image description.
 
-The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md).
+<!-- The implementation details are described in a [document](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/docs/IMAGES.md). -->
+</details>
 
 ## Conditional Formatting
 
-Conditional formatting could be specified by passing a list of conditional formatting rules as `conditionalFormatting` parameter. When multiple rules apply to the same cell, the first one of them has the priority.
+<details>
+<summary>To apply conditional formatting to a sheet, pass a list of conditional formatting rules as <code>conditionalFormatting</code> parameter to <code>writeExcelFile()</code> function.</summary>
+
+######
 
 ```js
-import writeExcelFile from 'write-excel-file'
-
-await writeExcelFile(data, {
-  fileName: 'file.xlsx',
-  conditionalFormatting: [{
-    cellRange: {
-      from: {
-        row: 2,
-        column: 1
-      },
-      to: {
-        row: 3,
-        column: 1
-      }
+// An example of one conditional formatting rule
+const conditionalFormatting = [{
+  cellRange: {
+    from: {
+      row: 2,
+      column: 1
     },
-    condition: {
-      operator: '>',
-      value: 100
-    },
-    style: {
-      backgroundColor: '#cc0000'
+    to: {
+      row: 3,
+      column: 1
     }
-  }]
-})
+  },
+  condition: {
+    operator: '>',
+    value: 100
+  },
+  style: {
+    backgroundColor: '#cc0000'
+  }
+}]
+
+await writeExcelFile(sheetData, { conditionalFormatting }).toFile(...)
 ```
 
 A conditional formatting rule is defined by properties:
 
-* `cells` — an object specifying a cell range defined by a `from` cell and a `to` cell
-  * `row` is a row number (starting from `1`)
-  * `column` is a column number (starting from `1`)
-* `condition` — an object specifying a condition
-  * Cell value comparison:
-    * Comparison to `value`: `{ operator: '<', value: 100 }`
-    * Between `value` and `value2`: `{ operator: '...', value: 100, value2: 200 }`
+* `cells` — An object specifying a cell range that the rule could be applied to, i.e. it limits the bounds of the rule.
+  * `from` — Top-left cell
+  * `to` — Bottom-right cell
+  * Each cell is defined by:
+    * `row` — Row number (starting from `1`)
+    * `column` — Column number (starting from `1`)
+* `condition` — An object specifying a condition that has to be met in order for the rule to be applied to a given cell.
+  * Matching a cell by its value:
+    * Compare to a single `value`:
+      * `{ operator: '<', value: 100 }` — Matches any cells having a numeric value less than `100`.
+    * Compare to two values — `value` and `value2`:
+      * `{ operator: '...', value: 100, value2: 200 }` — Matches any cells having a numeric value between `100` and `200` (inclusive).
     * Available `operator`s: `<`, `>`, `<=`, `>=`, `=`, `!=`, `...`
-  * Custom formula: `{ formula: '=$A1="Complete"' }`
-* `style` — an object specifying a style to apply
+  * Matching an entire row by a formula:
+    * `{ formula: '=$A1="ERROR"' }` — Matches all rows having text `ERROR` in column `A`.
+      * This dollar-sign technique is called "Mixed Reference with Fixed Column".
+* `style` — An object specifying the cell style to apply to matching cells.
   * Supports a subset of [cell style](#style) properties:
     <!-- * Font family -->
     <!-- * Font size -->
@@ -628,6 +685,9 @@ A conditional formatting rule is defined by properties:
     * Background color
     * Fill
     * Border
+
+P.S. When viewing a spreadsheet, if multiple conditional formatting rules "conflict" over the same cell, only the first rule to match the condition will be applied to that cell.
+</details>
 
 ## Browser Support
 
@@ -641,9 +701,7 @@ To include this library directly via a `<script/>` tag on a page, one can use an
 <script src="https://unpkg.com/write-excel-file@1.x/bundle/write-excel-file.min.js"></script>
 
 <script>
-  writeXlsxFile(objects, schema, {
-    fileName: 'file.xlsx'
-  })
+  writeXlsxFile(data, { fileName: 'file.xlsx' })
 </script>
 ```
 

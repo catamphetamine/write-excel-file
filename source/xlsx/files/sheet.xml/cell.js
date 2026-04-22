@@ -1,7 +1,3 @@
-// import Integer, { isInteger } from '../types/Integer.js'
-// import URL, { isURL } from '../types/URL.js'
-// import Email, { isEmail } from '../types/Email.js'
-
 import $textContent from '../../../xml/escapeTextContent.js'
 import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
 import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
@@ -75,8 +71,6 @@ function getXlsxType(type) {
   //
   switch (type) {
     case String:
-    // case Email:
-    // case URL:
       return 's'
       // I don't know why did I comment out the use of "inlineStr" XLSX type.
       // Perhaps there were some issues with it. Or perhaps there weren't and everyone else just uses "s".
@@ -84,7 +78,6 @@ function getXlsxType(type) {
       // return 'inlineStr'
 
     case Number:
-    // case Integer:
       // `n` is the default cell type (if no `t` has been specified).
       // return 'n'
       return
@@ -101,7 +94,7 @@ function getXlsxType(type) {
       return
 
     default:
-      throw new Error(`Unknown schema type: ${type && type.name || type}`)
+      throw new Error(`Unknown type: ${type && type.name || type}`)
   }
 }
 
@@ -114,27 +107,15 @@ function getXlsxValue(type, value, findOrCreateSharedString) {
   //
   switch (type) {
     case String:
-    // case Email:
-    // case URL:
       if (typeof value !== 'string') {
         throw new Error(`Invalid cell value: ${value}. Expected a string`)
       }
-      // if (type === Email && !isEmail(value)) {
-      //   throw new Error(`Invalid cell value: ${value}. Expected an Email`)
-      // }
-      // if (type === URL && !isURL(value)) {
-      //   throw new Error(`Invalid cell value: ${value}. Expected a URL`)
-      // }
       return findOrCreateSharedString(value)
 
     case Number:
-    // case Integer:
       if (typeof value !== 'number') {
         throw new Error(`Invalid cell value: ${value}. Expected a number`)
       }
-      // if (type === Integer && !isInteger(value)) {
-      //   throw new Error(`Invalid cell value: ${value}. Expected an Integer`)
-      // }
       return String(value)
 
     case Date:
@@ -158,7 +139,7 @@ function getXlsxValue(type, value, findOrCreateSharedString) {
       return $textContent(value)
 
     default:
-      throw new Error(`Unknown schema type: ${type && type.name || type}`)
+      throw new Error(`Unknown type: ${type && type.name || type}`)
   }
 }
 

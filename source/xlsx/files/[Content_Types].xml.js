@@ -3,9 +3,8 @@ import transformContent from '../helpers/features/transformContent.js'
 
 export default function generateContentTypesXml({
 	sheetIds,
-	multipleSheetsParameters,
 	features,
-	...restParameters
+	sheetsOptions
 }) {
 	let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 		'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
@@ -20,8 +19,7 @@ export default function generateContentTypesXml({
 			getAdditionalContent(
 				'[Content_Types].xml',
 				features,
-				restParameters,
-				{ multipleSheetsParameters }
+				sheetsOptions
 			) +
 		'</Types>'
 
@@ -30,8 +28,7 @@ export default function generateContentTypesXml({
 		xml,
 		'[Content_Types].xml',
 		features,
-		restParameters,
-		{ multipleSheetsParameters }
+		sheetsOptions
 	)
 
 	return xml

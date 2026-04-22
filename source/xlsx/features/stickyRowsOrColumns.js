@@ -12,8 +12,10 @@ export default {
 	files: {
 		transform: {
 			'xl/worksheets/sheet{id}.xml': {
-				transform(xml, { stickyRowsCount, stickyColumnsCount }, { sheetIndex, sheetId }) {
-					if (stickyRowsCount || stickyColumnsCount) {
+				transform(xml, sheetOptions, { sheetIndex, sheetId }) {
+					if (hasStickyRowsOrColumns(sheetOptions)) {
+						const { stickyRowsCount, stickyColumnsCount } = sheetOptions
+
 						const paneAttributes = {
 							// The vertical position of the split, in 1/20th of a point (twips),
 							// or, when frozen, the number of visible rows in the top pane(s).
@@ -76,18 +78,14 @@ export default {
 					}
 
 					return xml
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { stickyRowsCount, stickyColumnsCount } = availableParameters
-					return { stickyRowsCount, stickyColumnsCount }
 				}
 			},
 
 			'xl/workbook.xml': {
-				transform: (xml, { stickyRowsCount, stickyColumnsCount }) => {
-					if (stickyRowsCount || stickyColumnsCount) {
+				transform: (xml, sheetsOptions) => {
+					// If "sticky rows" or "sticky columns" feature is used, there must exist a `<workbookView/>` element
+					// because it will be referenced when configuring those "sticky rows" or "sticky columns".
+					if (sheetsOptions.some(hasStickyRowsOrColumns)) {
 						// Find a `<workbookView/>` element.
 						// It is required to exist because it is referenced as `workbookViewId="0"`
 						// attribute in `<sheetViews/>` element in `xl/worksheets/sheet{id}.xml` file.
@@ -106,14 +104,12 @@ export default {
 						}
 					}
 					return xml
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { stickyRowsCount, stickyColumnsCount } = availableParameters
-					return { stickyRowsCount, stickyColumnsCount }
 				}
 			}
 		}
 	}
+}
+
+function hasStickyRowsOrColumns(sheetOptions) {
+	return Boolean(sheetOptions.stickyRowsCount) || Boolean(sheetOptions.stickyColumnsCount)
 }

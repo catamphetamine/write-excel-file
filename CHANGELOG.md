@@ -1,3 +1,65 @@
+4.0.0 / 22.04.2026
+==================
+
+* Changed the arguments of `writeExcelFile()` function.
+  * The following options are now passed as part of a separate (third) argument: `fontFamily`, `fontSize`, `features`.
+
+* Changed the arguments of `writeExcelFile()` function when writing a file with mulitiple sheets.
+  * Old — two arguments:
+    * `[data1, data2]`
+    * `{ sheets: ['Sheet1', 'Sheet2'], columns: [columns1, columns2], ... }`
+  * New — one argument:
+    * `[`
+      * `{ data: data1, sheet: 'Sheet1', columns: columns1, ... },`
+      * `{ data: data2, sheet: 'Sheet2', columns: columns2, ... }`
+    * `]`
+
+* Changed the result of `writeExcelFile()` function.
+  * Instead of receiving options such as `fileName` or `filePath` or `buffer: true`, etc, and then adjusting the return type based on those options, it now returns an object with several `async toXxx()` methods.
+    * Old: `await writeExcelFile(data, { filePath: '/path/to/output-file.xlsx' })`
+    * New: `await writeExcelFile(data).toFile('/path/to/output-file.xlsx')`
+
+* If you were using `schema` parameter:
+  * Removed `schema` parameter from `writeExcelFile()` function.
+    * Use the new exported function `getSheetData()` instead.
+      * Old: `await writeExcelFile(objects, { schema })`
+      * New: `await writeExcelFile(getSheetData(objects, schema))`
+  * In a `schema`, `column` property was renamed to `header`.
+    * Old: `[{ column: 'First Name', value: (person) => person.firstName }]`
+    * New: `[{ header: 'First Name', value: (person) => person.firstName }]`
+  * In a `schema`, `header` property now represents a column header cell, so it can be not just a string but also an object with a `value` property and any optional cell style properties.
+    * This means that the header style for each different column can be specified directly in a `schema` entry for that column.
+  * In a `schema`, any cell properties such as `value`, `type`, `format`, `fontWeight`, etc were moved to a nested object called `cell`. Specifically, this `cell` property is a function of two arguments — `object` and `objectIndex` — which returns an object with the aforementioned cell properties. And the `value` property is no longer a "getter" function, it's a regular `value`.
+  * Previously, it used to apply the default `width: 14` to `type: Date` columns. It no longer does that.
+    * Specify the `width` of such columns manually in a `schema`.
+  * Removed `getHeaderStyle` parameter from `writeExcelFile()` function.
+    * Use the new `header` property on each column in a `schema` to set the style for that column's header cell.
+  * Previously, it used to apply bold font to the header row by default. It no longer does that.
+    * Use the new `header` property on each column in a `schema` to set the style for that column's header cell.
+  * If you were using `getCellStyle()` option:
+    * Removed `getCellStyle()` option. It was replaced by the new `cell()` property in a column definition in a `schema`.
+
+* If you were using `features` parameter:
+  * The `features` parameter was moved from the second argument to the third argument (in case of a file with a single sheet).
+  * If you implemented `file.transform` property of a feature:
+    * Changed the first argument of `files.transform.insert()` / `files.transform.transform()` — it's now an array with each separate sheet's options.
+    * Changed the second argument of `files.transform.insert()` / `files.transform.transform()`:
+      * Removed `multipleSheetsParameters` property because now all sheets' options are separate.
+      * Removed `attributeValue()` and `textContent()` properties because they can be imported directly from `write-excel-file/utility` subpackage.
+    * Removed `files.transform.parameters()` function. Any sheet options are now available to any feature.
+  * If you implemented `files.write` property of a feature:
+    * Changed the first argument of `files.write.files()` — it's now an array with each separate sheet's options.
+    * Changed the second argument of `files.write.files()`:
+      * Removed `multipleSheetsParameters` property because now all sheets' options are separate.
+      * Removed `attributeValue()` and `textContent()` properties because they can be imported directly from `write-excel-file/utility` subpackage.
+    * Removed `files.write.parameters()` function. Any sheet options are now available to any feature.
+
+* If you were using TypeScript:
+  * Renamed some TypeScript types:
+    * `ColumnSchema<Object, ValueType>` → `Column<Object>`
+    * `Schema` → `Column[]`
+    * `ValueType` → `Value`
+
 3.0.6 / 10.03.2026
 ==================
 
@@ -13,10 +75,10 @@
 * (breaking change) The default export has been removed in order to not confuse people.
 * (breaking change) `/browser` export uses [Web Workers](https://developer.mozilla.org/docs/Web/API/Web_Workers_API/Using_web_workers) now to avoid blocking the main thread. I dunno if Internet Explorer is supported now.
 * Added new exports: `/browser` and `/universal`.
-	* `/universal` works both in a web browser and Node.js. Only outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
-	* `/browser` works in a web browser. It replaced what used to be the default export. It also replaces [`jszip`](https://www.npmjs.com/package/jszip) dependency with [`fflate`](https://www.npmjs.com/package/fflate) because they claim it to be fast and small. It also removes [`file-saver`](https://www.npmjs.com/package/file-saver) dependency replacing it with a simple function.
-	* `/node` stayed the same but replaced [`archiver`](https://www.npmjs.com/package/archiver) with a fork called [`archiver-node`](https://npmjs.org/package/archiver-node) that fixes a few of issues in `archiver` package.
-	<!-- * The default export stayed the same. It's basically same as `/browser` but still uses [`jszip`](https://www.npmjs.com/package/jszip) instead of [`fflate`](https://www.npmjs.com/package/fflate). -->
+  * `/universal` works both in a web browser and Node.js. Only outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob).
+  * `/browser` works in a web browser. It replaced what used to be the default export. It also replaces [`jszip`](https://www.npmjs.com/package/jszip) dependency with [`fflate`](https://www.npmjs.com/package/fflate) because they claim it to be fast and small. It also removes [`file-saver`](https://www.npmjs.com/package/file-saver) dependency replacing it with a simple function.
+  * `/node` stayed the same but replaced [`archiver`](https://www.npmjs.com/package/archiver) with a fork called [`archiver-node`](https://npmjs.org/package/archiver-node) that fixes a few of issues in `archiver` package.
+  <!-- * The default export stayed the same. It's basically same as `/browser` but still uses [`jszip`](https://www.npmjs.com/package/jszip) instead of [`fflate`](https://www.npmjs.com/package/fflate). -->
 <!-- * Added `blob: true` option to `/node` subpackage. It outputs a [`Blob`](https://developer.mozilla.org/docs/Web/API/Blob). -->
 * (breaking change) Renamed cell property `color` to `textColor`.
 * (breaking change) Removed `headerStyle` parameter. Pass `getHeaderStyle()` parameter instead.

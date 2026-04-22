@@ -1,5 +1,3 @@
-import addProperties from '../../../helpers/features/addProperties.js'
-
 import hasAlignment from '../../../helpers/hasAlignment.js'
 import hasBorder from '../../../helpers/hasBorder.js'
 import hasFill from '../../../helpers/hasFill.js'
@@ -33,10 +31,6 @@ export default function getCellStyleProperties(cell, features) {
 		bottomBorderStyle
 	} = cell
 
-	// Add any custom cell style properties that're used by plugins.
-	const additionalProperties = {}
-	addProperties(additionalProperties, cell, features, 'style')
-
 	if (
 		hasAlignment({
 			align,
@@ -69,11 +63,9 @@ export default function getCellStyleProperties(cell, features) {
 			topBorderStyle,
 			bottomBorderColor,
 			bottomBorderStyle
-		}) ||
-		Object.keys(additionalProperties).length > 0
+		})
 	) {
 		return omitUndefinedProperties({
-			...additionalProperties,
 			// alignment
 			align,
 			alignVertical,

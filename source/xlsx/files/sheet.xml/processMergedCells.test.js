@@ -5,7 +5,7 @@ import processMergedCells from './processMergedCells.js'
 
 describe('processMergedCells()', () => {
   it('should process merged cells across columns', () => {
-    const data = [
+    const sheetData = [
       [
         { value: '1', span: 3 },
         undefined,
@@ -13,9 +13,9 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(data, { schema: undefined, features: [] }))
+    expect(processMergedCells(sheetData, { features: [] }))
       .to.deep.equal({
-        data,
+        sheetData,
         mergedCells: [
           [
             [0, 0],
@@ -26,7 +26,7 @@ describe('processMergedCells()', () => {
   })
 
   it('should process merged cells across columns and rows', () => {
-    const data = [
+    const sheetData = [
       [
         { value: '1.1' },
         { value: '1.2' },
@@ -44,9 +44,9 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(data, { schema: undefined, features: [] }))
+    expect(processMergedCells(sheetData, { features: [] }))
       .to.deep.equal({
-        data,
+        sheetData,
         mergedCells: [
           [
             [1, 0],
@@ -63,7 +63,7 @@ describe('processMergedCells()', () => {
         { value: '2' },
         { value: '3' }
       ]
-    ], { schema: undefined, features: [] }))
+    ], { features: [] }))
       .to.throw('Cell at row 1 and column 2')
   })
 
@@ -77,7 +77,7 @@ describe('processMergedCells()', () => {
         { value: '2.1' },
         { value: '2.2' }
       ]
-    ], { schema: undefined, features: [] }))
+    ], { features: [] }))
       .to.throw('Cell at row 2 and column 1')
   })
 
@@ -98,7 +98,7 @@ describe('processMergedCells()', () => {
         { value: '3.2' },
         { value: '3.3' }
       ]
-    ], { schema: undefined, features: [] }))
+    ], { features: [] }))
       .to.throw('Cell at row 2 and column 2')
 
     expect(() => processMergedCells([
@@ -117,12 +117,12 @@ describe('processMergedCells()', () => {
         { value: '3.2' },
         { value: '3.3' }
       ]
-    ], { schema: undefined, features: [] }))
+    ], { features: [] }))
       .to.throw('Cell at row 3 and column 1')
   })
 
   it('should copy styles to hidden cells in case of groups of merged cells', () => {
-    const data = [
+    const sheetData = [
       [
         { value: '1', span: 3, textColor: '#cc0000' },
         // This cell is hidden (obscured by the `span`).
@@ -132,9 +132,9 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(data, { schema: undefined, features: [] }))
+    expect(processMergedCells(sheetData, { features: [] }))
       .to.deep.equal({
-        data: [
+        sheetData: [
           [
             { value: '1', span: 3, textColor: '#cc0000' },
             { textColor: '#cc0000' },

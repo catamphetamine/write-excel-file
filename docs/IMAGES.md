@@ -20,52 +20,19 @@ In XLSX files, images reside in their own isolated layer, above the rest of the 
 The current input format is:
 
 ```js
-// Without `schema`.
 const row1 = [cell1, cell2]
 const data = [row1, row2]
 await writeXlsxFile(data)
-
-// With `schema`.
-const objects = [{ ... }, { ... }]
-await writeXlsxFile(objects, { schema })
 ```
 
 Since images shouldn't be part of `data`, they could be supplied in the `options` argument of the `writeXlsxFile()` function:
 
 ```js
-// Without `schema`.
 const images = [{ ... }, { ... }]
 const row1 = [cell1, cell2]
 const data = [row1, row2]
 await writeXlsxFile(data, { images })
-
-// With `schema`.
-const images = [{ ... }, { ... }]
-const objects = [{ ... }, { ... }]
-await writeXlsxFile(objects, { schema, images })
-````
-
-In case of a multi-sheet scenario:
-
-```js
-// Without `schema`.
-const images1 = [{ ... }, { ... }]
-const row1 = [cell1, cell2]
-const data1 = [row1, row2]
-await writeXlsxFile([data1, data2], {
-  images: [images1, images2],
-  sheets: ['Sheet 1', 'Sheet 2']
-})
-
-// With `schema`.
-const images1 = [{ ... }, { ... }]
-const objects1 = [{ ... }, { ... }]
-await writeXlsxFile([objects1, objects2], {
-  schema: [schema1, schema2],
-  images: [images1, images2],
-  sheets: ['Sheet 1', 'Sheet 2']
-})
-````
+```
 
 The image object could look like:
 

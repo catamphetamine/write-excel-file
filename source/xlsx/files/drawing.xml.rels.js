@@ -2,11 +2,10 @@ import getAdditionalContent from '../helpers/features/getAdditionalContent.js'
 import transformContent from '../helpers/features/transformContent.js'
 
 export default function generateDrawingXmlRels({
-	multipleSheetsParameters,
 	sheetIndex,
 	sheetId,
-	features,
-	...restParameters
+	sheetOptions,
+	features
 }) {
 	let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 		'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -14,8 +13,8 @@ export default function generateDrawingXmlRels({
 			getAdditionalContent(
 				'xl/drawings/_rels/drawing{id}.xml.rels',
 				features,
-				restParameters,
-				{ multipleSheetsParameters, sheetIndex, sheetId }
+				sheetOptions,
+				{ sheetIndex, sheetId }
 			) +
 		'</Relationships>'
 
@@ -24,8 +23,8 @@ export default function generateDrawingXmlRels({
 		xml,
 		'xl/drawings/_rels/drawing{id}.xml.rels',
 		features,
-		restParameters,
-		{ multipleSheetsParameters, sheetIndex, sheetId }
+		sheetOptions,
+		{ sheetIndex, sheetId }
 	)
 
 	return xml

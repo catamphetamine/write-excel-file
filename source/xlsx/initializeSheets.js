@@ -1,62 +1,39 @@
 import initializeStyles from './initializeStyles.js'
-import getInitializeStylesParameters from './initializeStyles.parameters.js'
 import initializeSharedStrings from './initializeSharedStrings.js'
 import validateSheetName from './validateSheetName.js'
-import isObject from './helpers/isObject.js'
 
-export default function initializeSheets({
-  sheetNames,
-  getHeaderStyle,
-  fontFamily,
-  fontSize,
-  features,
-	multipleSheetsParameters,
-  ...restParameters
-}) {
+export default function initializeSheets(sheetsData, sheetsOptions, globalOptions) {
   const { getSharedStrings, findOrCreateSharedString } = initializeSharedStrings()
 
-  const { getCellStyles, findOrCreateCellStyle } = initializeStyles({
-    fontFamily,
-    fontSize,
-    features,
-    ...getInitializeStylesParameters(restParameters, multipleSheetsParameters, features)
-  })
+  // const sheetsDefaultFonts = sheetsOptions.map((sheetOptions) => {
+	// 	const { fontFamily, fontSize } = sheetOptions
+  //   if (fontFamily || fontSize) {
+	// 		return { fontFamily, fontSize }
+	// 	}
+  // })
 
-  // Validate sheet name.
+	const defaultFont = getDefaultFont(globalOptions)
+  const { getCellStyles, findOrCreateCellStyle } = initializeStyles(defaultFont)
+
+	// Get sheet names.
+	const sheetNames = sheetsOptions.map(sheetOptions => sheetOptions.sheet)
+
+  // Validate sheet names.
   for (const sheetName of sheetNames) {
     validateSheetName(sheetName)
   }
 
-  const generateSheetXmlParameters = []
+  const sheetXmlParameters = []
   let sheetIndex = 0
-  for (const sheetName of sheetNames) {
-    const {
-      data,
-      schema,
-      columns,
-      ...sheetParameters
-    } = restParameters
-		validateData(data, { schema, multipleSheetsParameters })
-		// Validate the cases when this function is called directly in tests, etc.
-		if (multipleSheetsParameters === undefined) {
-			throw new Error('`multipleSheetsParameters` parameter not found')
-		}
-		const getParameterForSheet = (parameter) => {
-			if (multipleSheetsParameters) {
-				return parameter[sheetIndex]
-			}
-			return parameter
-		}
-    generateSheetXmlParameters.push({
-			...sheetParameters,
-			multipleSheetsParameters,
+  while (sheetIndex < sheetNames.length) {
+    sheetXmlParameters.push({
+			sheetData: sheetsData[sheetIndex],
+			sheetOptions: sheetsOptions[sheetIndex],
 			sheetIndex,
 			sheetId: getSheetId(sheetIndex),
-			data: getParameterForSheet(data),
-			schema: schema && getParameterForSheet(schema),
-			columns: columns && getParameterForSheet(columns),
-			customFont: fontFamily || fontSize,
-			getHeaderStyle,
+			hasDefaultFont: Boolean(defaultFont),
+			// hasDefaultFont: Boolean(sheetsDefaultFonts[sheetIndex]),
+			// findOrCreateCellStyle: (style) => findOrCreateCellStyle(style, sheetIndex),
 			findOrCreateCellStyle,
 			findOrCreateSharedString
 		})
@@ -71,12 +48,11 @@ export default function initializeSheets({
 			return {
 				sheetId: getSheetId(sheetIndex),
 				sheetName,
-				generateSheetXmlParameters: generateSheetXmlParameters[sheetIndex]
+				sheetXmlParameters: sheetXmlParameters[sheetIndex]
 			}
     }),
     getSharedStrings,
-    getCellStyles,
-		multipleSheetsParameters
+    getCellStyles
   }
 }
 
@@ -84,38 +60,9 @@ function getSheetId(sheetIndex) {
 	return String(sheetIndex + 1)
 }
 
-function validateData(data, { schema, multipleSheetsParameters }) {
-	if (multipleSheetsParameters) {
-		if (!Array.isArray(data) || (data.length > 0 && !Array.isArray(data[0]))) {
-			throw new TypeError('Expected `data` to be an array of arrays of rows')
-		}
-		for (const sheetData of data) {
-			validateSheetDataRows(sheetData, { schema })
-		}
-	} else {
-		if (!Array.isArray(data)) {
-			throw new TypeError('Expected `data` to be an array of rows')
-		}
-		validateSheetDataRows(data, { schema })
-	}
-}
-
-function validateSheetDataRows(data, { schema }) {
-	for (const row of data) {
-		if (row !== null && row !== undefined) {
-			if (schema) {
-				if (isObject(row)) {
-					return
-				} else {
-					throw new Error('Expected `data` rows to be objects')
-				}
-			} else {
-				if (Array.isArray(row)) {
-					return
-				} else {
-					throw new Error('Expected `data` rows to be arrays')
-				}
-			}
-		}
+function getDefaultFont(globalOptions) {
+	const { fontFamily, fontSize } = globalOptions
+	if (fontFamily || typeof fontSize === 'number') {
+		return { fontFamily, fontSize }
 	}
 }

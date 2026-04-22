@@ -5,6 +5,7 @@
     <meta charset="utf-8">
 
     <script src="./write-excel-file.min.js"></script>
+    <script src="./getSheetData.min.js"></script>
 
     <script src="./lib/promise-polyfill.min.js"></script>
 
@@ -83,7 +84,7 @@
         font-weight: bolder;
       }
 
-      #schema-edit
+      #objects-columns-edit
       {
         display: none;
       }
@@ -185,14 +186,14 @@
   </head>
 
   <body>
-    <a id="main-link" href="https://gitlab.com/catamphetamine/write-excel-file">
+    <a id="main-link" href="https://www.npmjs.com/package/write-excel-file">
       write-excel-file
     </a>
 
     <br/>
 
     <div>
-      Write simple <code>*.xlsx</code> files in a browser or Node.js
+      Write <code style="color: inherit">.xlsx</code> files in a browser or Node.js
     </div>
 
     <br/>
@@ -203,17 +204,17 @@
         <section>
           <header>
             <h2>Data</h2>
-            <button id="every-cell-data-edit">Edit</button>
+            <button id="cell-data-edit">Edit</button>
           </header>
-          <textarea id="every-cell-data" style="display: none"></textarea>
-          <pre><code class="language-js" id="every-cell-data-view"></code></pre>
+          <textarea id="cell-data" style="display: none"></textarea>
+          <pre><code class="language-js" id="cell-data-view"></code></pre>
         </section>
 
         <section>
           <header>
             <h2>Column Settings</h2>
           </header>
-          <pre><code class="language-js" id="every-cell-data-columns-view"></code></pre>
+          <pre><code class="language-js" id="cell-data-columns-view"></code></pre>
         </section>
       </div>
 
@@ -231,7 +232,7 @@
     <br/>
 
     <h2>
-      When passing <code>objects</code> and <code>schema</code>
+      When using <code>getSheetData(objects, columns)</code>
     </h2>
 
     <br/>
@@ -249,15 +250,15 @@
 
         <section>
           <header>
-            <h2>Schema</h2>
-            <button id="schema-edit">Edit</button>
+            <h2>Columns</h2>
+            <button id="objects-columns-edit">Edit</button>
           </header>
-          <textarea readonly id="schema" style="display: none"></textarea>
-          <pre><code class="language-js" id="schema-view"></code></pre>
+          <textarea readonly id="objects-columns" style="display: none"></textarea>
+          <pre><code class="language-js" id="objects-columns-view"></code></pre>
         </section>
       </div>
 
-      <button id="write-xlsx-file-button-schema">
+      <button id="write-xlsx-file-button-objects">
         Write *.xlsx file
       </button>
     </div>
@@ -291,24 +292,24 @@
         }
       }
 
-      document.getElementById('every-cell-data-edit').onclick = function() {
-        const objects = document.getElementById('every-cell-data')
-        const objectsView = document.getElementById('every-cell-data-view').parentNode
+      document.getElementById('cell-data-edit').onclick = function() {
+        const objects = document.getElementById('cell-data')
+        const objectsView = document.getElementById('cell-data-view').parentNode
         if (objects.style.display !== 'none') {
           objects.style.display = 'none';
           objectsView.style.display = 'block';
-          document.getElementById('every-cell-data-edit').textContent = 'Edit'
-          document.getElementById('objects-edit').className = ''
-          document.getElementById('every-cell-data-view').innerHTML = Prism.highlight(
-            document.getElementById('every-cell-data').value,
+          document.getElementById('cell-data-edit').textContent = 'Edit'
+          document.getElementById('cell-data-edit').className = ''
+          document.getElementById('cell-data-view').innerHTML = Prism.highlight(
+            document.getElementById('cell-data').value,
             Prism.languages.javascript,
             'javascript'
           )
         } else {
           objects.style.display = 'block';
           objectsView.style.display = 'none';
-          document.getElementById('every-cell-data-edit').textContent = 'Save'
-          document.getElementById('objects-edit').className = 'selected'
+          document.getElementById('cell-data-edit').textContent = 'Save'
+          document.getElementById('cell-data-edit').className = 'selected'
         }
       }
 
@@ -316,44 +317,63 @@
         {
           name: 'John Smith',
           dateOfBirth: 999999999999999,
-          cost: 1800,
-          paid: true
+          income: 120000,
+          married: true
         },
         {
           name: 'Alice Brown',
           dateOfBirth: 999999999999999,
-          cost: 2599.99,
-          paid: false
+          income: 60000,
+          married: false
         }
       ], null, 2).replace(/999999999999999/g, 'new Date()')
 
       document.getElementById('objects-view').innerHTML = document.getElementById('objects').value
 
-      const schema = [
+      const columnsWhenUsingObjects = [
         {
-          column: 'Name',
-          type: String,
-          value: student => student.name,
+          header: {
+            value: 'Name',
+            fontWeight: 'bold'
+          },
+          cell: (person) => ({
+            value: person.name
+          }),
           width: 20
         },
         {
-          column: 'Date of Birth',
-          type: Date,
-          format: 'mm/dd/yyyy',
-          value: student => student.dateOfBirth,
+          header: {
+            value: 'Date of Birth',
+            fontWeight: 'bold'
+          },
+          cell: (person) => ({
+            value: person.dateOfBirth,
+            type: Date,
+            format: 'mm/dd/yyyy'
+          }),
           width: 14
         },
         {
-          column: 'Cost',
-          type: Number,
-          format: '#,##0.00',
-          value: student => student.cost,
+          header: {
+            value: 'Income',
+            fontWeight: 'bold'
+          },
+          cell: (person) => ({
+            value: person.income,
+            type: Number,
+            format: '#,##0.00'
+          }),
           width: 12
         },
         {
-          column: 'Paid',
-          type: Boolean,
-          value: student => student.paid
+          header: {
+            value: 'Married',
+            fontWeight: 'bold'
+          },
+          cell: (person) => ({
+            value: person.married,
+            type: Boolean
+          })
         }
       ]
 
@@ -364,39 +384,58 @@
         {}
       ]
 
-      document.getElementById('schema').value = `
+      document.getElementById('objects-columns').value = `
 [
   {
-    column: 'Name',
-    type: String,
-    value: student => student.name,
+    header: {
+      value: 'Name',
+      fontWeight: 'bold'
+    },
+    cell: (person) => ({
+      value: person.name
+    }),
     width: 20
   },
   {
-    column: 'Date of Birth',
-    type: Date,
-    format: 'mm/dd/yyyy',
-    value: student => student.dateOfBirth,
+    header: {
+      value: 'Date of Birth',
+      fontWeight: 'bold'
+    },
+    cell: (person) => ({
+      value: person.dateOfBirth,
+      type: Date,
+      format: 'mm/dd/yyyy'
+    }),
     width: 14
   },
   {
-    column: 'Cost',
-    type: Number,
-    format: '#,##0.00',
-    value: student => student.cost,
+    header: {
+      value: 'Income',
+      fontWeight: 'bold'
+    },
+    cell: (person) => ({
+      value: person.income,
+      type: Number,
+      format: '#,##0.00'
+    }),
     width: 12
   },
   {
-    column: 'Paid',
-    type: Boolean,
-    value: student => student.paid
+    header: {
+      value: 'Married',
+      fontWeight: 'bold'
+    },
+    cell: (person) => ({
+      value: person.married,
+      type: Boolean
+    })
   }
 ]
 `.trim()
 
-      document.getElementById('schema-view').innerHTML = document.getElementById('schema').value
+      document.getElementById('objects-columns-view').innerHTML = document.getElementById('objects-columns').value
 
-      document.getElementById('every-cell-data').value = JSON.stringify([
+      document.getElementById('cell-data').value = JSON.stringify([
         [
           {
             value: 'Name',
@@ -407,18 +446,17 @@
             fontWeight: 'bold'
           },
           {
-            value: 'Cost',
+            value: 'Income',
             fontWeight: 'bold'
           },
           {
-            value: 'Paid',
+            value: 'Married',
             fontWeight: 'bold'
           }
         ],
         [
           {
-            value: 'John Smith',
-            type: 'String'
+            value: 'John Smith'
           },
           {
             value: 999999999999999,
@@ -437,8 +475,7 @@
         ],
         [
           {
-            value: 'Alice Brown',
-            type: 'String'
+            value: 'Alice Brown'
           },
           {
             value: 999999999999999,
@@ -458,12 +495,12 @@
       ], null, 2).replace(/999999999999999/g, 'new Date()')
         .replace(/"type": "([^",]+)"/g, '"type": $1')
 
-      document.getElementById('every-cell-data-view').innerHTML = document.getElementById('every-cell-data').value
+      document.getElementById('cell-data-view').innerHTML = document.getElementById('cell-data').value
 
 
-      document.getElementById('every-cell-data-columns-view').innerHTML = JSON.stringify(columns, null, 2)
+      document.getElementById('cell-data-columns-view').innerHTML = JSON.stringify(columns, null, 2)
 
-      document.getElementById('write-xlsx-file-button-schema').addEventListener('click', () => {
+      document.getElementById('write-xlsx-file-button-objects').addEventListener('click', () => {
         try {
           const objects = JSON.parse(
             document.getElementById('objects').value
@@ -476,7 +513,7 @@
               }
             }
           }
-          writeXlsxFile(objects, { schema, fileName: 'objects-and-schema.xlsx' }).then(
+          writeXlsxFile(getSheetData(objects, columnsWhenUsingObjects), { columns: columnsWhenUsingObjects }).toFile('objects.xlsx').then(
             () => {
               // console.log('File created')
             },
@@ -494,7 +531,7 @@
       document.getElementById('write-xlsx-file-button-cells').addEventListener('click', () => {
         try {
           const data = JSON.parse(
-            document.getElementById('every-cell-data').value
+            document.getElementById('cell-data').value
               .replace(/new Date\(\)/g, '999999999999999')
               .replace(/"type": ([^\s,]+)/g, '"type": "$1"')
           )
@@ -519,7 +556,7 @@
               }
             }
           }
-          writeXlsxFile(data, { columns, fileName: 'data.xlsx' }).then(
+          writeXlsxFile(data, { columns }).toFile('data.xlsx').then(
             () => {
               // console.log('File created')
             },

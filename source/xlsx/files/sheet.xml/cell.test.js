@@ -3,15 +3,11 @@ import { expect } from 'chai'
 
 import generateCell from './cell.js'
 
-// import Integer from '../types/Integer.js'
-// import Email from '../types/Email.js'
-// import URL from '../types/URL.js'
-
 describe('generateCell()', () => {
   describe('Create a cell of type Sting', () => {
     it('should throw if invalid type was supplied', () => {
       expect(() => generateCell(1, 0, 'Test', 'Unsupported'))
-        .to.throw('Unknown schema type: Unsupported')
+        .to.throw('Unknown type: Unsupported')
     })
 
     it('should create a cell', () => {
@@ -34,28 +30,6 @@ describe('generateCell()', () => {
         .to.equal(`<c r="B1" s="${cellStyleId}"><v>1000</v></c>`)
     })
   })
-
-  // describe('Create a cell of type Integer', () => {
-  //   it('Create a cell', () => {
-  //     expect(generateCell(1, 1, 1000, Integer)).to.equal('<c r="B1"><v>1000</v></c>')
-  //   })
-  // })
-
-  // describe('Create a cell of type URL', () => {
-  //   it('should create a cell', () => {
-  //     expect(generateCell(1, 1, 'https://google.com', URL, undefined, () => 0))
-  //       // .to.equal('<c r="B1" t="inlineStr"><is><t>https://google.com</t></is></c>')
-  //       .to.equal('<c r="B1" t="s"><v>0</v></c>')
-  //   })
-  // })
-
-  // describe('Create a cell of type Email', () => {
-  //   it('should create a cell', () => {
-  //     expect(generateCell(1, 1, 'example@domain.com', Email, undefined, () => 0))
-  //       // .to.equal('<c r="B1" t="inlineStr"><is><t>example@domain.com</t></is></c>')
-  //       .to.equal('<c r="B1" t="s"><v>0</v></c>')
-  //   })
-  // })
 
   describe('Create a cell of type Date', () => {
     it('should throw if no date format was supplied', () => {

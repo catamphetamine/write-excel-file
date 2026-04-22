@@ -1,96 +1,62 @@
 import $attributeValue from '../../xml/escapeAttributeValue.js'
 import getFileExtensionForContentType from '../helpers/getFileExtensionForContentType.js'
 
-function normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex }) {
-	const { images: imagesParameter } = parameters
-	if (imagesParameter) {
-		const imagesPerSheet = multipleSheetsParameters ? imagesParameter : [imagesParameter]
-		const images = typeof sheetIndex === 'number' ? imagesPerSheet[sheetIndex] : undefined
-		return { imagesPerSheet, images }
-	}
-	return {}
-}
-
 export default {
 	files: {
 		transform: {
 			'[Content_Types].xml': {
-				insert: (parameters, { multipleSheetsParameters }) => {
-					const { imagesPerSheet } = normalizeParameters(parameters, { multipleSheetsParameters })
-					if (imagesPerSheet) {
-						return getContentTypesXml({ imagesPerSheet })
+				insert: (sheetsOptions) => {
+					const sheetsImages = sheetsOptions.map(sheetOptions => sheetOptions.images)
+					if (sheetsImages.some(Boolean)) {
+						return getContentTypesXml(sheetsImages)
 					}
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { images } = availableParameters
-					return { images }
 				}
 			},
 
 			'xl/drawings/drawing{id}.xml': {
-				insert: (parameters, { sheetIndex, multipleSheetsParameters }) => {
-					const { images } = normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex })
+				insert: (sheetOptions, { sheetIndex, sheetId }) => {
+					const { images } = sheetOptions
 					if (images) {
 						return getImagesDrawingXml({ images })
 					}
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { images } = availableParameters
-					return { images }
 				}
 			},
 
 			'xl/drawings/_rels/drawing{id}.xml.rels': {
-				insert: (parameters, { sheetIndex, sheetId, multipleSheetsParameters }) => {
-					const { images } = normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex })
+				insert: (sheetOptions, { sheetIndex, sheetId }) => {
+					const { images } = sheetOptions
 					if (images) {
 						return getImagesDrawingXmlRels({ images, sheetIndex })
 					}
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { images } = availableParameters
-					return { images }
 				}
 			}
 		},
 
 		write: {
-			files: (parameters, { multipleSheetsParameters }) => {
-				const { imagesPerSheet } = normalizeParameters(parameters, { multipleSheetsParameters })
-				if (imagesPerSheet) {
-					return imagesPerSheet.map((sheetImages, sheetIndex) => {
-						if (sheetImages) {
-							return sheetImages.reduce((sheetFiles, image, imageIndex) => ({
-								...sheetFiles,
+			files: (sheetsOptions, { read }) => {
+				const sheetsImages = sheetsOptions.map(sheetOptions => sheetOptions.images)
+				if (sheetsImages.some(Boolean)) {
+					return sheetsImages.map((images, sheetIndex) => {
+						if (images) {
+							return images.reduce((imagesContent, image, imageIndex) => ({
+								...imagesContent,
 								[`xl/media/${getImageFileName(image, { sheetIndex, imageIndex })}`]: image.content
 							}), {})
 						}
 						return {}
-					}).reduce((allFiles, sheetFiles) => ({
-						...allFiles,
-						...sheetFiles
+					}).reduce((allImagesContent, sheetImagesContent) => ({
+						...allImagesContent,
+						...sheetImagesContent
 					}), {})
 				}
-			},
-
-			// These parameters will be passed through to the function above.
-			parameters: (availableParameters) => {
-				const { images } = availableParameters
-				return { images }
 			}
 		}
 	}
 }
 
-function getContentTypesXml({ imagesPerSheet }) {
+function getContentTypesXml(sheetsImages) {
 	// Get images from all sheets.
-	const imagesFromAllSheets = imagesPerSheet.reduce((all, images) => [
+	const imagesFromAllSheets = sheetsImages.reduce((all, images) => [
 		...all,
 		...(images || [])
 	], [])

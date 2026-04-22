@@ -2,9 +2,8 @@ import getAdditionalContent from '../helpers/features/getAdditionalContent.js'
 import transformContent from '../helpers/features/transformContent.js'
 
 export default function generateRelsXml({
-	multipleSheetsParameters,
 	features,
-	...restParameters
+	sheetsOptions
 }) {
 	let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 		'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
@@ -13,8 +12,7 @@ export default function generateRelsXml({
 			getAdditionalContent(
 				'_rels/.rels',
 				features,
-				restParameters,
-				{ multipleSheetsParameters }
+				sheetsOptions
 			) +
 		'</Relationships>'
 
@@ -23,8 +21,7 @@ export default function generateRelsXml({
 		xml,
 		'_rels/.rels',
 		features,
-		restParameters,
-		{ multipleSheetsParameters }
+		sheetsOptions
 	)
 
 	return xml

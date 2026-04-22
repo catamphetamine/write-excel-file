@@ -8,16 +8,6 @@ import hasFont from '../helpers/hasFont.js'
 import getFontXml from '../helpers/getFontXml.js'
 import getCellCoordinate from '../helpers/getCellCoordinate.js'
 
-function normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex }) {
-	const { conditionalFormatting: conditionalFormattingParameter } = parameters
-	if (conditionalFormattingParameter) {
-		const conditionalFormattingPerSheet = multipleSheetsParameters ? conditionalFormattingParameter : [conditionalFormattingParameter]
-		const conditionalFormatting = typeof sheetIndex === 'number' ? conditionalFormattingPerSheet[sheetIndex] : undefined
-		return { conditionalFormatting, conditionalFormattingPerSheet }
-	}
-	return {}
-}
-
 export default {
 	files: {
 		transform: {
@@ -25,49 +15,29 @@ export default {
 				// For some weird reason, Excel 2007 demands `<conditionalFormatting/>` element to go before `<drawing/>` element.
 				// Because `<drawing/>` element is added before any of the `insert()`s of any features,
 				// this feature has to use a `transform()` function instead of an `insert()` function.
-				transform: (xml, parameters, { multipleSheetsParameters, sheetIndex }) => {
-					const { conditionalFormatting, conditionalFormattingPerSheet } = normalizeParameters(parameters, { multipleSheetsParameters, sheetIndex })
+				transform: (xml, sheetOptions, { sheetIndex, sheetId }) => {
+					const { conditionalFormatting } = sheetOptions
 					if (conditionalFormatting) {
-						const conditionalFormattingXml = getConditionalFormattingRulesXml({
-							sheetIndex,
-							conditionalFormatting,
-							conditionalFormattingPerSheet
-						})
-						return xml.replace('</sheetData>', '</sheetData>' + conditionalFormattingXml)
+						const conditionalFormattingRulesXml = getConditionalFormattingRulesXml(conditionalFormatting)
+						return xml.replace('</sheetData>', '</sheetData>' + conditionalFormattingRulesXml)
 					}
 					return xml
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { conditionalFormatting } = availableParameters
-					return { conditionalFormatting }
 				}
 			},
 
 			'xl/styles.xml': {
-				insert: (parameters, { multipleSheetsParameters }) => {
-					const { conditionalFormattingPerSheet } = normalizeParameters(parameters, { multipleSheetsParameters })
-					if (conditionalFormattingPerSheet) {
-						return getConditionalFormattingStylesXml({ conditionalFormattingPerSheet })
+				insert: (sheetsOptions) => {
+					const sheetsConditionalFormatting = sheetsOptions.map(sheetOptions => sheetOptions.conditionalFormatting)
+					if (sheetsConditionalFormatting.some(Boolean)) {
+						return getConditionalFormattingStylesXml(sheetsConditionalFormatting)
 					}
-				},
-
-				// These parameters will be passed through to the function above.
-				parameters: (availableParameters) => {
-					const { conditionalFormatting } = availableParameters
-					return { conditionalFormatting }
 				}
 			}
 		}
 	}
 }
 
-function getConditionalFormattingRulesXml({
-	sheetIndex,
-	conditionalFormatting: conditionalFormattingRules,
-	conditionalFormattingPerSheet
-}) {
+function getConditionalFormattingRulesXml(conditionalFormattingRules) {
 	let xml = ''
 
 	let i = 0
@@ -99,11 +69,14 @@ function getConditionalFormattingRulesXml({
 
 		// The `dxfId` attribute in ".xlsx" (OpenXML) files is a zero-based integer index (0, 1, 2, ...)
 		// referencing a specific differential format record (`<dxf>`) within the "styles.xml" file.
-		const dxfId = getConditionalFormattingRuleGlobalIndex({
-			conditionalFormattingRuleIndex: i,
-			conditionalFormattingPerSheet,
-			sheetIndex
-		})
+		//
+		const dxfId = conditionalFormattingRule._globalIndex
+		//
+		// const dxfId = getConditionalFormattingRuleGlobalIndex({
+		// 	conditionalFormattingRuleIndex: i,
+		// 	sheetsConditionalFormatting,
+		// 	sheetIndex
+		// })
 
 		// There're a lot of possible `type`s of a `<cfRule/>`.
 		// The full list could be viewed by googling for "ST_CfType".
@@ -138,23 +111,23 @@ function formatValue(value) {
 	return String(value)
 }
 
-function getConditionalFormattingRuleGlobalIndex({
-	conditionalFormattingRuleIndex,
-	conditionalFormattingPerSheet,
-	sheetIndex
-}) {
-	let sheetRulesIndexOffset = 0
-
-	let i = 0
-	while (i < sheetIndex) {
-		if (conditionalFormattingPerSheet[i]) {
-			sheetRulesIndexOffset += conditionalFormattingPerSheet[i].length
-		}
-		i++
-	}
-
-	return sheetRulesIndexOffset + conditionalFormattingRuleIndex
-}
+// function getConditionalFormattingRuleGlobalIndex({
+// 	conditionalFormattingRuleIndex,
+// 	sheetsConditionalFormattingRules,
+// 	sheetIndex
+// }) {
+// 	let sheetRulesIndexOffset = 0
+//
+// 	let i = 0
+// 	while (i < sheetIndex) {
+// 		if (sheetsConditionalFormattingRules[i]) {
+// 			sheetRulesIndexOffset += sheetsConditionalFormattingRules[i].length
+// 		}
+// 		i++
+// 	}
+//
+// 	return sheetRulesIndexOffset + conditionalFormattingRuleIndex
+// }
 
 function getXlsxOperatorName(operator) {
 	switch (operator) {
@@ -177,10 +150,10 @@ function getXlsxOperatorName(operator) {
 	}
 }
 
-function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
+function getConditionalFormattingStylesXml(sheetsConditionalFormatting) {
 	let totalConditionalFormattingRulesCount = 0
 
-	for (const conditionalFormattingOfSheet of conditionalFormattingPerSheet) {
+	for (const conditionalFormattingOfSheet of sheetsConditionalFormatting) {
 		if (conditionalFormattingOfSheet) {
 			totalConditionalFormattingRulesCount += conditionalFormattingOfSheet.length
 		}
@@ -190,7 +163,7 @@ function getConditionalFormattingStylesXml({ conditionalFormattingPerSheet }) {
 
 	xml += `<dxfs count="${totalConditionalFormattingRulesCount}">`
 
-	for (const conditionalFormattingOfSheet of conditionalFormattingPerSheet) {
+	for (const conditionalFormattingOfSheet of sheetsConditionalFormatting) {
 		if (conditionalFormattingOfSheet) {
 			for (const conditionalFormattingRule of conditionalFormattingOfSheet) {
 				const {

@@ -11,32 +11,41 @@ import generateSharedStringsXml from './files/sharedStrings.xml.js'
 import generateStylesXml from './files/styles.xml.js'
 
 import getFeatures from './getFeatures.js'
-
+import validateSheetData from './validateSheetData.js'
 import initializeSheets from './initializeSheets.js'
-import getInitializeSheetsParameters from './initializeSheets.parameters.js'
-
-import getContentTypesParameters from './files/[Content_Types].xml.parameters.js'
-import getRelsParameters from './files/rels.parameters.js'
-import getWorkbookParameters from './files/workbook.xml.parameters.js'
-import getWorkbookRelsParameters from './files/workbook.xml.rels.parameters.js'
-import getSheetXmlRelsParameters from './files/sheet.xml.rels.parameters.js'
-import getDrawingXmlParameters from './files/drawing.xml.parameters.js'
-import getDrawingXmlRelsParameters from './files/drawing.xml.rels.parameters.js'
 
 import getWrittenFiles from './helpers/features/getWrittenFiles.js'
+import isObject from './helpers/isObject.js'
 
 /**
- * @param {SheetData|object[]} — Spreadsheet data
- * @param {object} — Options
+ * Creates contents (files) an `*.xlsx` file.
+ * @param {SheetData|Sheet[]} arg1
+ * @param {object} arg2 — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
+ * @param {object} [arg3] — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
  * @return {Record<string,string|Blob>} A map of files that exist inside an `.xlsx` file.
  */
-export default function generateXlsxFileContents(data, options = {}) {
-  const {
-    features: customFeatures,
-    ...parameters
-  } = options
+export default function generateXlsxFileContents(arg1, arg2, arg3) {
+  const { sheets: sheetsDataAndOptions, options } = getArguments(arg1, arg2, arg3)
 
-  const features = getFeatures(customFeatures)
+  const sheetsData = sheetsDataAndOptions.map(sheet => sheet.data)
+  let sheetsOptions = sheetsDataAndOptions.map(sheet => sheet.options)
+
+  sheetsOptions = setSheetNames(sheetsOptions)
+
+  // Here's a small hack for `conditionalFormatting` feature support.
+  // `.xlsx` format is weird and has many quirks.
+  // One of those quirks is each conditional formatting rule has to be assigned a globally-unique ID.
+  // That itself wouldn't be an issue if that globally-unique ID could be any string,
+  // but `.xlsx` format specification complicates things by demanding it to be
+  // a zero-based integer index (0, 1, 2, ...) referencing a specific `<dxf>` element in "styles.xml" file.
+  // So a conditional formatting rule ID can't be just "sheet1-rule2", it has to be specifically
+  // an index of this rule in the list of all rules for all sheets in a given `.xlsx` file.
+  // Because a sheet-specific file tranform function doesn't have access to other sheets' options,
+  // here it manually sets the global indexes of all conditional formatting rules,
+  // and it has to do so without mutating any input arguments.
+  sheetsOptions = setConditionalFormattingRulesGlobalIndexes(sheetsOptions)
+
+  const features = getFeatures(options.features)
 
   const files = {}
 
@@ -54,58 +63,66 @@ export default function generateXlsxFileContents(data, options = {}) {
   const {
     sheets,
     getSharedStrings,
-    getCellStyles,
-    multipleSheetsParameters
-  } = initializeSheets(getInitializeSheetsParameters(parameters, data, features))
+    getCellStyles
+  } = initializeSheets(sheetsData, sheetsOptions, options)
 
   files['[Content_Types].xml'] = generateContentTypesXml({
     sheetIds: sheets.map(_ => _.sheetId),
-    ...getContentTypesParameters(parameters, multipleSheetsParameters, features)
+    features,
+    sheetsOptions
   })
 
-  files['_rels/.rels'] = generateRelsXml(
-    getRelsParameters(parameters, multipleSheetsParameters, features)
-  )
+  files['_rels/.rels'] = generateRelsXml({
+    features,
+    sheetsOptions
+  })
 
   files['xl/_rels/workbook.xml.rels'] = generateWorkbookXmlRels({
     sheetIds: sheets.map(_ => _.sheetId),
-    ...getWorkbookRelsParameters(parameters, multipleSheetsParameters, features)
+    features,
+    sheetsOptions
   })
 
   files['xl/workbook.xml'] = generateWorkbookXml({
     sheetIdsAndNames: sheets.map(({ sheetId, sheetName }) => ({ sheetId, sheetName })),
-    ...getWorkbookParameters(parameters, multipleSheetsParameters, features)
+    features,
+    sheetsOptions
   })
 
   let sheetIndex = 0
-  for (const { sheetId, generateSheetXmlParameters } of sheets) {
-    files[`xl/worksheets/sheet${sheetId}.xml`] = generateSheetXml(generateSheetXmlParameters, features)
+  for (const { sheetId, sheetXmlParameters } of sheets) {
+    const sheetOptions = sheetsOptions[sheetIndex]
+
+    files[`xl/worksheets/sheet${sheetId}.xml`] = generateSheetXml(sheetXmlParameters, features)
 
     files[`xl/worksheets/_rels/sheet${sheetId}.xml.rels`] = generateSheetXmlRels({
       sheetIndex,
       sheetId,
-      ...getSheetXmlRelsParameters(parameters, multipleSheetsParameters, features)
+      sheetOptions,
+      features
     })
 
     files[`xl/drawings/drawing${sheetId}.xml`] = generateDrawingXml({
       sheetIndex,
       sheetId,
-      ...getDrawingXmlParameters(parameters, multipleSheetsParameters, features)
+      sheetOptions,
+      features
     })
 
     files[`xl/drawings/_rels/drawing${sheetId}.xml.rels`] = generateDrawingXmlRels({
       sheetIndex,
       sheetId,
-      ...getDrawingXmlRelsParameters(parameters, multipleSheetsParameters, features)
+      sheetOptions,
+      features
     })
 
     sheetIndex++
   }
 
-  writeFiles(getWrittenFiles(features, parameters, { multipleSheetsParameters, read: readFile }))
+  writeFiles(getWrittenFiles(features, sheetsOptions, { read: readFile }))
 
   // After sheets' XML was generated, it can generate "styles.xml" and "sharedStrings.xml".
-  files['xl/styles.xml'] = generateStylesXml(getCellStyles(), multipleSheetsParameters, features)
+  files['xl/styles.xml'] = generateStylesXml(getCellStyles(), sheetsOptions, features)
   files['xl/sharedStrings.xml'] = generateSharedStringsXml(getSharedStrings())
 
   // (minor minimization) Remove unused `drawing${id}.xml` files.
@@ -156,4 +173,56 @@ function validateFileContent(path, content) {
   if (!content) {
     throw new Error(`File \`content\` not specified: ${path}`)
   }
+}
+
+function getArguments(arg1, arg2, arg3) {
+  if (Array.isArray(arg1)) {
+    if (arg1.length === 0 || Array.isArray(arg1[0])) {
+      validateSheetData(arg1)
+      return {
+        sheets: [{
+          data: arg1,
+          options: arg2 || {}
+        }],
+        options: arg3 || {}
+      }
+    } else if (isObject(arg1[0])) {
+      for (const { data } of arg1) {
+        validateSheetData(data)
+      }
+      return {
+        sheets: arg1.map(({ data, ...options }) => ({
+          data,
+          options: options || {}
+        })),
+        options: arg2 || {}
+      }
+    } else {
+      throw new Error('Invalid first argument: must be either sheet data — an array of arrays — or an array of sheet objects')
+    }
+  } else {
+    throw new Error('Invalid first argument: must be an array')
+  }
+}
+
+// Sets a sheet name for each sheet.
+function setSheetNames(sheetsOptions) {
+  return sheetsOptions.map((sheetOptions, sheetIndex) => ({
+    ...sheetOptions,
+    sheet: sheetOptions.sheet || `Sheet${sheetIndex + 1}`
+  }))
+}
+
+// Sets a `_globalIndex: number` property on each conditional formatting rule.
+function setConditionalFormattingRulesGlobalIndexes(sheetsOptions) {
+  let globalIndex = 0
+  return sheetsOptions.map((sheetOptions) => ({
+    ...sheetOptions,
+    conditionalFormatting: sheetOptions.conditionalFormatting &&
+      sheetOptions.conditionalFormatting.map((conditionalFormattingRule) => ({
+        ...conditionalFormattingRule,
+        // `++` operator returns the value before the increment.
+        _globalIndex: globalIndex++
+      }))
+  }))
 }

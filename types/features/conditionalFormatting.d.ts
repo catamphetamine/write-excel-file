@@ -1,4 +1,4 @@
-import { CommonStyleProperties } from '../common.d.js'
+import { CellStylePropertiesUniversal } from '../CellStyleProperties.js'
 
 interface ConditionalFormattingConditionWithFormula {
 	formula: string;
@@ -44,7 +44,7 @@ export type ConditionalFormattingCondition =
 // It seems that the "conditional formatting" feature in the XLSX specification
 // doesn't support setting custom `fontFamily` or `fontSize` for some weird reason.
 // https://github.com/catamphetamine/write-excel-file/pull/10#issuecomment-3960778016
-interface ConditionalFormattingStyle extends Exclude<CommonStyleProperties, 'fontFamily' | 'fontSize'> {}
+interface ConditionalFormattingStyle extends Exclude<CellStylePropertiesUniversal, 'fontFamily' | 'fontSize'> {}
 
 export interface ConditionalFormatting {
 	cellRange: {
@@ -63,10 +63,6 @@ export interface ConditionalFormatting {
 	style: ConditionalFormattingStyle;
 }
 
-export interface ConditionalFormattingParametersSingleSheet {
+export interface ConditionalFormattingParameters {
 	conditionalFormatting?: ConditionalFormatting[];
-}
-
-export interface ConditionalFormattingParametersMultipleSheets {
-	conditionalFormatting?: ConditionalFormatting[][];
 }

@@ -1,0 +1,19 @@
+import { ConditionalFormattingParameters } from './features/conditionalFormatting.d.js'
+import { ImagesParameters } from './features/images.d.js'
+import { StickyRowsOrColumnsParameters } from './features/stickyRowsOrColumns.d.js'
+
+type Orientation = 'landscape';
+
+type SheetOptionsColumn = {
+	width?: number;
+};
+
+export interface SheetOptions<FileContent> extends StickyRowsOrColumnsParameters, ConditionalFormattingParameters, ImagesParameters<FileContent> {
+	sheet?: string;
+	orientation?: Orientation;
+	showGridLines?: boolean;
+	rightToLeft?: boolean;
+	zoomScale?: number;
+	dateFormat?: string;
+	columns?: SheetOptionsColumn[];
+}

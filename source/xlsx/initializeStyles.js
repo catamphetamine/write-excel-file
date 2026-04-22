@@ -6,13 +6,7 @@ import hasBorder from './helpers/hasBorder.js'
 // https://docs.microsoft.com/en-us/previous-versions/office/developer/office-2010/ee857658(v=office.14)?redirectedfrom=MSDN
 export const FORMAT_ID_STARTS_FROM = 100
 
-export default function initializeStyles({
-  fontFamily: defaultFontFamily,
-  fontSize: defaultFontSize,
-  features,
-  multipleSheetsParameters,
-  ...restParameters
-}) {
+export default function initializeStyles(defaultFont) {
   const formats = []
   const formatIdByFormat = {}
 
@@ -28,14 +22,27 @@ export default function initializeStyles({
   const borders = []
   const borderIdByBorderKey = {}
 
-  // Default font.
-  const defaultFont = {
-    fontSize: defaultFontSize,
-    fontFamily: defaultFontFamily
-  }
+  // Add default font.
   const defaultFontId = fonts.length
   fontIdByFontKey[getKey(defaultFont)] = defaultFontId
-  fonts.push(defaultFont)
+  fonts.push(defaultFont || {})
+
+  // // If any of the sheets have a default font that is different from the generic one,
+  // // add those fonts to the collection.
+  // const sheetsDefaultFontIds = sheetsDefaultFonts.map((font) => {
+  //   if (font) {
+  //     const fontKey = getKey(font)
+  //     if (fontIdByFontKey[fontKey] !== undefined) {
+  //       return fontIdByFontKey[fontKey]
+  //     }
+  //     const fontId = fonts.length
+  //     fontIdByFontKey[fontKey] = fontId
+  //     fonts.push(font)
+  //     return fontId
+  //   } else {
+  //     return defaultFontId
+  //   }
+  // })
 
   // Default fill (no color).
   const defaultFill = {}
@@ -86,9 +93,11 @@ export default function initializeStyles({
       topBorderColor,
       topBorderStyle,
       bottomBorderColor,
-      bottomBorderStyle,
-      ...restParameters
+      bottomBorderStyle
     } = cellStyle
+
+    // const defaultFont = sheetsDefaultFonts[sheetIndex]
+    // const defaultFontId = sheetsDefaultFontIds[sheetIndex]
 
     const font = {
       fontFamily,
@@ -156,11 +165,11 @@ export default function initializeStyles({
           fontIdByFontKey[fontKey] = fontId
           fonts.push({
             ...font,
-            fontSize: font.fontSize || defaultFontSize,
-            fontFamily: font.fontFamily || defaultFontFamily
+            fontSize: font.fontSize || (defaultFont && defaultFont.fontSize),
+            fontFamily: font.fontFamily || (defaultFont && defaultFont.fontFamily)
           })
         }
-      } else if (hasFont(defaultFont)) {
+      } else if (defaultFont) {
         fontId = defaultFontId
       }
 
@@ -214,13 +223,13 @@ export default function initializeStyles({
     return addStyle()
   }
 
-  // Add the default style.
+  // Add default style.
+  // It will be used for any cell that doesn't specify any custom style properties.
   findOrCreateCellStyle({})
 
   return {
     getCellStyles() {
       return {
-        ...restParameters,
         formats,
         styles,
         fonts,

@@ -9,42 +9,39 @@ import generateDrawingReference from './drawingReference.js'
 import getAdditionalContent from '../../helpers/features/getAdditionalContent.js'
 import transformContent from '../../helpers/features/transformContent.js'
 
-export default function generateSheetXml(parameters, features) {
+export default function generateSheetXml(sheetXmlParameters, features) {
 	const {
-		data: data_,
-		schema,
-		columns,
-		images,
-		getHeaderStyle,
+		sheetData: sheetData_,
+		sheetOptions,
+		sheetIndex,
+		sheetId,
+		hasDefaultFont,
 		findOrCreateCellStyle,
-		findOrCreateSharedString,
-		customFont,
+		findOrCreateSharedString
+	} = sheetXmlParameters
+
+	const {
+		columns,
 		dateFormat,
 		orientation,
 		showGridLines,
 		rightToLeft,
-		zoomScale,
-		sheetIndex,
-		sheetId,
-		multipleSheetsParameters,
-		...restParameters
-	} = parameters
+		zoomScale
+	} = sheetOptions
 
-	const { data, mergedCells } = processMergedCells(data_, { schema, features })
+	const { sheetData, mergedCells } = processMergedCells(sheetData_, { features })
 
   let xml = '<?xml version="1.0" ?>' +
 		'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mv="urn:schemas-microsoft-com:mac:vml" xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main">' +
 			// For some weird reason, Excel 2007 demands `<sheetViews/>` element to be the first one.
 			generateViews({ showGridLines, rightToLeft, zoomScale, sheetIndex }) +
 			// For some weird reason, Excel 2007 demands `<cols/>` element to follow `<sheetViews/>` element.
-			generateColumnsDescription({ schema, columns }) +
+			generateColumnsDescription(columns) +
 			'<sheetData>' +
-				generateRows(data, {
-					schema,
-					getHeaderStyle,
+				generateRows(sheetData, {
 					findOrCreateCellStyle,
 					findOrCreateSharedString,
-					customFont,
+					hasDefaultFont,
 					features,
 					dateFormat
 				}) +
@@ -56,8 +53,8 @@ export default function generateSheetXml(parameters, features) {
 			getAdditionalContent(
 				'xl/worksheets/sheet{id}.xml',
 				features,
-				restParameters,
-				{ multipleSheetsParameters, sheetIndex, sheetId }
+				sheetOptions,
+				{ sheetIndex, sheetId }
 			) +
 		'</worksheet>'
 
@@ -66,8 +63,8 @@ export default function generateSheetXml(parameters, features) {
 		xml,
 		'xl/worksheets/sheet{id}.xml',
 		features,
-		restParameters,
-		{ multipleSheetsParameters, sheetIndex, sheetId }
+		sheetOptions,
+		{ sheetIndex, sheetId }
 	)
 
 	return xml

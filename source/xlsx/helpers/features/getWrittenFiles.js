@@ -1,21 +1,14 @@
-import attributeValue from '../../../xml/escapeAttributeValue.js'
-import textContent from '../../../xml/escapeTextContent.js'
-
 export default function getWrittenFiles(
 	features,
-	availableParameters,
-	{ multipleSheetsParameters, read }
+	sheetsOptions,
+	{ read }
 ) {
 	let writtenFiles = {}
 
 	for (const feature of features) {
 		if (feature.files && feature.files.write) {
 			if (feature.files.write.files) {
-				const customParameters = feature.files.write.parameters ? feature.files.write.parameters(availableParameters) : undefined
-				const files = feature.files.write.files(
-					customParameters,
-					{ multipleSheetsParameters, read, attributeValue, textContent },
-				)
+				const files = feature.files.write.files(sheetsOptions, { read })
 				if (files) {
 					writtenFiles = {
 						...writtenFiles,

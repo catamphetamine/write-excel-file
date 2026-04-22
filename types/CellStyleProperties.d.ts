@@ -55,7 +55,9 @@ type TextDecoration =
 	TextDecorationPropertiesWithSingleUnderline |
 	TextDecorationPropertiesWithDoubleUnderline
 
-export interface CommonStyleProperties {
+// These cell style properties are supported both in sheet data
+// and conditional formatting rules.
+export interface CellStylePropertiesUniversal {
 	fontFamily?: string;
 	fontSize?: number;
 	fontWeight?: FontWeight;
@@ -75,4 +77,16 @@ export interface CommonStyleProperties {
 	topBorderStyle?: BorderStyle;
 	bottomBorderColor?: Color;
 	bottomBorderStyle?: BorderStyle;
+}
+
+// These are cell style properties that're supported in sheet data.
+export interface CellStyleProperties extends CellStylePropertiesUniversal {
+	align?: 'left' | 'center' | 'right';
+	alignVertical?: 'top' | 'center' | 'bottom';
+	height?: number;
+	span?: number;
+	rowSpan?: number;
+	indent?: number;
+	wrap?: boolean;
+	textRotation?: number;
 }

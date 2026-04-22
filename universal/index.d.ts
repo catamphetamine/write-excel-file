@@ -1,55 +1,39 @@
+// The contents of this file is identical between the different exports:
+// `/node`, `/browser`, etc.
+
+import { ReturnType } from './ReturnType.d.js'
+import { FileContent } from './FileContent.d.js'
+
 import { ImageType } from '../types/features/images.d.js'
 
-import {
-	SheetData,
-	OptionsSingleSheetWithSchema,
-	OptionsMultipleSheetsWithSchema,
-	OptionsSingleSheetWithoutSchema,
-	OptionsMultipleSheetsWithoutSchema
-} from '../types/api.d.js'
+import { Sheet } from '../types/Sheet.js'
+import { SheetOptions } from '../types/SheetOptions.js'
+import { SheetData } from '../types/SheetData.js'
+import { Options } from '../types/Options.d.js'
+import { Column } from '../types/getSheetData.d.js'
 
-export { ValueType, Cell, CellObject, Row, SheetData, ColumnSchema, Schema, Feature } from '../types/api.d.js'
-
-type FileContent = Blob;
+export { Sheet } from '../types/Sheet.js'
+export { SheetOptions } from '../types/SheetOptions.js'
+export { Value, Cell, CellObject, Row, SheetData } from '../types/SheetData.js'
+export { Options } from '../types/Options.d.js'
+export { Column } from '../types/getSheetData.d.js'
+export { Feature } from '../types/Feature.d.js'
 
 export type Image = ImageType<FileContent>;
 
-// With Schema.
-
-interface OptionsSingleSheetWithSchemaReturnBlob<Object> extends OptionsSingleSheetWithSchema<Object, FileContent> {}
-interface OptionsMultipleSheetsWithSchemaReturnBlob<Object> extends OptionsMultipleSheetsWithSchema<Object, FileContent> {}
-
-// With `schema`.
-// Return `Blob`.
-declare function writeXlsxFile<Object>(
-	objects: Object[],
-	options: OptionsSingleSheetWithSchemaReturnBlob<Object>
-) : Promise<Blob>;
-
-// With `schema`.
-// Return `Blob`.
-// Multiple `sheets`.
-declare function writeXlsxFile<Object>(
-	objects: Object[][],
-	options: OptionsMultipleSheetsWithSchemaReturnBlob<Object>
-) : Promise<Blob>;
-
-// Without Schema.
-
-interface OptionsSingleSheetWithoutSchemaReturnBlob extends OptionsSingleSheetWithoutSchema<FileContent> {}
-interface OptionsMultipleSheetsWithoutSchemaReturnBlob extends OptionsMultipleSheetsWithoutSchema<FileContent> {}
-
-// Return `Blob`.
+// Single sheet
 declare function writeXlsxFile(
-	data: SheetData,
-	options: OptionsSingleSheetWithoutSchemaReturnBlob
-) : Promise<Blob>;
+	sheetData: SheetData,
+	sheetOptions?: SheetOptions<FileContent>,
+	options?: Options
+) : Promise<ReturnType>;
 
-// Return `Blob`.
-// Multiple `sheets`.
+// Multiple sheets
 declare function writeXlsxFile(
-	data: SheetData[],
-	options: OptionsMultipleSheetsWithoutSchemaReturnBlob
-) : Promise<Blob>;
+	sheets: Sheet<FileContent>[],
+	options?: Options
+) : Promise<ReturnType>;
 
 export default writeXlsxFile;
+
+export function getSheetData<Object>(objects: Object[], columns: Column[]): SheetData;

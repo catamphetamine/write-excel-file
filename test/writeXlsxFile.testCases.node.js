@@ -10,12 +10,12 @@ export default {
 
   'node-images-on-multiple-sheets': {
     args: () => [
-      [data, data],
-      {
-        sheets: ['Sheet One', 'Sheet Two'],
-        columns: [columns, columns],
-        images: [
-          [
+      [
+        {
+          data,
+          sheet: 'Sheet One',
+          columns,
+          images: [
             {
               // // File path (deprecated).
               // content: path.join(IMAGES_DIRECTORY, '1.png'),
@@ -43,8 +43,13 @@ export default {
                 column: 5
               }
             }
-          ],
-          [
+          ]
+        },
+        {
+          data,
+          sheet: 'Sheet Two',
+          columns,
+          images: [
             {
               // Readable stream.
               content: fs.createReadStream(path.join(IMAGES_DIRECTORY, '3.jpg')),
@@ -57,13 +62,13 @@ export default {
                 row: 1,
                 column: 1
               },
-							// Has non-zero offset.
+              // Has non-zero offset.
               offsetX: 20,
               offsetY: 20
             }
           ]
-        ]
-      }
+        }
+      ]
     ]
   },
 
@@ -71,15 +76,15 @@ export default {
     run: async ({ filePath, writeXlsxFile }) => {
       const outputStream = fs.createWriteStream(filePath)
 
-      await new Promise((resolve, reject) => {
-        writeXlsxFile(data, { columns }).then((stream) => {
-          stream.pipe(outputStream)
-          stream.on('end', function () {
-            console.log('XLSX file stream ended')
-          })
-          stream.on('error', function (error) {
-            reject(error)
-          })
+      await new Promise(async (resolve, reject) => {
+        const stream = await writeXlsxFile(data, { columns }).toStream()
+
+        stream.pipe(outputStream)
+        stream.on('end', function () {
+          console.log('Readalbe stream ended')
+        })
+        stream.on('error', function (error) {
+          reject(error)
         })
 
         outputStream.on('close', function() {
@@ -90,8 +95,15 @@ export default {
     }
   },
 
-  'node-return-buffer': {
+  'node-write-to-output-stream': {
     run: async ({ filePath, writeXlsxFile }) => {
+      const outputStream = fs.createWriteStream(filePath)
+      await writeXlsxFile(data, { columns }).toStream(outputStream)
+    }
+  },
+
+  'node-return-buffer': {
+    run: async ({ writeXlsxFile }) => {
       // function writeBufferToFile(buffer, path) {
       //   // open the file in writing mode, adding a callback function where we do the actual writing
       //   const fd = fs.openSync(path, 'w')
@@ -100,7 +112,7 @@ export default {
       //   fs.closeSync(fd)
       // }
 
-      const buffer = await writeXlsxFile(data, { columns, buffer: true })
+      const buffer = await writeXlsxFile(data, { columns }).toBuffer()
       // writeBufferToFile(buffer, filePath)
     }
   }
@@ -124,7 +136,7 @@ export default {
 	// 		// 	return Readable.fromWeb(blob.stream())
 	// 		// }
   //
-  //     const blob = await writeXlsxFile(data, { columns, blob: true })
+  //     const blob = await writeXlsxFile(data, { columns }).toBlob()
   //     writeBufferToFile(await blobToBuffer(blob), filePath)
   //   }
   // }

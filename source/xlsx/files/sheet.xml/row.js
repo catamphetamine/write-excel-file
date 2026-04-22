@@ -4,15 +4,12 @@ import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
 import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
 import isCellObject from '../../helpers/isCellObject.js'
 
-// import Integer from '../types/Integer.js'
-
 export default function generateRow(row, rowIndex, {
 	findOrCreateCellStyle,
 	findOrCreateSharedString,
-	customFont,
+	hasDefaultFont,
 	dateFormat,
-	features,
-	usesSchema
+	features
 }) {
 	// To ensure the row number starts as in Excel.
 	const rowNumber = rowIndex + 1
@@ -42,9 +39,7 @@ export default function generateRow(row, rowIndex, {
 			} else {
 				// Get cell value type.
 				if (type === undefined) {
-					if (!usesSchema) {
-						type = detectValueType(value)
-					}
+					type = detectValueType(value)
 					if (type === undefined) {
 						// The default cell value type is `String`.
 						type = String
@@ -55,11 +50,11 @@ export default function generateRow(row, rowIndex, {
 
 			// Validate `format` property.
 			if (format) {
-				if (type !== Date && type !== Number && type !== String && type !== 'Formula') { // && type !== Integer) {
-					throw new Error('`format` can only be used on `Date`, `Number`, `String` or `"Formula"` cells') // or `Integer` cells')
+				if (type !== Date && type !== Number && type !== String && type !== 'Formula') {
+					throw new Error(`\`format\` "${format}" was specified on a cell of type \`${type}\`. \`format\` could only be specified on a cell of type \`Date\`, \`Number\`, \`String\` or \`"Formula"\`.`)
 				}
 				if (type === String && format !== '@') {
-					throw new Error('`String` cells only support "@" `format`')
+					throw new Error(`\`format\` "${format}" was specified on a cell of type \`String\`. The only supported \`format\` for a cell of type \`String\` is "@".`)
 				}
 			} else {
 				if (type === Date) {
@@ -67,11 +62,14 @@ export default function generateRow(row, rowIndex, {
 				}
 			}
 
+			const hasFormat = Boolean(format)
+			const hasCellStyle = Boolean(cellStyleProperties)
+
 			let cellStyleId
 			if (
-				format ||
-				customFont ||
-				cellStyleProperties
+				hasDefaultFont ||
+				hasFormat ||
+				hasCellStyle
 			) {
 				cellStyleId = findOrCreateCellStyle({
 					format,

@@ -1,4 +1,4 @@
-export interface StickyRowsOrColumnsOptions {
+export interface StickyRowsOrColumnsParameters {
 	stickyColumnsCount?: number;
 	stickyRowsCount?: number;
 }

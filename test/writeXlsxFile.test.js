@@ -27,12 +27,8 @@ describe('writeXlsxFile', function() {
         if (testCase.run) {
           await testCase.run({ filePath, writeXlsxFile: writeXlsxFileNode })
         } else if (testCase.args) {
-          let [arg1, arg2, ...argsRest] = testCase.args()
-          arg2 = {
-            ...arg2,
-            filePath
-          }
-          await writeXlsxFileNode.apply(this, [arg1, arg2, ...argsRest])
+          const [arg1, arg2, ...argsRest] = testCase.args()
+          await writeXlsxFileNode.apply(this, [arg1, arg2, ...argsRest]).toFile(filePath)
         } else {
           throw new Error(`Unsupported test case object:\n${JSON.stringify(testCase, null, 2)}`)
         }
@@ -43,7 +39,7 @@ describe('writeXlsxFile', function() {
     }
 
     // Test `writeXlsxFileUniversal()` function.
-    const universalOutputBlob = await writeXlsxFileUniversal([['a', 'b', 'c'], [1, 2, 3]])
+    const universalOutputBlob = await writeXlsxFileUniversal([['a', 'b', 'c'], [1, 2, 3]]).toBlob()
     const universalOutputBuffer = Buffer.from(await universalOutputBlob.arrayBuffer())
     await fs.writeFileSync(path.join(OUTPUT_DIRECTORY, 'universal.xlsx'), universalOutputBuffer)
 
@@ -51,12 +47,11 @@ describe('writeXlsxFile', function() {
 
     // Empty string passed as sheet name.
     // https://gitlab.com/catamphetamine/write-excel-file/-/issues/49
-    await shouldThrow('empty', async () => {
-      await writeXlsxFileUniversal([[[1, 2, 3], [4, 5, 6]]], {
-        columns: [[{}]],
-        sheets: ['']
-      })
-    })
+    // Doesn't throw an error because it autogenerates a sheet name in such case.
+    await writeXlsxFileUniversal(
+      [[1, 2, 3], [4, 5, 6]],
+      { sheet: '' }
+    ).toBlob()
 
     // Sheet name too long.
     // https://gitlab.com/catamphetamine/write-excel-file/-/issues/49
@@ -64,7 +59,7 @@ describe('writeXlsxFile', function() {
       await writeXlsxFileUniversal([[1, 2, 3], [4, 5, 6]], {
         columns: [{}],
         sheet: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
-      })
+      }).toBlob()
     })
 
     // Illegal sheet name characters.
@@ -73,7 +68,7 @@ describe('writeXlsxFile', function() {
       await writeXlsxFileUniversal([[1, 2, 3], [4, 5, 6]], {
         columns: [{}],
         sheet: 'a/b'
-      })
+      }).toBlob()
     })
   })
 })

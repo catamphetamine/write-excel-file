@@ -9,15 +9,14 @@ import transformContent from '../helpers/features/transformContent.js'
 
 import { FORMAT_ID_STARTS_FROM } from '../initializeStyles.js'
 
-export default function generateStylesXml(parameters, multipleSheetsParameters, features) {
+export default function generateStylesXml(cellStyles, sheetsOptions, features) {
   const {
     formats,
     styles,
     fonts,
     fills,
-    borders,
-    ...restParameters
-  } = parameters
+    borders
+  } = cellStyles
 
   let xml = '<?xml version="1.0" ?>'
   xml += '<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
@@ -129,8 +128,7 @@ export default function generateStylesXml(parameters, multipleSheetsParameters, 
   xml += getAdditionalContent(
     'xl/styles.xml',
     features,
-    restParameters,
-    { multipleSheetsParameters }
+    sheetsOptions
   )
 
   xml += '</styleSheet>'
@@ -140,8 +138,7 @@ export default function generateStylesXml(parameters, multipleSheetsParameters, 
     xml,
     'xl/styles.xml',
     features,
-    restParameters,
-    { multipleSheetsParameters }
+    sheetsOptions
   )
 
   return xml
