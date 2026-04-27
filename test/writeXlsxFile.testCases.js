@@ -87,31 +87,118 @@ export const columns = [
 	// Fourth column missing intentionally
 ]
 
-export default {
-	'data-values': {
-		args: () => [
-			data.map(row => row.map(cell => cell.value)),
-			{ columns, dateFormat: 'dd.mm.yyyy' }
-		]
-	},
+const objects = [
+  {
+    name: 'John Smith',
+    dateOfBirth: new Date(Date.UTC(2000, 1 - 1, 5)),
+    income: 120000,
+    married: true
+  },
+  {
+    name: 'Alice Brown',
+    dateOfBirth: new Date(Date.UTC(2005, 4 - 1, 3)),
+    income: 60000,
+    married: false
+  }
+]
 
-	'data-objects': {
+// Helper function: creates a header cell object
+const getHeader = (text) => ({
+  value: text,
+  fontWeight: 'bold'
+})
+
+const columnsForObjects = [
+  {
+    header: getHeader('Name'),
+    cell: (person) => ({
+      value: person.name
+    }),
+    width: 20 // `width` is optional and is measured in characters
+  },
+  {
+    header: getHeader('Date of Birth'),
+    cell: (person) => ({
+      value: person.dateOfBirth,
+      type: Date, // `type` is optional and will be derived from `value`
+      format: 'mm/dd/yyyy'
+    }),
+		width: 14
+  },
+  {
+    header: getHeader('Income'),
+    cell: (person) => ({
+      value: person.income,
+      type: Number, // `type` is optional and will be derived from `value`
+      format: '#,##0.00'
+    }),
+		width: 12
+  },
+  {
+    header: getHeader('Married'),
+    cell: (person) => ({
+      value: person.married,
+      type: Boolean // `type` is optional and will be derived from `value`
+    })
+  }
+]
+
+export default {
+	'data': {
 		args: () => [
 			data,
 			{ columns }
 		]
 	},
 
-	'data-objects-type-not-specified': {
+	'simple-values': {
 		args: () => [
-			data.map(row => row.map(cell => ({
-				...cell,
-				type: undefined,
-				format: undefined
-			}))),
+			data.map(row => row.map(cell => cell.value)),
+			{ columns, dateFormat: 'dd.mm.yyyy' }
+		]
+	},
+
+	'objects': {
+		args: () => [
+			objects,
+			{ columns: columnsForObjects }
+		]
+	},
+
+	'type-autodetection': {
+		args: () => [
+			data.map(
+				row => row.map(
+					cell => ({
+						...cell,
+						type: undefined
+					})
+				)
+			),
 			{
-				columns,
-				dateFormat: 'mm/dd/yyyy'
+				columns
+			}
+		]
+	},
+
+	'date-format-option': {
+		args: () => [
+			data.map(
+				row => row.map(
+					cell => ({
+						...cell,
+						type: undefined,
+						format: undefined
+					})
+				)
+			),
+			{
+				columns: [
+					{ width: 10 },
+					{ width: 24 },
+					{ width: 12 }
+				],
+				dateFormat: 'dddd, mmmm d, yyyy'
 			}
 		]
 	},

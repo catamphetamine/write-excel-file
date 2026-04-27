@@ -13,13 +13,14 @@ import generateStylesXml from './files/styles.xml.js'
 import getFeatures from './getFeatures.js'
 import validateSheetData from './validateSheetData.js'
 import initializeSheets from './initializeSheets.js'
+import getSheetData from '../getSheetData/getSheetData.js'
 
 import getWrittenFiles from './helpers/features/getWrittenFiles.js'
 import isObject from './helpers/isObject.js'
 
 /**
  * Creates contents (files) an `*.xlsx` file.
- * @param {SheetData|Sheet[]} arg1
+ * @param {SheetData|Object[]|Sheet[]} arg1
  * @param {object} arg2 — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
  * @param {object} [arg3] — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
  * @return {Record<string,string|Blob>} A map of files that exist inside an `.xlsx` file.
@@ -178,6 +179,7 @@ function validateFileContent(path, content) {
 function getArguments(arg1, arg2, arg3) {
   if (Array.isArray(arg1)) {
     if (arg1.length === 0 || Array.isArray(arg1[0])) {
+      // `arg1` is `SheetData`
       validateSheetData(arg1)
       return {
         sheets: [{
@@ -187,14 +189,29 @@ function getArguments(arg1, arg2, arg3) {
         options: arg3 || {}
       }
     } else if (isObject(arg1[0])) {
-      for (const { data } of arg1) {
-        validateSheetData(data)
+      // `arg1` is either `Sheet[]` or `Object[]`
+      // Check for legacy parameter `schema`.
+      if (isObject(arg2) && Array.isArray(arg2.schema)) {
+        throw new Error('`schema` parameter was removed, use `columns` parameter instead')
       }
+      if (isObject(arg2) && Array.isArray(arg2.columns)) {
+        // `arg1` is `Object[]`.
+        // Don't remove `columns` property from `arg2` because it's still required there
+        // to apply the column `width`.
+        return getArguments(getSheetData(arg1, arg2.columns), arg2, arg3)
+      }
+      // `arg1` is `Sheet[]`
       return {
-        sheets: arg1.map(({ data, ...options }) => ({
-          data,
-          options: options || {}
-        })),
+        sheets: arg1.map(({ data, ...options }) => {
+          if (!data) {
+            throw new Error('`data` property is required for each sheet')
+          }
+          validateSheetData(data)
+          return {
+            data,
+            options: options || {}
+          }
+        }),
         options: arg2 || {}
       }
     } else {

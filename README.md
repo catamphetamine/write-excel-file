@@ -45,9 +45,13 @@ Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file
 
 * If you were using `schema` parameter:
   * Removed `schema` parameter from `writeExcelFile()` function.
-    * Use the new exported function `getSheetData()` instead.
-      * Old: `await writeExcelFile(objects, { schema })`
-      * New: `await writeExcelFile(getSheetData(objects, schema))`
+    * Instead of `schema` parameter, either use a new `columns` parameter or a new function `getSheetData()`:
+      * Using the new `columns` parameter (not same as `schema`):
+        * Old: `await writeExcelFile(objects, { schema })`
+        * New: `await writeExcelFile(objects, { columns })`
+      * Using the new function `getSheetData()`:
+        * Old: `await writeExcelFile(objects, { schema })`
+        * New: `await writeExcelFile(getSheetData(objects, schema))`
   * In a `schema`, `column` property was renamed to `header`.
     * Old: `[{ column: 'First Name', value: (person) => person.firstName }]`
     * New: `[{ header: 'First Name', value: (person) => person.firstName }]`
@@ -272,10 +276,20 @@ await writeExcelFile(sheetData, { columns }).toFile(...)
 
 Usually, there's a list of `objects` that should be written to an `.xlsx` file.
 
-One could easily convert those `objects` to `sheetData` by using `getSheetData()` function.
+One could easily convert such `objects` to `sheetData` by passing an additional parameter called `columns` which should describe the list of columns in the output `.xlsx` file.
+
+Each column should be an object with properties:
+
+* (optional) `header` — describes the column header cell
+  * Either a string or a cell object
+* `cell` — describes each (non-header) cell in this column
+  * A function of two arguments — `object` and `objectIndex` — that returns a cell object
+* (optional) `width` — column width (in characters)
+
+Example:
 
 ```js
-// JSON objects
+// These objects should be written to an `.xlsx` file
 const objects = [
   {
     name: 'John Smith',
@@ -293,13 +307,7 @@ const objects = [
 ```
 
 ```js
-// Creates a header cell object
-const getHeader = (text) => ({
-  value: text,
-  fontWeight: 'bold'
-})
-
-// A list of columns in the output sheet
+// These columns should be written to the `.xlsx` file
 const columns = [
   {
     header: getHeader('Name'),
@@ -332,14 +340,21 @@ const columns = [
     })
   }
 ]
+
+// Helper function: creates a header cell object
+const getHeader = (text) => ({
+  value: text,
+  fontWeight: 'bold'
+})
 ```
 
 ```js
-import writeExcelFile, { getSheetData } from 'write-excel-file/node'
+await writeExcelFile(objects, { columns }).toFile(...)
+```
 
-const sheetData = getSheetData(objects, columns)
+will write the following `sheetData`:
 
-sheetData ===
+```js
 [
   [
     { value: 'Name', fontWeight: 'bold' },
@@ -360,20 +375,20 @@ sheetData ===
     { value: false, type: Boolean }
   ]
 ]
-
-// Pass the `columns` to `writeExcelFile()` in order to apply the column `width`.
-await writeExcelFile(sheetData, { columns }).toFile(...)
 ```
 
-The `columns` argument should describe a list of columns in the output sheet data.
+Passing `objects` and `columns` is just a shortcut for first using `getSheetData()` function to convert `objects` to `sheetData` and then writing `sheetData` to an `.xlsx` file.
 
-Each column should be an object with properties:
+```js
+import writeExcelFile, { getSheetData } from 'write-excel-file/node'
 
-* (optional) `header` — describes the column header cell
-  * Either a string or a cell object
-* `cell` — describes each (non-header) cell in this column
-  * A function of two arguments — `object` and `objectIndex` — that returns a cell object
-* (optional) `width` (in characters)
+// Convert `objects` to `sheetData`.
+const sheetData = getSheetData(objects, columns)
+
+// Write `sheetData` to an `.xslx` file.
+// Also pass the `columns` here to apply the column `width`.
+await writeExcelFile(sheetData, { columns }).toFile(...)
+```
 
 ## Cell Options
 

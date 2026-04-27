@@ -13,7 +13,7 @@ import zipToStream from '../zip/zipToStream.js'
 
 /**
  * Creates an `*.xlsx` file.
- * @param {SheetData|Sheet[]} arg1
+ * @param {SheetData|Object[]|Sheet[]} arg1
  * @param {object} arg2 — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
  * @param {object} [arg3] — If `arg1` is `SheetData`, `arg2` is `SheetOptions` and `arg3` is `Options`. If `arg1` is `Sheet[]`, `arg2` is `Options`.
  * @returns {object} Returns an object with `async` methods: `toBuffer()`, `toStream(writeStream?)`, `toFile(filePath)`.

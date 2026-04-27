@@ -8,6 +8,7 @@ import { ImageType } from '../types/features/images.d.js'
 
 import { Sheet } from '../types/Sheet.js'
 import { SheetOptions } from '../types/SheetOptions.js'
+import { SheetOptionsForObjects } from '../types/SheetOptionsForObjects.js'
 import { SheetData } from '../types/SheetData.js'
 import { Options } from '../types/Options.d.js'
 import { Column } from '../types/getSheetData.d.js'
@@ -25,6 +26,13 @@ export type Image = ImageType<FileContent>;
 declare function writeXlsxFile(
 	sheetData: SheetData,
 	sheetOptions?: SheetOptions<FileContent>,
+	options?: Options<FileContent>
+): ReturnType;
+
+// Single sheet (objects)
+declare function writeXlsxFile<Object>(
+	objects: Object[],
+	sheetOptions: SheetOptionsForObjects<Object, FileContent>,
 	options?: Options<FileContent>
 ): ReturnType;
 

@@ -21,9 +21,13 @@
 
 * If you were using `schema` parameter:
   * Removed `schema` parameter from `writeExcelFile()` function.
-    * Use the new exported function `getSheetData()` instead.
-      * Old: `await writeExcelFile(objects, { schema })`
-      * New: `await writeExcelFile(getSheetData(objects, schema))`
+    * Instead of `schema` parameter, either use a new `columns` parameter or a new function `getSheetData()`:
+      * Using the new `columns` parameter (not same as `schema`):
+        * Old: `await writeExcelFile(objects, { schema })`
+        * New: `await writeExcelFile(objects, { columns })`
+      * Using the new function `getSheetData()`:
+        * Old: `await writeExcelFile(objects, { schema })`
+        * New: `await writeExcelFile(getSheetData(objects, schema))`
   * In a `schema`, `column` property was renamed to `header`.
     * Old: `[{ column: 'First Name', value: (person) => person.firstName }]`
     * New: `[{ header: 'First Name', value: (person) => person.firstName }]`

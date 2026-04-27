@@ -31,33 +31,6 @@ export default [
     }
   },
 
-  // `getSheetData()` function is used on the demo page.
-  {
-    input: './source/getSheetData/getSheetData.js',
-    plugins: [
-      json(),
-      terser(),
-      nodeResolve({
-        browser: true
-      }),
-      commonjs()
-    ],
-    external: [
-      // 'react',
-      // 'prop-types'
-    ],
-    output: {
-      format: 'umd',
-      name: 'getSheetData',
-      file: 'bundle/getSheetData.min.js',
-      sourcemap: true,
-      globals: {
-        // 'react': 'React',
-        // 'prop-types': 'PropTypes'
-      }
-    }
-  },
-
   // Test cases.
   {
     input: './test/writeXlsxFile.testCases.js',

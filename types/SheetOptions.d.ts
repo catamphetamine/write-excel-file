@@ -4,9 +4,9 @@ import { StickyRowsOrColumnsParameters } from './features/stickyRowsOrColumns.d.
 
 type Orientation = 'landscape';
 
-type SheetOptionsColumn = {
+export interface SheetOptionsColumn {
 	width?: number;
-};
+}
 
 export interface SheetOptions<FileContent> extends StickyRowsOrColumnsParameters, ConditionalFormattingParameters, ImagesParameters<FileContent> {
 	sheet?: string;
