@@ -1,4 +1,4 @@
-import { CellStyleProperties } from './CellStyleProperties.d.js'
+import type { CellStyleProperties } from './CellStyleProperties.d.js'
 
 // Some users have requested exporting `Value` type.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/30

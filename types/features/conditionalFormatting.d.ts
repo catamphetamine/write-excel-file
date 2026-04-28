@@ -1,4 +1,4 @@
-import { CellStylePropertiesUniversal } from '../CellStyleProperties.d.js'
+import type { CellStylePropertiesUniversal } from '../CellStyleProperties.d.js'
 
 interface ConditionalFormattingConditionWithFormula {
 	formula: string;

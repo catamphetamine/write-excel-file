@@ -160,6 +160,8 @@ Possible `type`:
 * `Date` — `type: Date` and `value: new Date()`
 * `'Formula'` — `type: 'Formula'` and `value: '=AVERAGE(A1:A10)'`
 
+And while `sheetData` argument provides the ultimate control and flexibility, most people just need to quickly output a list of JSON objects to an `.xlsx` file, so there's an [easy way](#convert-objects-to-sheet-data) to do so.
+
 ## Import
 
 This package provides a separate `import` path for each different environment, as described below.

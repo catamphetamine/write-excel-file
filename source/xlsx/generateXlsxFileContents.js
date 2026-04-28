@@ -181,6 +181,10 @@ function getArguments(arg1, arg2, arg3) {
     if (arg1.length === 0 || Array.isArray(arg1[0])) {
       // `arg1` is `SheetData`
       validateSheetData(arg1)
+      // Validate that a developer is not using the legacy way of writing multiple sheets.
+      if (Array.isArray(arg1[0]) && arg1.length > 0 && Array.isArray(arg1[0][0])) {
+        throw new Error('In order to write multiple sheets, pass an array of sheet objects')
+      }
       return {
         sheets: [{
           data: arg1,
@@ -190,7 +194,7 @@ function getArguments(arg1, arg2, arg3) {
       }
     } else if (isObject(arg1[0])) {
       // `arg1` is either `Sheet[]` or `Object[]`
-      // Check for legacy parameter `schema`.
+      // Validate that a developer is not using a legacy parameter `schema`.
       if (isObject(arg2) && Array.isArray(arg2.schema)) {
         throw new Error('`schema` parameter was removed, use `columns` parameter instead')
       }

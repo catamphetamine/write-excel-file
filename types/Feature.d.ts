@@ -1,4 +1,4 @@
-import { SheetOptions } from './SheetOptions.d.js'
+import type { SheetOptions } from './SheetOptions.d.js'
 
 // `feature.files.transform` type
 

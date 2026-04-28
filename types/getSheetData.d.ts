@@ -1,5 +1,5 @@
-import { Cell } from './SheetData.d.js'
-import { SheetOptionsColumn } from './SheetOptions.d.js';
+import type { Cell } from './SheetData.d.js'
+import type { SheetOptionsColumn } from './SheetOptions.d.js';
 
 // Some users have requested exporting `Column` type.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/30

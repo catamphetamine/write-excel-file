@@ -1,4 +1,4 @@
-import Stream from 'stream'
-import { Blob } from 'buffer'
+import type Stream from 'stream'
+import type { Blob } from 'buffer'
 
 export type FileContent = Stream | Buffer | Blob

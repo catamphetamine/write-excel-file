@@ -1,6 +1,6 @@
-import { ConditionalFormattingParameters } from './features/conditionalFormatting.d.js'
-import { ImagesParameters } from './features/images.d.js'
-import { StickyRowsOrColumnsParameters } from './features/stickyRowsOrColumns.d.js'
+import type { ConditionalFormattingParameters } from './features/conditionalFormatting.d.js'
+import type { ImagesParameters } from './features/images.d.js'
+import type { StickyRowsOrColumnsParameters } from './features/stickyRowsOrColumns.d.js'
 
 type Orientation = 'landscape';
 

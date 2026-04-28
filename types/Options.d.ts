@@ -1,4 +1,4 @@
-import { Feature } from './Feature.d.js'
+import type { Feature } from './Feature.d.js'
 
 export interface Options<FileContent> {
 	fontFamily?: string;
