@@ -1,3 +1,28 @@
+4.0.5 / 01.05.2026
+==================
+
+* Applied a fix suggested by [@stewartfeasby](https://github.com/stewartfeasby) for a [bug](https://github.com/catamphetamine/write-excel-file/issues/12) when using conditional formatting together with `span` or `rowSpan` property of a cell object resulted in a corrupt `.xlsx` file.
+
+* Renamed `span` property of a cell object to `columnSpan`.
+  * The old name still works but is deprecated.
+
+* Added some new functions in `write-excel-file/utility` subpackage:
+  * `getChildElements()`
+  * `insertElementMarkupAccordingToOrderOfSiblings()`
+  * `getOrderOfSiblings()`
+
+* If you were using `escapeAttributeName()`, `escapeAttributeValue()` or `escapeTextContent()` functions from `write-excel-file/utility` subpackage:
+  * `escapeAttributeName()`, `escapeAttributeValue()`, `escapeTextContent()` functions no longer remove "illegal characters" (i.e. prohibited ranges of UTF-8 characters — "control characters" or "surrogate blocks") because the names of these functions specifically say "escape", not "escape and remove illegal characters".
+  * Those functions are now deprecated.
+  * Use the new exported functions instead:
+    * `sanitizeAttributeName()`
+    * `sanitizeAttributeValue()`
+    * `sanitizeTextContent()`
+  * The new functions also remove any invalid characters such as `"="` in attribute name, etc, which the old functions didn't do.
+
+* If you were using `findElements()` or `findElementsInsideElement()` functions from `write-excel-file/utility` subpackage:
+  * Removed functions `findElements()` or `findElementsInsideElement()` because they seem to be of no use. Instead, use a combination of `findElement()` and `getChildElements()` functions.
+
 4.0.0 / 22.04.2026
 ==================
 
@@ -18,6 +43,10 @@
   * Instead of receiving options such as `fileName` or `filePath` or `buffer: true`, etc, and then adjusting the return type based on those options, it now returns an object with several `async toXxx()` methods.
     * Old: `await writeExcelFile(data, { filePath: '/path/to/output-file.xlsx' })`
     * New: `await writeExcelFile(data).toFile('/path/to/output-file.xlsx')`
+
+* If you were passing `span` property as part of a cell object:
+  * Renamed `span` property of a cell object to `columnSpan`.
+    * The old name still works but is deprecated.
 
 * If you were using `schema` parameter:
   * Removed `schema` parameter from `writeExcelFile()` function.

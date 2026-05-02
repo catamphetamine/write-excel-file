@@ -43,6 +43,10 @@ Also check out [`read-excel-file`](https://www.npmjs.com/package/read-excel-file
     * Old: `await writeExcelFile(data, { filePath: '/path/to/output-file.xlsx' })`
     * New: `await writeExcelFile(data).toFile('/path/to/output-file.xlsx')`
 
+* If you were passing `span` property as part of a cell object:
+  * Renamed `span` property of a cell object to `columnSpan`.
+    * The old name still works but is deprecated.
+
 * If you were using `schema` parameter:
   * Removed `schema` parameter from `writeExcelFile()` function.
     * Instead of `schema` parameter, either use a new `columns` parameter or a new function `getSheetData()`:
@@ -452,9 +456,9 @@ Cell style properties:
   * `height: number` — Row height, in "points".
 
 * Combine cells
-  * `span: number` — Column span. Even if a cell spans `N` columns, it should still be represented as `N` individual cells in the `sheetData`. In that case, all the cells except the left-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row would look like `[{ value: 'Text', span: 3 }, null, null, { value: 'After text' }]`.
+  * `columnSpan: number` — Column span. Specifying `columnSpan: N` will combine a given cell with `N - 1` of the next cells in the same row. Such combined cells will visually appear as a single one when viewing the spreadsheet, but in the `sheetData` structure those cells should still stay separate. In that case, all the cells except the first one will simply be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the first cell in a row spans 3 columns, then the row could look like `[{ value: 'Text', columnSpan: 3 }, null, null, { value: 'After text' }]`.
 
-  * `rowSpan: number` — Row span. Even if a cell spans `N` rows, it should still be represented as `N` individual cells in the `sheetData`. In that case, all the cells except the top-most one will be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row would look like `[{ value: 'Rows', rowSpan: 2 }, { value: 'R1' }]` and the second row would look like `[null, { value: 'R2' }]`.
+  * `rowSpan: number` — Row span. Specifying `rowSpan: N` will combine a given cell with `N - 1` of the cells below it in the same column. Such combined cells will visually appear as a single one when viewing the spreadsheet, but in the `sheetData` structure those cells should still stay separate. In that case, all the cells except the top one will simply be ignored. One could use `null` or `undefined` to represent such ignored cells. For example, if the top left cell spans 2 rows, then the first row could look like `[{ value: 'A1-A2', rowSpan: 2 }, { value: 'B1' }]` and the second row could look like `[null, { value: 'B2' }]`.
 
 * Alignment
 
@@ -577,25 +581,33 @@ An `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension 
 
 Sidenote: When implementing a "feature", one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage (the built-in "features" use these helper functions):
 
-* `findElement()`
-* `findElements()`
-* `findElementInsideElement()`
-* `findElementsInsideElement()`
-* `getOpeningTagMarkup()`
-* `getClosingTagMarkup()`
-* `getSelfClosingTagMarkup()`
-* `replaceElement()`
-* `getMarkupInsideElement()`
-* `setMarkupInsideElement()`
-* `prependMarkupInsideElement()`
-* `appendMarkupInsideElement()`
-* `escapeAttributeName()`
-* `escapeAttributeValue()`
-* `escapeTextContent()`
+* `findElement(xml, 'tag')` — Finds a single `<tag/>` element.
+* `findElementInsideElement(xml, 'tag', enclosingElement)` — Finds a single `<tag/>` element inside a given element.
+* `getChildElements(xml, element)` — Returns all child elements of a given element.
+* `getOpeningTagMarkup('tag', { attribute: 'value' })` — Returns XML for an opening `<tag>` with given attributes.
+* `getClosingTagMarkup('tag')` — Returns XML for a closing `</tag>`.
+* `getSelfClosingTagMarkup('tag', { attribute: 'value' })` — Returns XML for a self-closing `<tag/>` with given attributes.
+* `insertElementMarkupAccordingToOrderOfSiblings(xml, elementXml, orderOfSiblings, 'parentTagName1', ...)` — Inserts a given markup of a single element in a given `xml` string at a given "path" of parent element(s) while maintaining a pre-defined of siblings.
+  * Use this function whenever inserting a new element in an `.xml` file. The reason is that `.xlsx` file format is extremely sensitive to the order of elements, and maintaining the correct order of siblings is essential to avoid a "corrupt file" error when opening the resulting file in a spreadsheet viewer application.
+  * They say that the order of siblings is specified in XML "schemas" (`.xsd` files) in "Part 4" of the [ECMA-376 Office Open XML File Formats](https://en.wikipedia.org/wiki/Office_Open_XML)" specification. I personally didn't even bother checking because this whole "specification" thing already looks needlessly convoluted. Anyway, I asked Google's AI for "xlsx sheet.xml elements order" and it did output some kind of a list — a slightly different one depending on the exact wording — which I used as a loose reference and it seemed to fix those pesky "corrupt file" errors, so you could do the same.
+  * Example: `insertElementMarkupAccordingToOrderOfSiblings(xml, '<child1/>', ['child1', 'child2', 'child3'], 'parent1')` will insert `<child1/>` inside the first `<parent1>` element in the `xml` string.
+  * Optionally, the insertion "path" could be specified in more detail by passing not just a single parent tag name but a chain of parent tag names. For example, `insertElementMarkupAccordingToOrderOfSiblings(xml, '<child1/>', ['child1', 'child2', 'child3'], 'parent1', 'parent2')` will insert `<child1/>` inside the first `<parent1>` element of the first `<parent2>` element in the `xml` string.
+* `getOrderOfSiblings(fileName, 'parentTagName1', ...)` — One could use it to get the `orderOfSiblings` argument for `insertElementMarkupAccordingToOrderOfSiblings()` function.
+  * The list of file names or tag names supported by this function is nowhere near complete, so don't rely on it too much. Currently, it only supports 3 file names, and only the top-level tags in those files.
+* `replaceElement(xml, element, replacementXml)` — Replaces `element` with a given substring.
+* `getMarkupInsideElement(xml, element)` — Returns the XML inside a given `element`.
+* `setMarkupInsideElement(xml, element, replacementXml)` — Replaces the XML inside a given `element`.
+* `prependMarkupInsideElement(xml, element, addedXml)` — Prepends XML inside a given `element`.
+* `appendMarkupInsideElement(xml, element, addedXml)` — Appends XML inside a given `element`.
+* `sanitizeAttributeName('attribute')` — "Sanitizes" a string for output as an attribute name. Removes any illegal characters. Escapes any "special" characters.
+* `sanitizeAttributeValue('value')` — "Sanitizes" a string for output as an attribute value. Removes any illegal characters. Escapes any "special" characters.
+* `sanitizeTextContent('text')` — "Sanitizes" a string for output as text content of an XML element. Removes any illegal characters. Escapes any "special" characters.
 
 For an example of a "feature" implementation see [`./source/xlsx/features`](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xlsx/features) directory of the code repository. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and also see `./types/features` directory for TypeScript definitions of the built-in "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
 
 P.S. When implementing a "feature", don't rely too much on the `.xlsx` file contents to have any particular shape or form (within reason). For example, don't really assume the XML markup in those files to have a certain fixed shape or to maintain a particular fixed order of elements or their attributes. That's because in future versions of this package, the XML markup inside those `.xml` files may potentially be refactored, with some elements considered "unnecessary" and being removed, or non-previously-existing elements being added by default. This means that `transform` functions shouldn't rely on a particular order of existing elements or attributes to find-and-replace those, nor should they presume any particular elements or attributes to not already exist when adding those, i.e. perhaps they should check before adding, in which case perhaps prefer using `transform` over `insert` (see [`stickyRowsOrColumns`](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/source/xlsx/features/stickyRowsOrColumns.js) feature code for an example). Analogous, `files.write` functions could use `read()` function to check if a file with such name already exists. And to avoid any potential conflicts when introducing a new "relationship ID", consider using a unique "namespace" so that it looks like `rId-${namespace}-1` rather than just `rId1`.
+
+P.P.S. Also note that the `.xlsx` document specification (officially called "[ECMA-376 Office Open XML File Formats](https://en.wikipedia.org/wiki/Office_Open_XML)") dictates a specific order of each and every XML element, and breaking that order will result in a "corrupt file" error when opening the file in a spreadsheet viewer application.
 </details>
 
 ## Images

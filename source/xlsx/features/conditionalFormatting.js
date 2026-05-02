@@ -1,4 +1,5 @@
-import escapeTextContent from '../../xml/escapeTextContent.js'
+import sanitizeTextContent from '../../xml/sanitizeTextContent.js'
+import insertElementMarkupAccordingToOrderOfSiblings from '../../xml/insertElementMarkupAccordingToOrderOfSiblings.js'
 
 import hasFill from '../helpers/hasFill.js'
 import getFillXml from '../helpers/getFillXml.js'
@@ -7,6 +8,7 @@ import getBorderXml from '../helpers/getBorderXml.js'
 import hasFont from '../helpers/hasFont.js'
 import getFontXml from '../helpers/getFontXml.js'
 import getCellCoordinate from '../helpers/getCellCoordinate.js'
+import getOrderOfSiblings from '../helpers/getOrderOfSiblings.js'
 
 export default {
 	files: {
@@ -19,7 +21,12 @@ export default {
 					const { conditionalFormatting } = sheetOptions
 					if (conditionalFormatting) {
 						const conditionalFormattingRulesXml = getConditionalFormattingRulesXml(conditionalFormatting)
-						return xml.replace('</sheetData>', '</sheetData>' + conditionalFormattingRulesXml)
+						return insertElementMarkupAccordingToOrderOfSiblings(
+							xml,
+							conditionalFormattingRulesXml,
+							getOrderOfSiblings('xl/worksheets/sheet{id}.xml', 'worksheet'),
+							'worksheet'
+						)
 					}
 					return xml
 				}
@@ -83,13 +90,13 @@ function getConditionalFormattingRulesXml(conditionalFormattingRules) {
 
 		if (formula) {
 			xml += `<cfRule type="expression" dxfId="${dxfId}" priority="${priority}">`
-			xml += `<formula>${escapeTextContent(formula)}</formula>`
+			xml += `<formula>${sanitizeTextContent(formula)}</formula>`
 			xml += '</cfRule>'
 		} else if (operator) {
 			xml += `<cfRule type="cellIs" operator="${getXlsxOperatorName(operator)}" dxfId="${dxfId}" priority="${priority}">`
-			xml += `<formula>${escapeTextContent(formatValue(value))}</formula>`
+			xml += `<formula>${sanitizeTextContent(formatValue(value))}</formula>`
 			if (getXlsxOperatorName(operator) === 'between') {
-				xml += `<formula>${escapeTextContent(formatValue(value2))}</formula>`
+				xml += `<formula>${sanitizeTextContent(formatValue(value2))}</formula>`
 			}
 			xml += '</cfRule>'
 		} else {

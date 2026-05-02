@@ -1,4 +1,4 @@
-import $attributeValue from '../../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../../xml/sanitizeAttributeValue.js'
 
 export default function generateLayout({
 	sheetId,
@@ -49,7 +49,7 @@ export default function generateLayout({
 
 		layout += '<pageSetup'
 		layout += ` paperSize="${paperSize}"`
-		layout += ` orientation="${$attributeValue(orientation)}"`
+		layout += ` orientation="${sanitizeAttributeValue(orientation)}"`
 		layout += '/>'
 	}
 

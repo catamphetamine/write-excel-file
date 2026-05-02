@@ -328,7 +328,7 @@ export default {
 			dataRowSpan[1][0] = {
 				...dataRowSpan[1][0],
 				rowSpan: 2,
-				// Add test styles.
+				// Test that any styles are applied to the entire row span
 				// https://gitlab.com/catamphetamine/write-excel-file/-/issues/43
 				borderStyle: 'thick',
 				borderColor: '#cc0000'
@@ -353,8 +353,34 @@ export default {
 			}
 			dataSpan[1][0] = {
 				value: 'Column Span',
+				columnSpan: 2,
+				// Test that any styles are applied to the entire column span
+				// https://gitlab.com/catamphetamine/write-excel-file/-/issues/43
+				borderStyle: 'thick',
+				borderColor: '#cc0000'
+			}
+			dataSpan[1][1] = null
+
+			return [
+				dataSpan,
+				{ columns }
+			]
+		}
+	},
+
+	'column-span-legacy-property-name': {
+		args: () => {
+			// Create `data` with `span`.
+			const dataSpan = data.slice()
+			let i = 0
+			while (i < dataSpan.length) {
+				dataSpan[i] = dataSpan[i].slice()
+				i++
+			}
+			dataSpan[1][0] = {
+				value: 'Column Span',
 				span: 2,
-				// Add test styles.
+				// Test that any styles are applied to the entire column span
 				// https://gitlab.com/catamphetamine/write-excel-file/-/issues/43
 				borderStyle: 'thick',
 				borderColor: '#cc0000'
@@ -422,7 +448,7 @@ export default {
 
 			// Escaping is not required for this test case
 			// because the input data is fixed and doesn't contain any weird characters.
-			const escapeAttributeValue = (value) => value
+			const sanitizeAttributeValue = (value) => value
 
 			const customFeature = {
 				files: {
@@ -457,7 +483,7 @@ export default {
 									[sensitivityLabelsDefinitionFilePath]:
 										'<?xml version="1.0" encoding="utf-8" standalone="yes"?>' +
 										'<clbl:labelList xmlns:clbl="http://schemas.microsoft.com/office/2020/mipLabelMetadata">' +
-											`<clbl:label id="${escapeAttributeValue(sensitivityLabelId)}" siteId="${escapeAttributeValue(sensitivityLabelSiteId)}" method="${escapeAttributeValue(sensitivityLabelAssignmentMethod)}" contentBits="${escapeAttributeValue(String(sensitivityLabelContentBits || 0))}" enabled="1" removed="0" />` +
+											`<clbl:label id="${sanitizeAttributeValue(sensitivityLabelId)}" siteId="${sanitizeAttributeValue(sensitivityLabelSiteId)}" method="${sanitizeAttributeValue(sensitivityLabelAssignmentMethod)}" contentBits="${sanitizeAttributeValue(String(sensitivityLabelContentBits || 0))}" enabled="1" removed="0" />` +
 										'</clbl:labelList>'
 								}
 							}
@@ -556,6 +582,55 @@ export default {
 				}]
 			}
 		]
+	},
+
+	// There was a bug when using conditional formatting with column span resulted in a corrupt file.
+	// https://github.com/catamphetamine/write-excel-file/issues/12
+	'conditional-formatting-with-column-span': {
+		args: () => {
+			// Create `data` with `span`.
+			const dataSpan = data.slice()
+			let i = 0
+			while (i < dataSpan.length) {
+				dataSpan[i] = dataSpan[i].slice()
+				i++
+			}
+			dataSpan[1][0] = {
+				...dataSpan[1][0],
+				span: 2
+			}
+			dataSpan[1][1] = null
+
+			return [
+				dataSpan,
+				{
+					columns,
+					conditionalFormatting: [{
+						cellRange: {
+							from: {
+								row: 2,
+								column: 1
+							},
+							to: {
+								row: 3,
+								column: 1
+							}
+						},
+						condition: {
+							operator: '>',
+							value: 200
+						},
+						style: {
+							backgroundColor: '#cc0000',
+							fontStyle: 'italic',
+							textDecoration: {
+								underline: true
+							}
+						}
+					}]
+				}
+			]
+		}
 	},
 
 	'images-on-multiple-sheets': {

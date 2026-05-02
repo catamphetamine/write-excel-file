@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 import getFillXml from '../helpers/getFillXml.js'
 import getBorderXml from '../helpers/getBorderXml.js'
 import getFontXml from '../helpers/getFontXml.js'
@@ -33,7 +33,7 @@ export default function generateStylesXml(cellStyles, sheetsOptions, features) {
   if (formats.length > 0) {
     xml += `<numFmts count="${formats.length}">`
     for (let i = 0; i < formats.length; i++) {
-      xml += `<numFmt numFmtId="${FORMAT_ID_STARTS_FROM + i}" formatCode="${$attributeValue(formats[i])}"/>`
+      xml += `<numFmt numFmtId="${FORMAT_ID_STARTS_FROM + i}" formatCode="${sanitizeAttributeValue(formats[i])}"/>`
     }
     xml += `</numFmts>`
   }

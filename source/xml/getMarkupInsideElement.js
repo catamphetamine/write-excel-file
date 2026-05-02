@@ -1,5 +1,5 @@
 /**
- * Returns the XML markup inside an `element` that was found in `xml` using `findElement()` or `findElements()` function.
+ * Returns the XML inside an `element` that was found in `xml` using `findElement()` function.
  * @param {string} xml
  * @param {FoundElement} element
  * @returns {string}

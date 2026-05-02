@@ -1,7 +1,7 @@
 import getAdditionalContent from '../helpers/features/getAdditionalContent.js'
 import transformContent from '../helpers/features/transformContent.js'
 
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 
 export default function generateWorkbookXml({
 	sheetIdsAndNames,
@@ -21,7 +21,7 @@ export default function generateWorkbookXml({
 			// `<sheets/>` element must be placed after `<bookViews/>` element.
 			// Otherwise Excel 2007 would consider the spreadsheet to be corrupt.
 			'<sheets>' +
-				sheetIdsAndNames.map(({ sheetId, sheetName }) => `<sheet name="${$attributeValue(sheetName)}" sheetId="${sheetId}" r:id="rId${sheetId}"/>`).join('') +
+				sheetIdsAndNames.map(({ sheetId, sheetName }) => `<sheet name="${sanitizeAttributeValue(sheetName)}" sheetId="${sheetId}" r:id="rId${sheetId}"/>`).join('') +
 			'</sheets>' +
 			'<definedNames/>' +
 			'<calcPr/>' +

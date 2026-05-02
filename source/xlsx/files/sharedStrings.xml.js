@@ -1,4 +1,4 @@
-import $textContent from '../../xml/escapeTextContent.js'
+import sanitizeTextContent from '../../xml/sanitizeTextContent.js'
 
 export default function generateSharedStringsXml(sharedStrings) {
 	let xml = '<?xml version="1.0"?>'
@@ -6,7 +6,7 @@ export default function generateSharedStringsXml(sharedStrings) {
 	for (const string of sharedStrings) {
 		const attributes = string.trim().length === string.length ? '' : ' xml:space="preserve"';
 		xml += `<si><t${attributes}>`
-		xml += $textContent(string)
+		xml += sanitizeTextContent(string)
 		xml += '</t></si>'
 	}
 	xml += '</sst>'

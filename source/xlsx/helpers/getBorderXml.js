@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 import getXlsxColorForHexColor from './getXlsxColorForHexColor.js'
 
 export default function getBorderXml({
@@ -50,8 +50,8 @@ function getSideBorderXml(side, { style, color }) {
 	}
 	const hasChildren = Boolean(color)
 	return `<${side}` +
-		(style ? ` style="${$attributeValue(style)}"` : '') +
+		(style ? ` style="${sanitizeAttributeValue(style)}"` : '') +
 		(hasChildren ? '>' : '/>') +
-		(color ? `<color rgb="${$attributeValue(getXlsxColorForHexColor(color))}"/>` : '') +
+		(color ? `<color rgb="${sanitizeAttributeValue(getXlsxColorForHexColor(color))}"/>` : '') +
 		(hasChildren ? `</${side}>` : '')
 }

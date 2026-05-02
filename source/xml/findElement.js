@@ -1,4 +1,4 @@
-import findElements_ from './findElements_.js'
+import findElementsNonRecursive_ from './findElementsNonRecursive_.js'
 
 /**
  * Finds a single element in valid XML markup.
@@ -7,5 +7,6 @@ import findElements_ from './findElements_.js'
  * @returns {object|undefined} — A found element, represented by an object with propeties: `{ openingTagStartIndex: number, openingTagEndIndex: number, openingTagAttributes: object, selfClosingTag?: boolean, closingTagStartIndex?: number, closingTagEndIndex?: number }`
  */
 export default function findElement(xml, tagName) {
-	return findElements_(xml, tagName, true)[0]
+	const elements = findElementsNonRecursive_(xml, { tagName, stopAfterFirstMatch: true })
+	return elements[0]
 }

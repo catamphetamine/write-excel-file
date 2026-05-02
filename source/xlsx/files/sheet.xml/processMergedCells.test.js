@@ -4,7 +4,7 @@ import { expect } from 'chai'
 import processMergedCells from './processMergedCells.js'
 
 describe('processMergedCells()', () => {
-  it('should process merged cells across columns', () => {
+  it('should process merged cells across columns (has `span` legacy property)', () => {
     const sheetData = [
       [
         { value: '1', span: 3 },
@@ -24,8 +24,28 @@ describe('processMergedCells()', () => {
         ]
       })
   })
+  it('should process merged cells across columns (has `columnSpan`)', () => {
+    const sheetData = [
+      [
+        { value: '1', columnSpan: 3 },
+        undefined,
+        null
+      ]
+    ]
 
-  it('should process merged cells across columns and rows', () => {
+    expect(processMergedCells(sheetData, { features: [] }))
+      .to.deep.equal({
+        sheetData,
+        mergedCells: [
+          [
+            [0, 0],
+            [0, 2]
+          ]
+        ]
+      })
+  })
+
+  it('should process merged cells across columns and rows (has `columnSpan` and `rowSpan`)', () => {
     const sheetData = [
       [
         { value: '1.1' },
@@ -33,7 +53,7 @@ describe('processMergedCells()', () => {
         { value: '1.3' }
       ],
       [
-        { value: '2.1', span: 3, rowSpan: 2 },
+        { value: '2.1', columnSpan: 3, rowSpan: 2 },
         null,
         null
       ],
@@ -56,10 +76,21 @@ describe('processMergedCells()', () => {
       })
   })
 
-  it('should validate overlapping cells when using `span`', () => {
+  it('should validate overlapping cells when using `span` (legacy property)', () => {
     expect(() => processMergedCells([
       [
         { value: '1', span: 3 },
+        { value: '2' },
+        { value: '3' }
+      ]
+    ], { features: [] }))
+      .to.throw('Cell at row 1 and column 2')
+  })
+
+  it('should validate overlapping cells when using `columnSpan`', () => {
+    expect(() => processMergedCells([
+      [
+        { value: '1', columnSpan: 3 },
         { value: '2' },
         { value: '3' }
       ]
@@ -81,7 +112,7 @@ describe('processMergedCells()', () => {
       .to.throw('Cell at row 2 and column 1')
   })
 
-  it('should validate overlapping cells when using `span` and `rowSpan`', () => {
+  it('should validate overlapping cells when using `columnSpan` and `rowSpan`', () => {
     expect(() => processMergedCells([
       [
         { value: '1.1' },
@@ -89,7 +120,7 @@ describe('processMergedCells()', () => {
         { value: '1.3' }
       ],
       [
-        { value: '2.1', span: 3, rowSpan: 2 },
+        { value: '2.1', columnSpan: 3, rowSpan: 2 },
         { value: '2.2' },
         { value: '2.3' }
       ],
@@ -108,7 +139,7 @@ describe('processMergedCells()', () => {
         { value: '1.3' }
       ],
       [
-        { value: '2.1', span: 3, rowSpan: 2 },
+        { value: '2.1', columnSpan: 3, rowSpan: 2 },
         null,
         null
       ],
@@ -124,10 +155,10 @@ describe('processMergedCells()', () => {
   it('should copy styles to hidden cells in case of groups of merged cells', () => {
     const sheetData = [
       [
-        { value: '1', span: 3, textColor: '#cc0000' },
-        // This cell is hidden (obscured by the `span`).
+        { value: '1', columnSpan: 3, textColor: '#cc0000' },
+        // This cell is hidden (obscured by the `columnSpan`).
         undefined,
-        // This cell is hidden (obscured by the `span`).
+        // This cell is hidden (obscured by the `columnSpan`).
         null
       ]
     ]
@@ -136,7 +167,7 @@ describe('processMergedCells()', () => {
       .to.deep.equal({
         sheetData: [
           [
-            { value: '1', span: 3, textColor: '#cc0000' },
+            { value: '1', columnSpan: 3, textColor: '#cc0000' },
             { textColor: '#cc0000' },
             { textColor: '#cc0000' }
           ]

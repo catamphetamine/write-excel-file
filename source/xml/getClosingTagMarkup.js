@@ -1,5 +1,5 @@
 /**
- * Returns XML markup for a "closing tag" with a given `tagName`.
+ * Returns XML for a "closing tag" with a given `tagName`.
  * @param {string} tagName
  * @returns {string}
  */

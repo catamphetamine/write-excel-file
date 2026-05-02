@@ -2,11 +2,14 @@ import findElement from '../../xml/findElement.js'
 import replaceElement from '../../xml/replaceElement.js'
 import prependMarkupInsideElement from '../../xml/prependMarkupInsideElement.js'
 import appendMarkupInsideElement from '../../xml/appendMarkupInsideElement.js'
-import getCellCoordinate from '../helpers/getCellCoordinate.js'
 import getOpeningTagMarkup from '../../xml/getOpeningTagMarkup.js'
 import getClosingTagMarkup from '../../xml/getClosingTagMarkup.js'
 import getSelfClosingTagMarkup from '../../xml/getSelfClosingTagMarkup.js'
 import findElementInsideElement from '../../xml/findElementInsideElement.js'
+import insertElementMarkupAccordingToOrderOfSiblings from '../../xml/insertElementMarkupAccordingToOrderOfSiblings.js'
+
+import getCellCoordinate from '../helpers/getCellCoordinate.js'
+import getOrderOfSiblings from '../helpers/getOrderOfSiblings.js'
 
 export default {
 	files: {
@@ -100,7 +103,12 @@ export default {
 							// Add a `<bookViews/>` element with a child '<workbookView/>` element.
 							// For some reason, Excel 2007 demands `<bookViews/>` element to go before `<sheets/>` element.
 							// And `<sheets/>` element always exists.
-							xml = xml.replace('<sheets>', '<bookViews><workbookView/></bookViews>' + '<sheets>')
+							return insertElementMarkupAccordingToOrderOfSiblings(
+								xml,
+								'<bookViews><workbookView/></bookViews>',
+								getOrderOfSiblings('xl/workbook.xml', 'workbook'),
+								'workbook'
+							)
 						}
 					}
 					return xml

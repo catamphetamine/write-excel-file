@@ -13,7 +13,7 @@ export default function generateWorkbookXmlRels({
 			`<Relationship Id="rId${sheetIds.length + 2}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>` +
 			// Apply any plugins that insert additional content to this XML.
 			getAdditionalContent(
-				'xl/workbook.xml',
+				'xl/_rels/workbook.xml.rels',
 				features,
 				sheetsOptions
 			) +
@@ -22,7 +22,7 @@ export default function generateWorkbookXmlRels({
 	// Apply any plugins that transform this XML.
 	xml = transformContent(
 		xml,
-		'xl/workbook.xml',
+		'xl/_rels/workbook.xml.rels',
 		features,
 		sheetsOptions
 	)

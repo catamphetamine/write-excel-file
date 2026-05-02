@@ -52,7 +52,7 @@ Finally, establish a "relationship" between the document and the sensitivity lab
 The above XML modifications could be implemented as the following custom "feature":
 
 ```js
-import { escapeAttributeValue } from 'write-excel-file/utility'
+import { sanitizeAttributeValue } from 'write-excel-file/utility'
 
 // Constants.
 const sensitivityLabelsDefinitionFilePath = 'docMetadata/LabelInfo.xml'
@@ -107,7 +107,7 @@ const sensitivityLabelsFeature = {
             [sensitivityLabelsDefinitionFilePath]:
               '<?xml version="1.0" encoding="utf-8" standalone="yes"?>' +
               '<clbl:labelList xmlns:clbl="http://schemas.microsoft.com/office/2020/mipLabelMetadata">' +
-                `<clbl:label id="${escapeAttributeValue(sensitivityLabelId)}" siteId="${escapeAttributeValue(sensitivityLabelSiteId)}" method="${escapeAttributeValue(sensitivityLabelAssignmentMethod || 'Privileged')}" contentBits="${escapeAttributeValue(String(sensitivityLabelContentBits || 0))}" enabled="1" removed="0" />` +
+                `<clbl:label id="${sanitizeAttributeValue(sensitivityLabelId)}" siteId="${sanitizeAttributeValue(sensitivityLabelSiteId)}" method="${sanitizeAttributeValue(sensitivityLabelAssignmentMethod || 'Privileged')}" contentBits="${sanitizeAttributeValue(String(sensitivityLabelContentBits || 0))}" enabled="1" removed="0" />` +
               '</clbl:labelList>'
           }
         }

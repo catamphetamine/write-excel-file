@@ -1,4 +1,4 @@
-import $textContent from '../../../xml/escapeTextContent.js'
+import sanitizeTextContent from '../../../xml/sanitizeTextContent.js'
 import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
 import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
 import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
@@ -136,7 +136,7 @@ function getXlsxValue(type, value, findOrCreateSharedString) {
       if (typeof value !== 'string') {
         throw new Error(`Invalid cell value: ${value}. Expected a string`)
       }
-      return $textContent(value)
+      return sanitizeTextContent(value)
 
     default:
       throw new Error(`Unknown type: ${type && type.name || type}`)

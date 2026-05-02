@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 import getXlsxColorForHexColor from './getXlsxColorForHexColor.js'
 
 export default function getFontXml(font, { isDefaultGenericFont } = {}) {
@@ -16,7 +16,7 @@ export default function getFontXml(font, { isDefaultGenericFont } = {}) {
 	// Apply `fontFamily`
 	if (fontFamily) {
 		// `<name/>` element specifies the actual typeface name, such as "Calibri" or "Arial".
-		xml += `<name val="${$attributeValue(fontFamily)}"/>`
+		xml += `<name val="${sanitizeAttributeValue(fontFamily)}"/>`
 	}
 
 	// Apply `fontSize`
@@ -77,7 +77,7 @@ export default function getFontXml(font, { isDefaultGenericFont } = {}) {
 
 	// Apply `textColor`
 	if (textColor) {
-		xml += `<color rgb="${$attributeValue(getXlsxColorForHexColor(textColor))}"/>`
+		xml += `<color rgb="${sanitizeAttributeValue(getXlsxColorForHexColor(textColor))}"/>`
 	} else {
 		// In XLSX files, `theme="1"` for font color typically refers to the first color
 		// in the document's theme palette, which is usually "light-1" (white or very light grey)

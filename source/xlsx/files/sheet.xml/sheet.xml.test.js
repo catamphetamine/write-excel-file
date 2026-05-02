@@ -54,7 +54,35 @@ describe('generateSheetXml()', () => {
     ).to.equal(expectedXML)
   })
 
-  it('should detect `span`/`rowSpan` overlap', () => {
+  it('should detect `columnSpan`/`rowSpan` overlap', () => {
+    expect(() => {
+      generateSheetXml(
+        {
+          findOrCreateSharedString(string) {
+            return 0
+          },
+          sheetData: [
+            [
+              {
+                value: 'Text',
+                columnSpan: 3
+              },
+              null,
+              {
+                value: 'Text'
+              }
+            ]
+          ],
+          sheetIndex: 0,
+          sheetId: 1,
+          sheetOptions: {}
+        },
+        []
+      )
+    }).to.throw('columnSpan')
+  })
+
+  it('should detect `span`(legacy property)/`rowSpan` overlap', () => {
     expect(() => {
       generateSheetXml(
         {
@@ -79,6 +107,6 @@ describe('generateSheetXml()', () => {
         },
         []
       )
-    }).to.throw('span')
+    }).to.throw('columnSpan')
   })
 })

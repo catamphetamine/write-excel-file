@@ -12,7 +12,7 @@ import getCellCoordinate from '../../helpers/getCellCoordinate.js'
 // [
 //   [...],
 //   [
-//     { type: String, value: 'abc', span: 3, rowSpan: 2 },
+//     { type: String, value: 'abc', columnSpan: 3, rowSpan: 2 },
 //     { ... },
 //     { ... }
 //   ],

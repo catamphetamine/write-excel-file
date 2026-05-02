@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 
 export default function getAlignmentXml({
 	align,
@@ -8,10 +8,10 @@ export default function getAlignmentXml({
 	wrap
 }) {
 	return '<alignment' +
-		(align ? ` horizontal="${$attributeValue(align)}"` : '') +
-		(alignVertical ? ` vertical="${$attributeValue(alignVertical)}"` : '') +
+		(align ? ` horizontal="${sanitizeAttributeValue(align)}"` : '') +
+		(alignVertical ? ` vertical="${sanitizeAttributeValue(alignVertical)}"` : '') +
 		(textRotation ? ` textRotation="${getTextRotation(validateTextRotation(textRotation))}"` : '') +
-		(indent ? ` indent="${$attributeValue(String(indent))}"` : '') +
+		(indent ? ` indent="${sanitizeAttributeValue(String(indent))}"` : '') +
 		(wrap ? ` wrapText="1"` : '') +
 		'/>'
 }

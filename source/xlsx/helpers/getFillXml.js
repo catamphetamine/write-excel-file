@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 import getXlsxColorForHexColor from './getXlsxColorForHexColor.js'
 
 import hasFill from './hasFill.js'
@@ -35,8 +35,8 @@ export default function getFillXml(fill, { conditionalFormatting } = {}) {
 	// `<bgColor rgb="..."/>` same as `<fgColor rgb="..."/>`.
 
 	xml += `<patternFill patternType="${isSolidFill ? 'solid' : fillPatternStyle}">`
-	xml += `<fgColor rgb="${$attributeValue(getXlsxColorForHexColor(isSolidFill ? backgroundColor : fillPatternColor))}"/>`
-	xml += `<bgColor ${isSolidFill && !conditionalFormatting ? 'indexed="64"' : 'rgb="' + $attributeValue(getXlsxColorForHexColor(backgroundColor)) + '"'}/>`
+	xml += `<fgColor rgb="${sanitizeAttributeValue(getXlsxColorForHexColor(isSolidFill ? backgroundColor : fillPatternColor))}"/>`
+	xml += `<bgColor ${isSolidFill && !conditionalFormatting ? 'indexed="64"' : 'rgb="' + sanitizeAttributeValue(getXlsxColorForHexColor(backgroundColor)) + '"'}/>`
 	xml += '</patternFill>'
 
 	// Close the `<fill>` element.

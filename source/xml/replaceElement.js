@@ -1,13 +1,13 @@
 /**
- * Replaces an `element` that was found in `xml` using `findElement()` or `findElements()` function with a given XML `markup`.
+ * Replaces an `element` that was found in `xml` using `findElement()` function with a given `replacementXml` markup.
  * @param {string} xml
  * @param {FoundElement} element
- * @param {string} markup
+ * @param {string} replacementXml
  * @returns {string}
  */
-export default function replaceElement(xml, element, markup) {
+export default function replaceElement(xml, element, replacementXml) {
 	if (element.selfClosingTag) {
-		return xml.slice(0, element.openingTagStartIndex) + markup + xml.slice(element.openingTagEndIndex + 1)
+		return xml.slice(0, element.openingTagStartIndex) + replacementXml + xml.slice(element.openingTagEndIndex + 1)
 	}
-	return xml.slice(0, element.openingTagStartIndex) + markup + xml.slice(element.closingTagEndIndex + 1)
+	return xml.slice(0, element.openingTagStartIndex) + replacementXml + xml.slice(element.closingTagEndIndex + 1)
 }

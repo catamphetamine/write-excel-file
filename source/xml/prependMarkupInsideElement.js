@@ -1,15 +1,15 @@
 import setMarkupInsideElement from './setMarkupInsideElement.js'
 
 /**
- * Prepends `markup` inside an `element` that was found in `xml` using `findElement()` or `findElements()` function.
+ * Prepends XML inside an `element` that was found in `xml` using `findElement()` function.
  * @param {string} xml
  * @param {FoundElement} element
- * @param {string} markup
+ * @param {string} addedXml
  * @returns {string}
  */
-export default function prependMarkupInsideElement(xml, element, markup) {
+export default function prependMarkupInsideElement(xml, element, addedXml) {
 	if (element.selfClosingTag) {
-		return setMarkupInsideElement(xml, element, markup)
+		return setMarkupInsideElement(xml, element, addedXml)
 	}
-	return xml.slice(0, element.openingTagEndIndex + 1) + markup + xml.slice(element.openingTagEndIndex + 1)
+	return xml.slice(0, element.openingTagEndIndex + 1) + addedXml + xml.slice(element.openingTagEndIndex + 1)
 }

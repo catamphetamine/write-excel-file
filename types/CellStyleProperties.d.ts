@@ -84,7 +84,7 @@ export interface CellStyleProperties extends CellStylePropertiesUniversal {
 	align?: 'left' | 'center' | 'right';
 	alignVertical?: 'top' | 'center' | 'bottom';
 	height?: number;
-	span?: number;
+	columnSpan?: number;
 	rowSpan?: number;
 	indent?: number;
 	wrap?: boolean;

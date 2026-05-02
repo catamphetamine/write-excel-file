@@ -1,7 +1,7 @@
 import getAttributesString from './getAttributesString.js'
 
 /**
- * Returns XML markup for an "opening tag" with a given `tagName` and optional `attributes`.
+ * Returns XML for an "opening tag" with a given `tagName` and optional `attributes`.
  * @param {string} tagName
  * @param {object} [attributes]
  * @returns {string}

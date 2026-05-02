@@ -5,7 +5,7 @@ import generateMergedCellsDescription from './mergedCellsDescription.js'
 import processMergedCells from './processMergedCells.js'
 
 describe('generateMergedCellsDescription()', () => {
-  it('should generate merged cells across columns', () => {
+  it('should generate merged cells with `span` property (legacy property name)', () => {
     const data = [
       [
         { value: '1', span: 3 },
@@ -20,7 +20,22 @@ describe('generateMergedCellsDescription()', () => {
       .to.equal('<mergeCells count="1"><mergeCell ref="A1:C1"/></mergeCells>')
   })
 
-  it('should generate merged cells across columns and rows', () => {
+  it('should generate merged cells with `columnSpan` property', () => {
+    const data = [
+      [
+        { value: '1', columnSpan: 3 },
+        undefined,
+        null
+      ]
+    ]
+
+    const { mergedCells } = processMergedCells(data, { features: [] })
+
+    expect(generateMergedCellsDescription(mergedCells))
+      .to.equal('<mergeCells count="1"><mergeCell ref="A1:C1"/></mergeCells>')
+  })
+
+  it('should generate merged cells with both `columnSpan` and `rowSpan`', () => {
     const data = [
       [
         { value: '1.1' },
@@ -28,7 +43,7 @@ describe('generateMergedCellsDescription()', () => {
         { value: '1.3' }
       ],
       [
-        { value: '2.1', span: 3, rowSpan: 2 },
+        { value: '2.1', columnSpan: 3, rowSpan: 2 },
         null,
         null
       ],

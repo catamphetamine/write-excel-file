@@ -1,4 +1,4 @@
-import $attributeValue from '../../xml/escapeAttributeValue.js'
+import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 import getFileExtensionForContentType from '../helpers/getFileExtensionForContentType.js'
 
 export default {
@@ -139,7 +139,7 @@ function getImagesDrawingXml({ images }) {
 
 		xml += '<xdr:nvPicPr>'
 
-		xml += `<xdr:cNvPr id="${imageId}" name="${image.title ? $attributeValue(image.title) : 'Picture ' + imageId}" descr="${image.description ? $attributeValue(image.description) : ''}"/>`
+		xml += `<xdr:cNvPr id="${imageId}" name="${image.title ? sanitizeAttributeValue(image.title) : 'Picture ' + imageId}" descr="${image.description ? sanitizeAttributeValue(image.description) : ''}"/>`
 
 		xml += '<xdr:cNvPicPr>'
     // Optional XML element. Locks the aspect ratio of the image. -->
