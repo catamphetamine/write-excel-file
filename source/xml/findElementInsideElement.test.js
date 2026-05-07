@@ -19,4 +19,11 @@ describe('utility/findElementInsideElement', () => {
 			closingTagEndIndex: 25
 		})
 	})
+
+	it('should find element inside another element (not exists)', () => {
+		const b = findElement('<a><b x="y" z="z"><c>d</c></b><b/></a>', 'b')
+		expect(
+			findElementInsideElement('<a><b x="y" z="z"><c>d</c></b><b/></a>', 'z', b)
+		).to.be.undefined
+	})
 })

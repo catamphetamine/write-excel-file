@@ -11,6 +11,8 @@ import applyEnclosingElementOffset from './applyEnclosingElementOffset.js'
  */
 export default function findElementInsideElement(xml, tagName, enclosingElement) {
 	const element = findElement(getMarkupInsideElement(xml, enclosingElement), tagName)
-	applyEnclosingElementOffset(element, enclosingElement)
-	return element
+	if (element) {
+		applyEnclosingElementOffset(element, enclosingElement)
+		return element
+	}
 }

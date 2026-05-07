@@ -1,3 +1,8 @@
+4.0.6 / 07.05.2026
+==================
+
+* Applied a fix suggested by [Didier Richard](https://gitlab.com/kisslog.fr) for a [bug](https://gitlab.com/catamphetamine/write-excel-file/-/work_items/114) when `findElementInsideElement()` utility function crashed if the element doesn't exist.
+
 4.0.5 / 01.05.2026
 ==================
 
