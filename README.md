@@ -304,7 +304,7 @@ const objects = [
     married: true
   },
   {
-    name: 'Alice Brown',
+    name: 'Kate Brown',
     dateOfBirth: new Date(Date.UTC(2005, 4 - 1, 3)),
     income: 60000,
     married: false
@@ -375,7 +375,7 @@ will write the following `sheetData`:
     { value: true, type: Boolean }
   ],
   [
-    { value: 'Alice Brown' },
+    { value: 'Kate Brown' },
     { value: 2005-04-03T00:00:00.000Z, type: Date, format: 'mm/dd/yyyy' },
     { value: 60000, type: Number, format: '#,##0.00' },
     { value: false, type: Boolean }
@@ -383,7 +383,12 @@ will write the following `sheetData`:
 ]
 ```
 
-Passing `objects` and `columns` is just a shortcut for first using `getSheetData()` function to convert `objects` to `sheetData` and then writing `sheetData` to an `.xlsx` file.
+| Name       | Date of Birth | Income      | Married |
+| -----------| ------------- | ----------- | ------- |
+| John Smith | 5/1/2000      | $120,000.00 | TRUE    |
+| Kate Brown | 4/3/2005      | $60,000.00  | FALSE   |
+
+P.S. Passing `objects` and `columns` is just a shortcut for first using `getSheetData()` function to convert `objects` to `sheetData` and then writing `sheetData` to an `.xlsx` file.
 
 ```js
 import writeExcelFile, { getSheetData } from 'write-excel-file/node'
