@@ -461,7 +461,7 @@ export default {
 				columns,
 				// Hide the 2nd row.
 				rows: [
-					undefined,
+					{},
 					{ hidden: true }
 				]
 			}
@@ -478,7 +478,7 @@ export default {
 					{ width: 20 }
 				],
 				rows: [
-					undefined,
+					{},
 					{ hidden: true }
 				]
 			}
@@ -492,7 +492,7 @@ export default {
 				columns,
 				rows: [
 					{ height: 36 },
-					undefined,
+					{},
 					{ height: 60 }
 				]
 			}
