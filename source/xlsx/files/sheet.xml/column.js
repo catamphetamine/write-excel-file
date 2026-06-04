@@ -11,11 +11,11 @@ export default function generateColumnDescription(column, index) {
   }
 
   // Get the column width (in characters).
-  const { width } = column
+  const { width, hidden } = column
 
-  // If no width specified (0 width is not allowed as well), then
+  // If neither a width nor `hidden` is specified (0 width is not allowed as well),
   // leave the definition empty and the width will be applied automatically.
-  if (!width) {
+  if (!width && !hidden) {
     return ''
   }
 
@@ -28,7 +28,10 @@ export default function generateColumnDescription(column, index) {
   // `customWidth="1"` is required in order for `width="..."` to be applied.
   // Otherwise, Microsoft Office 2007 Excel wouldn't apply the custom column `width`.
   //
-  return `<col min="${columnNumber}" max="${columnNumber}" width="${width}" customWidth="1"/>`
+  const widthAttributes = width ? ` width="${width}" customWidth="1"` : ''
+  const hiddenAttribute = hidden ? ' hidden="1"' : ''
+
+  return `<col min="${columnNumber}" max="${columnNumber}"${widthAttributes}${hiddenAttribute}/>`
 }
 
 // /**

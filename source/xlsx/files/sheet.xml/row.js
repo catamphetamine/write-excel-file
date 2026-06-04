@@ -5,6 +5,7 @@ import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
 import isCellObject from '../../helpers/isCellObject.js'
 
 export default function generateRow(row, rowIndex, {
+	rowOption,
 	findOrCreateCellStyle,
 	findOrCreateSharedString,
 	hasDefaultFont,
@@ -94,6 +95,11 @@ export default function generateRow(row, rowIndex, {
 		})
 		.join('')
 
+	// `sheetOptions.rows[rowIndex].height` overrides any per-cell `height`.
+	if (rowOption && rowOption.height !== undefined) {
+		rowHeight = rowOption.height
+	}
+
 	const rowAttributes = {
 		r: rowNumber
 	}
@@ -101,6 +107,10 @@ export default function generateRow(row, rowIndex, {
 	if (rowHeight) {
 		rowAttributes.ht = rowHeight
 		rowAttributes.customHeight = 1
+	}
+
+	if (rowOption && rowOption.hidden) {
+		rowAttributes.hidden = 1
 	}
 
 	return getOpeningTagMarkup('row', rowAttributes) + rowCells + getClosingTagMarkup('row')

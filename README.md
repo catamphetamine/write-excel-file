@@ -514,7 +514,8 @@ Cell style properties:
 The following sheet-specific options could be passed as part of the second argument to `writeExcelFile()` function:
 
 * `sheet: string` — The name of the sheet.
-* `columns: object[]` — Column widths.
+* `columns: object[]` — Per-column options. Each entry supports `width` and `hidden`. Example: `[{ width: 20 }, { hidden: true }]`.
+* `rows: object[]` — Per-row options. Each entry supports `height` and `hidden`. Use `undefined` to leave a row untouched. Example: `[undefined, { hidden: true }]`.
 * `orientation: string` — Sheet orientation. Default is `"portrait"`. Possible values: `"portrait"`, `"landscape"`.
 * `dateFormat: string` — Default `format` that will be used for all `Date` cells. Example: `"mm/dd/yyyy"`.
 * `stickyRowsCount: number` — Makes a given number of top rows "sticky" (Excel calls them "frozen").

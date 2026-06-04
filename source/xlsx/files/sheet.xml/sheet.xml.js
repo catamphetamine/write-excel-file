@@ -22,6 +22,7 @@ export default function generateSheetXml(sheetXmlParameters, features) {
 
 	const {
 		columns,
+		rows,
 		dateFormat,
 		orientation,
 		showGridLines,
@@ -39,6 +40,7 @@ export default function generateSheetXml(sheetXmlParameters, features) {
 			generateColumnsDescription(columns) +
 			'<sheetData>' +
 				generateRows(sheetData, {
+					rowOptions: rows,
 					findOrCreateCellStyle,
 					findOrCreateSharedString,
 					hasDefaultFont,

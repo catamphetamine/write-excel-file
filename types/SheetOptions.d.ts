@@ -6,6 +6,12 @@ type Orientation = 'landscape';
 
 export interface SheetOptionsColumn {
 	width?: number;
+	hidden?: boolean;
+}
+
+export interface SheetOptionsRow {
+	height?: number;
+	hidden?: boolean;
 }
 
 export interface SheetOptions<FileContent> extends StickyRowsOrColumnsParameters, ConditionalFormattingParameters, ImagesParameters<FileContent> {
@@ -16,4 +22,5 @@ export interface SheetOptions<FileContent> extends StickyRowsOrColumnsParameters
 	zoomScale?: number;
 	dateFormat?: string;
 	columns?: SheetOptionsColumn[];
+	rows?: SheetOptionsRow[];
 }

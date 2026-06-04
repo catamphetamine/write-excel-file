@@ -425,6 +425,80 @@ export default {
 		]
 	},
 
+	'hidden-columns': {
+		args: () => [
+			data,
+			{
+				// Hide the 2nd column (Date of Birth).
+				columns: [
+					{},
+					{ width: 14, hidden: true },
+					{ width: 20 }
+				]
+			}
+		]
+	},
+
+	'hidden-column-without-width': {
+		args: () => [
+			data,
+			{
+				// Hide the 4th column with no width specified.
+				columns: [
+					{},
+					{ width: 14 },
+					{ width: 20 },
+					{ hidden: true }
+				]
+			}
+		]
+	},
+
+	'hidden-rows': {
+		args: () => [
+			data,
+			{
+				columns,
+				// Hide the 2nd row.
+				rows: [
+					undefined,
+					{ hidden: true }
+				]
+			}
+		]
+	},
+
+	'hidden-rows-and-columns': {
+		args: () => [
+			data,
+			{
+				columns: [
+					{},
+					{ width: 14, hidden: true },
+					{ width: 20 }
+				],
+				rows: [
+					undefined,
+					{ hidden: true }
+				]
+			}
+		]
+	},
+
+	'row-height-via-options': {
+		args: () => [
+			data,
+			{
+				columns,
+				rows: [
+					{ height: 36 },
+					undefined,
+					{ height: 60 }
+				]
+			}
+		]
+	},
+
 	'zoom-scale': {
 		args: () => [
 			[
