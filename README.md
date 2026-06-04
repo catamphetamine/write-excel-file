@@ -575,6 +575,12 @@ await writeExcelFile(
 ).toFile(...)
 ```
 
+### Available custom features
+
+Third-party packages that plug into `write-excel-file` via the `features` parameter:
+
+* [`@onparallel/write-excel-file-data-validation`](https://www.npmjs.com/package/@onparallel/write-excel-file-data-validation) — Adds Excel data validation: dropdown lists, numeric/date/time ranges, text length constraints, and custom formulas. Errors and input prompts can be configured per cell or per range.
+
 So what can it do?
 
 An `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension renamed to `.xlsx`. If one renames an `*.xslx` file to a `*.zip` file and unpacks it, one could see that it has a certain directory structure and contains certain `*.xml` files. A "feature" implementation could "hook" into creating those `*.xml` files — `xl/styles.xml`, `xl/worksheets/sheet{id}.xml`, etc — to transform their content in any desired way.
