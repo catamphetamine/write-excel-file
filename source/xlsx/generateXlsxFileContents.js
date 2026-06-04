@@ -63,6 +63,7 @@ export default function generateXlsxFileContents(arg1, arg2, arg3) {
 
   const {
     sheets,
+    firstVisibleSheetIndex,
     getSharedStrings,
     getCellStyles
   } = initializeSheets(sheetsData, sheetsOptions, options)
@@ -85,7 +86,8 @@ export default function generateXlsxFileContents(arg1, arg2, arg3) {
   })
 
   files['xl/workbook.xml'] = generateWorkbookXml({
-    sheetIdsAndNames: sheets.map(({ sheetId, sheetName }) => ({ sheetId, sheetName })),
+    sheetIdsAndNames: sheets.map(({ sheetId, sheetName, hidden }) => ({ sheetId, sheetName, hidden })),
+    firstVisibleSheetIndex,
     features,
     sheetsOptions
   })

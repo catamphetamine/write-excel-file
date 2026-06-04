@@ -23,6 +23,15 @@ export default function initializeSheets(sheetsData, sheetsOptions, globalOption
     validateSheetName(sheetName)
   }
 
+  // Excel requires the selected sheet to be visible.
+  // Find the index of the first non-hidden sheet so views and `<workbookView/>`
+  // can be authored against it.
+  let firstVisibleSheetIndex = sheetsOptions.findIndex(sheetOptions => !sheetOptions.hidden)
+  if (firstVisibleSheetIndex < 0) {
+    // All sheets hidden is invalid in Excel — fall back to the first sheet.
+    firstVisibleSheetIndex = 0
+  }
+
   const sheetXmlParameters = []
   let sheetIndex = 0
   while (sheetIndex < sheetNames.length) {
@@ -31,6 +40,7 @@ export default function initializeSheets(sheetsData, sheetsOptions, globalOption
 			sheetOptions: sheetsOptions[sheetIndex],
 			sheetIndex,
 			sheetId: getSheetId(sheetIndex),
+			firstVisibleSheetIndex,
 			hasDefaultFont: Boolean(defaultFont),
 			// hasDefaultFont: Boolean(sheetsDefaultFonts[sheetIndex]),
 			// findOrCreateCellStyle: (style) => findOrCreateCellStyle(style, sheetIndex),
@@ -48,9 +58,11 @@ export default function initializeSheets(sheetsData, sheetsOptions, globalOption
 			return {
 				sheetId: getSheetId(sheetIndex),
 				sheetName,
+				hidden: Boolean(sheetsOptions[sheetIndex].hidden),
 				sheetXmlParameters: sheetXmlParameters[sheetIndex]
 			}
     }),
+    firstVisibleSheetIndex,
     getSharedStrings,
     getCellStyles
   }

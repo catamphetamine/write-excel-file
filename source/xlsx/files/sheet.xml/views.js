@@ -2,9 +2,16 @@ import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
 
 export default function generateViews({
 	sheetIndex,
+	firstVisibleSheetIndex,
 	...viewProperties
 }) {
-	if (!hasView(viewProperties)) {
+	// The first visible sheet must explicitly opt in to `tabSelected` when the
+	// default (sheet 0) isn't the visible one — otherwise emit `<sheetViews/>`
+	// only when there are view properties to apply.
+	const isFirstVisibleSheet = sheetIndex === (firstVisibleSheetIndex || 0)
+	const needsTabSelectedFallback = isFirstVisibleSheet && firstVisibleSheetIndex > 0
+
+	if (!hasView(viewProperties) && !needsTabSelectedFallback) {
 		return ''
 	}
 
@@ -17,7 +24,7 @@ export default function generateViews({
 	let views = ''
 
 	const sheetViewAttributes = {
-		tabSelected: sheetIndex === 0 ? 1 : 0, // The first sheet is selected by default.
+		tabSelected: isFirstVisibleSheet ? 1 : 0,
 		workbookViewId: 0
 	}
 

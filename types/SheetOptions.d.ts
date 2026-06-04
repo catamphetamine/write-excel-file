@@ -16,4 +16,5 @@ export interface SheetOptions<FileContent> extends StickyRowsOrColumnsParameters
 	zoomScale?: number;
 	dateFormat?: string;
 	columns?: SheetOptionsColumn[];
+	hidden?: boolean;
 }

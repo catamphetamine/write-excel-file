@@ -522,6 +522,7 @@ The following sheet-specific options could be passed as part of the second argum
 * `showGridLines: boolean` — Pass `false` to hide grid lines.
 * `rightToLeft: boolean` — Pass `true` to use right-to-left layout. This is used in right-to-left languages like Arabic.
 * `zoomScale: number` — Initial zoom factor. For example, `1.5` would scale the sheet to 150%.
+* `hidden: boolean` — Pass `true` to hide the sheet. At least one sheet in the workbook must remain visible.
 
 ## Global Options
 

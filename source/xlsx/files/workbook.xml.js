@@ -5,9 +5,16 @@ import sanitizeAttributeValue from '../../xml/sanitizeAttributeValue.js'
 
 export default function generateWorkbookXml({
 	sheetIdsAndNames,
+	firstVisibleSheetIndex,
 	features,
 	sheetsOptions
 }) {
+	// When the first sheet is hidden, point `<workbookView/>` at the first
+	// visible sheet so Excel doesn't refuse to open the spreadsheet.
+	const workbookViewAttributes = firstVisibleSheetIndex > 0
+		? ` firstSheet="${firstVisibleSheetIndex}" activeTab="${firstVisibleSheetIndex}"`
+		: ''
+
 	let xml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
 		'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mv="urn:schemas-microsoft-com:mac:vml" xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main" xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac" xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main">' +
 			// `<workbookPr/>` element must be the first one.
@@ -16,12 +23,15 @@ export default function generateWorkbookXml({
 			// `<bookViews/>` element must be placed after `<workbookPr/>` element.
 			// Otherwise Excel 2007 would consider the spreadsheet to be corrupt.
 			'<bookViews>' +
-				'<workbookView/>' +
+				`<workbookView${workbookViewAttributes}/>` +
 			'</bookViews>' +
 			// `<sheets/>` element must be placed after `<bookViews/>` element.
 			// Otherwise Excel 2007 would consider the spreadsheet to be corrupt.
 			'<sheets>' +
-				sheetIdsAndNames.map(({ sheetId, sheetName }) => `<sheet name="${sanitizeAttributeValue(sheetName)}" sheetId="${sheetId}" r:id="rId${sheetId}"/>`).join('') +
+				sheetIdsAndNames.map(({ sheetId, sheetName, hidden }) => {
+					const state = hidden ? ' state="hidden"' : ''
+					return `<sheet name="${sanitizeAttributeValue(sheetName)}" sheetId="${sheetId}"${state} r:id="rId${sheetId}"/>`
+				}).join('') +
 			'</sheets>' +
 			'<definedNames/>' +
 			'<calcPr/>' +

@@ -418,6 +418,42 @@ export default {
 		]
 	},
 
+	'hidden-sheet': {
+		args: () => [
+			[
+				{
+					data,
+					sheet: 'Visible',
+					columns
+				},
+				{
+					data,
+					sheet: 'Hidden',
+					columns,
+					hidden: true
+				}
+			]
+		]
+	},
+
+	'hidden-first-sheet': {
+		args: () => [
+			[
+				{
+					data,
+					sheet: 'Hidden',
+					columns,
+					hidden: true
+				},
+				{
+					data,
+					sheet: 'Visible',
+					columns
+				}
+			]
+		]
+	},
+
 	'hide-grid-lines': {
 		args: () => [
 			data,
