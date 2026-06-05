@@ -584,7 +584,7 @@ An `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension 
 
 ######
 
-Sidenote: When implementing a "feature", one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage (the built-in "features" use these helper functions):
+Sidenote: When implementing a "feature", one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage (the built-in "features" use these same helper functions):
 
 * `findElement(xml, 'tag')` — Finds a single `<tag/>` element.
 * `findElementInsideElement(xml, 'tag', enclosingElement)` — Finds a single `<tag/>` element inside a given element.
@@ -610,10 +610,28 @@ Sidenote: When implementing a "feature", one could use the few ["helper" functio
 
 For an example of a "feature" implementation see [`./source/xlsx/features`](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xlsx/features) directory of the code repository. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and also see `./types/features` directory for TypeScript definitions of the built-in "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
 
+The idea is that any "feature" has "raw" unrestricted read/write access to any of the files inside the `.xlsx` file. This means that anything is possible to implement. But it's not necessarily the most convenient way. More likely, implementing a feature will involve manipulating the markup of multiple `.xml` files through juggling with different elements and attributes in order to cover all possible cases, which is gonna feel clunky. But at the end of the day, flexibility outweighs convenience. For me as a "core" maintainer, at least. Potential (questionable) improvements could include adding a "hook" like `transformElementXml(elementXml, elementTagName, xmlFileName, { elementIndex, sheetId }, sheetOptions)`, but that would clutter the code further and I feel like the existing tools are already enough.
+
+If a "feature" needs access to sheet data, simply pass it as an argument to the feature constructor:
+
+```js
+await writeExcelFile(
+  sheetData, sheetOptions, { features: [feature(sheetData)] }
+).toFile('/path/to/output-file.xlsx')
+```
+
 P.S. When implementing a "feature", don't rely too much on the `.xlsx` file contents to have any particular shape or form (within reason). For example, don't really assume the XML markup in those files to have a certain fixed shape or to maintain a particular fixed order of elements or their attributes. That's because in future versions of this package, the XML markup inside those `.xml` files may potentially be refactored, with some elements considered "unnecessary" and being removed, or non-previously-existing elements being added by default. This means that `transform` functions shouldn't rely on a particular order of existing elements or attributes to find-and-replace those, nor should they presume any particular elements or attributes to not already exist when adding those, i.e. perhaps they should check before adding, in which case perhaps prefer using `transform` over `insert` (see [`stickyRowsOrColumns`](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/source/xlsx/features/stickyRowsOrColumns.js) feature code for an example). Analogous, `files.write` functions could use `read()` function to check if a file with such name already exists. And to avoid any potential conflicts when introducing a new "relationship ID", consider using a unique "namespace" so that it looks like `rId-${namespace}-1` rather than just `rId1`.
 
 P.P.S. Also note that the `.xlsx` document specification (officially called "[ECMA-376 Office Open XML File Formats](https://en.wikipedia.org/wiki/Office_Open_XML)") dictates a specific order of each and every XML element, and breaking that order will result in a "corrupt file" error when opening the file in a spreadsheet viewer application.
+
+Summary: This package intentionally offloads any non-essential stuff to custom "features". The reason is to prevent this package from growing into a monster of a software that Excel is. Modularity is the only way to combat complexity. Bend under the pressure of merging "just this one" "small" feature that a particular for-profit company really needs in order to please their bosses and eventually the package turns into an unmaintainable bloated mess. Consider how you even got here — a myriad of feature-complete alternatives exist out there and yet you preferred this one for some reason. The less the "core" is, the less intention I'd have to "abandon" maintaining this software.
 </details>
+
+######
+
+Here're some of the third-party features submitted by other developers.
+
+* [`@onparallel/write-excel-file-data-validation`](https://www.npmjs.com/package/@onparallel/write-excel-file-data-validation) — Adds interactive user input "data validation" when editing a spreadsheet: choosing a value from a [pre-defined list](https://www.youtube.com/shorts/9GX3kbfWxj0), restricting a numeric/integer/date/time value to a [certain range](https://www.youtube.com/shorts/pysK1Z0YJNk), adding [text length](https://www.youtube.com/shorts/9leDTxRNUA0) constraints, or validating user input using custom [formulas](https://www.youtube.com/watch?v=bDXQy60BcT4) in "tricky" cases.
 
 ## Images
 

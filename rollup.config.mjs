@@ -36,7 +36,6 @@ export default [
     input: './test/writeXlsxFile.testCases.js',
     plugins: [
       json(),
-      terser(),
       nodeResolve({
         browser: true
       }),
@@ -45,8 +44,7 @@ export default [
     output: {
       format: 'umd',
       name: 'TEST_CASES',
-      file: 'bundle/test-cases.js',
-      sourcemap: true
+      file: 'bundle/test-cases.js'
     }
   }
 ]
