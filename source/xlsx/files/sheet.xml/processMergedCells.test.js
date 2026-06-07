@@ -13,16 +13,15 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(sheetData, { features: [] }))
-      .to.deep.equal({
-        sheetData,
-        mergedCells: [
-          [
-            [0, 0],
-            [0, 2]
-          ]
+    expect(processMergedCells(sheetData, [])).to.deep.equal({
+      sheetData,
+      mergedCells: [
+        [
+          [0, 0],
+          [0, 2]
         ]
-      })
+      ]
+    })
   })
   it('should process merged cells across columns (has `columnSpan`)', () => {
     const sheetData = [
@@ -33,16 +32,15 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(sheetData, { features: [] }))
-      .to.deep.equal({
-        sheetData,
-        mergedCells: [
-          [
-            [0, 0],
-            [0, 2]
-          ]
+    expect(processMergedCells(sheetData, [])).to.deep.equal({
+      sheetData,
+      mergedCells: [
+        [
+          [0, 0],
+          [0, 2]
         ]
-      })
+      ]
+    })
   })
 
   it('should process merged cells across columns and rows (has `columnSpan` and `rowSpan`)', () => {
@@ -64,92 +62,96 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(sheetData, { features: [] }))
-      .to.deep.equal({
-        sheetData,
-        mergedCells: [
-          [
-            [1, 0],
-            [2, 2]
-          ]
+    expect(processMergedCells(sheetData, [])).to.deep.equal({
+      sheetData,
+      mergedCells: [
+        [
+          [1, 0],
+          [2, 2]
         ]
-      })
+      ]
+    })
   })
 
   it('should validate overlapping cells when using `span` (legacy property)', () => {
-    expect(() => processMergedCells([
-      [
-        { value: '1', span: 3 },
-        { value: '2' },
-        { value: '3' }
-      ]
-    ], { features: [] }))
-      .to.throw('Cell at row 1 and column 2')
+    expect(() => {
+      processMergedCells([
+        [
+          { value: '1', span: 3 },
+          { value: '2' },
+          { value: '3' }
+        ]
+      ], [])
+    }).to.throw('Cell at row 1 and column 2')
   })
 
   it('should validate overlapping cells when using `columnSpan`', () => {
-    expect(() => processMergedCells([
-      [
-        { value: '1', columnSpan: 3 },
-        { value: '2' },
-        { value: '3' }
-      ]
-    ], { features: [] }))
-      .to.throw('Cell at row 1 and column 2')
+    expect(() => {
+      processMergedCells([
+        [
+          { value: '1', columnSpan: 3 },
+          { value: '2' },
+          { value: '3' }
+        ]
+      ], [])
+    }).to.throw('Cell at row 1 and column 2')
   })
 
   it('should validate overlapping cells when using `rowSpan`', () => {
-    expect(() => processMergedCells([
-      [
-        { value: '1.1', rowSpan: 2 },
-        { value: '1.2' }
-      ],
-      [
-        { value: '2.1' },
-        { value: '2.2' }
-      ]
-    ], { features: [] }))
-      .to.throw('Cell at row 2 and column 1')
+    expect(() => {
+      processMergedCells([
+        [
+          { value: '1.1', rowSpan: 2 },
+          { value: '1.2' }
+        ],
+        [
+          { value: '2.1' },
+          { value: '2.2' }
+        ]
+      ], [])
+    }).to.throw('Cell at row 2 and column 1')
   })
 
   it('should validate overlapping cells when using `columnSpan` and `rowSpan`', () => {
-    expect(() => processMergedCells([
-      [
-        { value: '1.1' },
-        { value: '1.2' },
-        { value: '1.3' }
-      ],
-      [
-        { value: '2.1', columnSpan: 3, rowSpan: 2 },
-        { value: '2.2' },
-        { value: '2.3' }
-      ],
-      [
-        { value: '3.1' },
-        { value: '3.2' },
-        { value: '3.3' }
-      ]
-    ], { features: [] }))
-      .to.throw('Cell at row 2 and column 2')
+    expect(() => {
+      processMergedCells([
+        [
+          { value: '1.1' },
+          { value: '1.2' },
+          { value: '1.3' }
+        ],
+        [
+          { value: '2.1', columnSpan: 3, rowSpan: 2 },
+          { value: '2.2' },
+          { value: '2.3' }
+        ],
+        [
+          { value: '3.1' },
+          { value: '3.2' },
+          { value: '3.3' }
+        ]
+      ], [])
+    }).to.throw('Cell at row 2 and column 2')
 
-    expect(() => processMergedCells([
-      [
-        { value: '1.1' },
-        { value: '1.2' },
-        { value: '1.3' }
-      ],
-      [
-        { value: '2.1', columnSpan: 3, rowSpan: 2 },
-        null,
-        null
-      ],
-      [
-        { value: '3.1' },
-        { value: '3.2' },
-        { value: '3.3' }
-      ]
-    ], { features: [] }))
-      .to.throw('Cell at row 3 and column 1')
+    expect(() => {
+      processMergedCells([
+        [
+          { value: '1.1' },
+          { value: '1.2' },
+          { value: '1.3' }
+        ],
+        [
+          { value: '2.1', columnSpan: 3, rowSpan: 2 },
+          null,
+          null
+        ],
+        [
+          { value: '3.1' },
+          { value: '3.2' },
+          { value: '3.3' }
+        ]
+      ], [])
+    }).to.throw('Cell at row 3 and column 1')
   })
 
   it('should copy styles to hidden cells in case of groups of merged cells', () => {
@@ -163,21 +165,20 @@ describe('processMergedCells()', () => {
       ]
     ]
 
-    expect(processMergedCells(sheetData, { features: [] }))
-      .to.deep.equal({
-        sheetData: [
-          [
-            { value: '1', columnSpan: 3, textColor: '#cc0000' },
-            { textColor: '#cc0000' },
-            { textColor: '#cc0000' }
-          ]
-        ],
-        mergedCells: [
-          [
-            [0, 0],
-            [0, 2]
-          ]
+    expect(processMergedCells(sheetData, [])).to.deep.equal({
+      sheetData: [
+        [
+          { value: '1', columnSpan: 3, textColor: '#cc0000' },
+          { textColor: '#cc0000' },
+          { textColor: '#cc0000' }
         ]
-      })
+      ],
+      mergedCells: [
+        [
+          [0, 0],
+          [0, 2]
+        ]
+      ]
+    })
   })
 })

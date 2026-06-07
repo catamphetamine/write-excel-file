@@ -41,7 +41,7 @@ describe('writeXlsxFile', function() {
     // Test `writeXlsxFileUniversal()` function.
     const universalOutputBlob = await writeXlsxFileUniversal([['a', 'b', 'c'], [1, 2, 3]]).toBlob()
     const universalOutputBuffer = Buffer.from(await universalOutputBlob.arrayBuffer())
-    await fs.writeFileSync(path.join(OUTPUT_DIRECTORY, 'universal.xlsx'), universalOutputBuffer)
+    await fs.writeFileSync(path.join(OUTPUT_DIRECTORY, 'universal-export.xlsx'), universalOutputBuffer)
 
     console.log('Check `*.xlsx` files in the `./test-output` folder')
 

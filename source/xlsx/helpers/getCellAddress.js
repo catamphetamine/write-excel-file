@@ -1,4 +1,10 @@
-export default function getCellCoordinate(rowIndex, columnIndex) {
+/**
+ * Gets spreadsheet cell string coordinate from row index and column index.
+ * @param {number} rowIndex
+ * @param {number} columnIndex
+ * @returns {string}
+ */
+export default function getCellAddress(rowIndex, columnIndex) {
   return `${getColumnLetter(columnIndex)}${rowIndex + 1}`
 }
 

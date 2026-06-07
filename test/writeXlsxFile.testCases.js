@@ -165,7 +165,7 @@ export default {
 		]
 	},
 
-	'type-autodetection': {
+	'cell-type-not-specified-should-autodetect-from-value': {
 		args: () => [
 			data.map(
 				row => row.map(
@@ -552,7 +552,53 @@ export default {
 		}
 	},
 
-	'conditional-formatting': {
+	'custom-feature-transform-element-attributes-replace-fourth-column-type-from-boolean-to-number-and-rename-sheet': {
+		args: () => {
+			const customFeature = {
+				files: {
+					transform: {
+						'xl/workbook.xml': {
+							transformElementAttributes: (tagName, attributes, index, sheetOptions, properties) => {
+								if (tagName === 'sheet' && index === 0) {
+									return {
+										...attributes,
+										name: 'Renamed Sheet'
+									}
+								}
+								return attributes
+							}
+						},
+
+						'xl/worksheets/sheet{id}.xml': {
+							transformElementAttributes: (tagName, attributes, index, sheetOptions, properties) => {
+								if (tagName === 'c') {
+									// Test the correctness of `properties` and `sheetOptions`.
+									if (properties.sheetIndex === 0 && properties.sheetId === '1' && sheetOptions.columns === columns) {
+										if (index === 3) {
+											// Transform "boolean" cell type to "number" cell type.
+											return {
+												...attributes,
+												t: 'n'
+											}
+										}
+									}
+								}
+								return attributes
+							}
+						}
+					}
+				}
+			}
+
+			return [
+				data,
+				{ columns },
+				{ features: [customFeature] }
+			]
+		}
+	},
+
+	'conditional-formatting-background-color-red': {
 		args: () => [
 			data,
 			{
@@ -586,7 +632,7 @@ export default {
 
 	// There was a bug when using conditional formatting with column span resulted in a corrupt file.
 	// https://github.com/catamphetamine/write-excel-file/issues/12
-	'conditional-formatting-with-column-span': {
+	'conditional-formatting-background-color-red-with-column-span': {
 		args: () => {
 			// Create `data` with `span`.
 			const dataSpan = data.slice()

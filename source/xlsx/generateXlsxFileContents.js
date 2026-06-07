@@ -5,7 +5,7 @@ import generateContentTypesXml, { getDrawingContentTypeXml } from './files/[Cont
 import generateDrawingXml, { DRAWING_XML_START, DRAWING_XML_END } from './files/drawing.xml.js'
 import generateDrawingXmlRels from './files/drawing.xml.rels.js'
 import generateSheetXml from './files/sheet.xml/sheet.xml.js'
-import { DRAWING_REFERENCE_XML } from './files/sheet.xml/drawingReference.js'
+import generateDrawingReferenceXml from './files/sheet.xml/drawingReference.js'
 import generateSheetXmlRels, { getDrawingRelationshipXml } from './files/sheet.xml.rels.js'
 import generateSharedStringsXml from './files/sharedStrings.xml.js'
 import generateStylesXml from './files/styles.xml.js'
@@ -17,6 +17,8 @@ import getSheetData from '../getSheetData/getSheetData.js'
 
 import getWrittenFiles from './helpers/features/getWrittenFiles.js'
 import isObject from './helpers/isObject.js'
+
+import getSelfClosingTagMarkup from '../xml/getSelfClosingTagMarkup.js'
 
 /**
  * Creates contents (files) an `*.xlsx` file.
@@ -147,12 +149,16 @@ function removeUnusedDrawings(files, sheets) {
       delete files[`xl/drawings/drawing${sheetId}.xml`]
       delete files[`xl/drawings/_rels/drawing${sheetId}.xml.rels`]
 
-      removeSubstring(files, `xl/worksheets/sheet${sheetId}.xml`, DRAWING_REFERENCE_XML)
+      if (!removeSubstring(files, `xl/worksheets/sheet${sheetId}.xml`, generateDrawingReferenceXml(getSelfClosingTagMarkup))) {
+        throw new Error(COULD_NOT_REMOVE_UNUSED_DRAWINGS)
+      }
       removeSubstring(files, `xl/worksheets/_rels/sheet${sheetId}.xml.rels`, getDrawingRelationshipXml(sheetId))
       removeSubstring(files, '[Content_Types].xml', getDrawingContentTypeXml(sheetId))
     }
   }
 }
+
+const COULD_NOT_REMOVE_UNUSED_DRAWINGS = 'Couldn\'t remove unused drawings'
 
 function removeSubstring(files, key, substring) {
   if (!files[key]) {
@@ -161,7 +167,10 @@ function removeSubstring(files, key, substring) {
   if (files[key].indexOf(substring) < 0) {
     throw new Error(`Substring "${substring}" not found in "${key}"`)
   }
-  files[key] = files[key].replace(substring, '')
+  const stringBeforeRemoval = files[key]
+  const stringAfterRemoval = stringBeforeRemoval.replace(substring, '')
+  files[key] = stringAfterRemoval
+  return stringBeforeRemoval !== stringAfterRemoval
 }
 
 function validateFilePath(path) {

@@ -19,7 +19,7 @@ import getCellStyleProperties from './helpers/getCellStyleProperties.js'
 //   [...]
 // ]
 
-export default function processMergedCells(sheetData, { features }) {
+export default function processMergedCells(sheetData, features) {
 	const mergedCells = []
 
 	let cloneSheetData = () => {

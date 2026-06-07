@@ -1,101 +1,30 @@
 import generateCell from './cell.js'
 import getCellStyleProperties from './helpers/getCellStyleProperties.js'
-import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
-import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
 import isCellObject from '../../helpers/isCellObject.js'
 
-export default function generateRow(row, rowIndex, {
-	findOrCreateCellStyle,
-	findOrCreateSharedString,
-	hasDefaultFont,
-	dateFormat,
-	features
-}) {
-	// To ensure the row number starts as in Excel.
-	const rowNumber = rowIndex + 1
+export default function generateRow(tag, row, index, parameters) {
+	// Calculate row height.
 	let rowHeight
-	const rowCells = row
-		.map((cell, columnIndex) => {
-			if (cell === undefined || cell === null) {
-				return ''
-			}
-
-			const cellObject = isCellObject(cell) ? cell : { value: cell }
-
-			const cellStyleProperties = getCellStyleProperties(cellObject, features)
-
-			const {
-				height
-			} = cellObject
-
-			let {
-				type,
-				value,
-				format
-			} = cellObject
-
-			if (isEmpty(value)) {
-				value = null
-			} else {
-				// Get cell value type.
-				if (type === undefined) {
-					type = detectValueType(value)
-					if (type === undefined) {
-						// The default cell value type is `String`.
-						type = String
-						value = String(value)
-					}
+	for (const cell of row) {
+		if (isCellObject(cell)) {
+			if (cell.height) {
+				if (rowHeight === undefined || rowHeight < cell.height) {
+					rowHeight = cell.height
 				}
 			}
+		}
+	}
 
-			// Validate `format` property.
-			if (format) {
-				if (type !== Date && type !== Number && type !== String && type !== 'Formula') {
-					throw new Error(`\`format\` "${format}" was specified on a cell of type \`${type}\`. \`format\` could only be specified on a cell of type \`Date\`, \`Number\`, \`String\` or \`"Formula"\`.`)
-				}
-				if (type === String && format !== '@') {
-					throw new Error(`\`format\` "${format}" was specified on a cell of type \`String\`. The only supported \`format\` for a cell of type \`String\` is "@".`)
-				}
-			} else {
-				if (type === Date) {
-					format = dateFormat
-				}
-			}
-
-			const hasFormat = Boolean(format)
-			const hasCellStyle = Boolean(cellStyleProperties)
-
-			let cellStyleId
-			if (
-				hasDefaultFont ||
-				hasFormat ||
-				hasCellStyle
-			) {
-				cellStyleId = findOrCreateCellStyle({
-					format,
-					...cellStyleProperties
-				})
-			}
-
-			if (height) {
-				if (rowHeight === undefined || rowHeight < height) {
-					rowHeight = height
-				}
-			}
-
-			return generateCell(
-				rowNumber,
-				columnIndex,
-				value,
-				type,
-				cellStyleId,
-				findOrCreateSharedString
-			)
+	// Generate `<r/>` element inner XML.
+	const rowIndex = index
+	const rowCellsXml = row
+		.map((cell, index) => {
+			return getCellXml(tag, cell, index, rowIndex, parameters)
 		})
 		.join('')
 
 	const rowAttributes = {
-		r: rowNumber
+		r: index + 1
 	}
 
 	if (rowHeight) {
@@ -103,7 +32,79 @@ export default function generateRow(row, rowIndex, {
 		rowAttributes.customHeight = 1
 	}
 
-	return getOpeningTagMarkup('row', rowAttributes) + rowCells + getClosingTagMarkup('row')
+	return tag('row', rowAttributes, rowCellsXml, index)
+}
+
+function getCellXml(tag, cell, index, rowIndex, {
+	findOrCreateCellStyle,
+	findOrCreateSharedString,
+	hasDefaultFont,
+	dateFormat,
+	features
+}) {
+	if (cell === undefined || cell === null) {
+		return ''
+	}
+
+	const cellObject = isCellObject(cell) ? cell : { value: cell }
+
+	const cellStyleProperties = getCellStyleProperties(cellObject, features)
+
+	let {
+		type,
+		value,
+		format
+	} = cellObject
+
+	if (isEmpty(value)) {
+		value = null
+	} else {
+		// Get cell value type.
+		if (type === undefined) {
+			type = detectValueType(value)
+			if (type === undefined) {
+				// The default cell value type is `String`.
+				type = String
+				value = String(value)
+			}
+		}
+	}
+
+	// Validate `format` property.
+	if (format) {
+		if (type !== Date && type !== Number && type !== String && type !== 'Formula') {
+			throw new Error(`\`format\` "${format}" was specified on a cell of type \`${type}\`. \`format\` could only be specified on a cell of type \`Date\`, \`Number\`, \`String\` or \`"Formula"\`.`)
+		}
+		if (type === String && format !== '@') {
+			throw new Error(`\`format\` "${format}" was specified on a cell of type \`String\`. The only supported \`format\` for a cell of type \`String\` is "@".`)
+		}
+	} else {
+		if (type === Date) {
+			format = dateFormat
+		}
+	}
+
+	const hasFormat = Boolean(format)
+	const hasCellStyle = Boolean(cellStyleProperties)
+
+	let cellStyleId
+	if (
+		hasDefaultFont ||
+		hasFormat ||
+		hasCellStyle
+	) {
+		cellStyleId = findOrCreateCellStyle({
+			format,
+			...cellStyleProperties
+		})
+	}
+
+	return generateCell(tag, {
+		value,
+		type,
+		cellStyleId,
+		findOrCreateSharedString
+	}, index, rowIndex)
 }
 
 function isEmpty(value) {

@@ -1,3 +1,17 @@
+4.1.0 / 07.06.2026
+==================
+
+* In `write-excel-file/node` export, replaced `archiver` dependency with `fflate`. In other words, in Node.js, `.xlsx` file internals zipping is now done by `fflate` package rather than `archiver` package.
+
+* "Features" can now transform XML element attributes in the form of a JSON object. See the new `transformElementAttributes()` function.
+  * Currently, it only supports the following files:
+    * `xl/worksheets/sheet{id}.xml`
+    * `xl/workbook.xml`
+
+* The `/utility` subpackage now exports two additional functions:
+  * `getCellAddress(rowIndex, columnIndex)` — Converts cell row and column indexes to an address like `A1`, `B2`, etc.
+  * `convertDateToSerialNumber(date)` — Converts a `Date` to an XLSX ["serial number"](https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487).
+
 4.0.6 / 07.05.2026
 ==================
 

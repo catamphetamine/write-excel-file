@@ -1,13 +1,13 @@
 // Returns the content that should be inserted by `features` when performing a `transformName` transform.
 export default function getAdditionalContent(
-	transformName,
+	fileName,
 	features,
 	sheetOptions,
 	properties
 ) {
 	let content = ''
 	for (const feature of features) {
-		const transform = feature.files && feature.files.transform && feature.files.transform[transformName]
+		const transform = feature.files && feature.files.transform && feature.files.transform[fileName]
 		if (transform && transform.insert) {
 			const insertedContent = transform.insert(
 				sheetOptions,

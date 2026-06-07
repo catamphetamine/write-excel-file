@@ -15,6 +15,11 @@ const hour = 60 * 60 * 1000
 
 const day = 24 * hour
 
-export default function convertDateToExcelSerial(date) {
+/**
+ * Converts a `Date` into an XLSX "serial" number.
+ * @param {Date} date
+ * @returns {number}
+ */
+export default function convertDateToSerialNumber(date) {
   return date.getTime() / day + daysBeforeUnixEpoch
 }

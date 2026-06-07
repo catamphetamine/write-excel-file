@@ -1,11 +1,13 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
+import getElementXml from '../../helpers/features/getElementXml.js'
+
 import generateColumnsDescription from './columns.js'
 
 describe('generateColumns()', () => {
   it('should generate columns description', () => {
-    expect(generateColumnsDescription([
+    expect(generateColumnsDescription(tag, [
       {
         value: 'Test',
         type: String,
@@ -21,3 +23,7 @@ describe('generateColumns()', () => {
     )
   })
 })
+
+function tag(tagName, attributes, innerXml) {
+  return getElementXml('xl/worksheets/sheet{id}.xml', tagName, attributes, innerXml, 0, {}, {}, [])
+}

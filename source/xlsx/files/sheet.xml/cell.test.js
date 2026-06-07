@@ -1,17 +1,19 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
-import generateCell from './cell.js'
+import getElementXml from '../../helpers/features/getElementXml.js'
+
+import generateCell_ from './cell.js'
 
 describe('generateCell()', () => {
   describe('Create a cell of type Sting', () => {
     it('should throw if invalid type was supplied', () => {
-      expect(() => generateCell(1, 0, 'Test', 'Unsupported'))
+      expect(() => generateCell(0, 0, 'Test', 'Unsupported'))
         .to.throw('Unknown type: Unsupported')
     })
 
     it('should create a cell', () => {
-      expect(generateCell(1, 0, 'Test', String, undefined, () => 0)).to.equal(
+      expect(generateCell(0, 0, 'Test', String, undefined, () => 0)).to.equal(
         // '<c r="A1" t="inlineStr"><is><t>Test</t></is></c>'
         '<c r="A1" t="s"><v>0</v></c>'
       )
@@ -20,40 +22,65 @@ describe('generateCell()', () => {
 
   describe('Create a cell of type Number', () => {
     it('should create a cell', () => {
-      expect(generateCell(1, 1, 1000, Number))
+      expect(generateCell(0, 1, 1000, Number))
         .to.equal('<c r="B1"><v>1000</v></c>')
     })
 
     it('should create a cell with a cell style ID', () => {
       const cellStyleId = 123
-      expect(generateCell(1, 1, 1000, Number, cellStyleId))
+      expect(generateCell(0, 1, 1000, Number, cellStyleId))
         .to.equal(`<c r="B1" s="${cellStyleId}"><v>1000</v></c>`)
     })
   })
 
   describe('Create a cell of type Date', () => {
     it('should throw if no date format was supplied', () => {
-      expect(() => generateCell(1, 0, new Date(2020, 11, 30), Date))
+      expect(() => generateCell(0, 0, new Date(2020, 11, 30), Date))
         .to.throw('No `format`')
     })
 
     it('should create a cell', () => {
       const cellStyleId = 123
-      expect(generateCell(1, 0, new Date(2020, 11, 30), Date, cellStyleId, () => 0))
+      expect(generateCell(0, 0, new Date(2020, 11, 30), Date, cellStyleId, () => 0))
         // .to.equal('<c r="B1" t="inlineStr"><is><t>example@domain.com</t></is></c>')
         .to.equal(`<c r="A1" s="${cellStyleId}"><v>44194.875</v></c>`)
     })
 
     it('should create an empty cell (`null`) (has custom style)', () => {
       const cellStyleId = 123
-      expect(generateCell(1, 0, null, Date, cellStyleId, () => 0))
+      expect(generateCell(0, 0, null, Date, cellStyleId, () => 0))
         .to.equal('<c r="A1" s="123"/>')
     })
 
     it('should create an empty cell (`null`) (no custom style)', () => {
       const cellStyleId = undefined
-      expect(generateCell(1, 0, null, Date, cellStyleId, () => 0))
+      expect(generateCell(0, 0, null, Date, cellStyleId, () => 0))
         .to.equal('')
     })
   })
 })
+
+function generateCell(
+  rowIndex,
+  columnIndex,
+  value,
+  type,
+  cellStyleId, // There are test cases specifically with `cellStyleId: undefined`.
+  findOrCreateSharedString
+) {
+  return generateCell_(
+    tag,
+    {
+      value,
+      type,
+      cellStyleId,
+      findOrCreateSharedString
+    },
+    columnIndex,
+    rowIndex
+  )
+}
+
+function tag(tagName, attributes, innerXml) {
+  return getElementXml('xl/worksheets/sheet{id}.xml', tagName, attributes, innerXml, 0, {}, {}, [])
+}

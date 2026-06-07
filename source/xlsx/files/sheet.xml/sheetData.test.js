@@ -3,29 +3,32 @@ import { expect } from 'chai'
 
 import getElementXml from '../../helpers/features/getElementXml.js'
 
-import generateRow from './row.js'
+import sheetData from './sheetData.js'
 
-describe('generateRow()', () => {
-  it('Should create one row from given data', () => {
-    expect(generateRow(
+describe('sheet.xml/sheetData', () => {
+  it('should generate rows', () => {
+    expect(sheetData(
       tag,
-      [
-        { value: 'Test', type: String },
-        { value: 1000, type: Number }
-      ],
-      0,
+      [[{
+        value: 'Test',
+        type: String
+      }, {
+        value: 1000,
+        type: Number
+      }]],
       {
         findOrCreateSharedString(string) {
           return 0
-        },
+        }
+      },
+      {
         sheetIndex: 0,
         sheetId: 1,
         sheetOptions: {},
         features: []
       }
     )).to.equal(
-      // '<row r="1"><c r="A1" t="inlineStr"><is><t>Test</t></is></c><c r="B1"><v>1000</v></c></row>'
-    	'<row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>1000</v></c></row>'
+    	'<sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>1000</v></c></row></sheetData>'
     )
   })
 })

@@ -18,6 +18,8 @@ import {
 	sanitizeAttributeName,
 	sanitizeAttributeValue,
 	sanitizeTextContent,
+	getCellAddress,
+	convertDateToSerialNumber,
 	// Deprecated exports.
 	escapeAttributeName,
 	escapeAttributeValue,
@@ -44,6 +46,8 @@ describe('/utility', () => {
 		expect(sanitizeAttributeName).to.be.a('function')
 		expect(sanitizeAttributeValue).to.be.a('function')
 		expect(sanitizeTextContent).to.be.a('function')
+		expect(getCellAddress).to.be.a('function')
+		expect(convertDateToSerialNumber).to.be.a('function')
 		// Deprecated exports.
 		expect(escapeAttributeName).to.be.a('function')
 		expect(escapeAttributeValue).to.be.a('function')
@@ -67,6 +71,8 @@ describe('/utility', () => {
 		expect(CommonJs.sanitizeAttributeName).to.be.a('function')
 		expect(CommonJs.sanitizeAttributeValue).to.be.a('function')
 		expect(CommonJs.sanitizeTextContent).to.be.a('function')
+		expect(CommonJs.getCellAddress).to.be.a('function')
+		expect(CommonJs.convertDateToSerialNumber).to.be.a('function')
 		// Deprecated exports
 		expect(CommonJs.escapeAttributeName).to.be.a('function')
 		expect(CommonJs.escapeAttributeValue).to.be.a('function')

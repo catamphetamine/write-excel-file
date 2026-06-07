@@ -1,9 +1,10 @@
 import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
 
-export default function generateViews({
-	sheetIndex,
-	...viewProperties
-}) {
+export default function generateSheetViews(
+	tag,
+	viewProperties,
+	sheetIndex
+) {
 	if (!hasView(viewProperties)) {
 		return ''
 	}
@@ -13,8 +14,6 @@ export default function generateViews({
 		rightToLeft,
 		zoomScale
 	} = viewProperties
-
-	let views = ''
 
 	const sheetViewAttributes = {
 		tabSelected: sheetIndex === 0 ? 1 : 0, // The first sheet is selected by default.
@@ -38,11 +37,9 @@ export default function generateViews({
 		sheetViewAttributes.zoomScale = Math.round(zoomScale * 100)
 	}
 
-	views += '<sheetViews>'
-	views += getSelfClosingTagMarkup('sheetView', sheetViewAttributes)
-	views += '</sheetViews>'
+	const sheetViewXml = tag('sheetView', sheetViewAttributes, null, 0)
 
-	return views
+	return tag('sheetViews', null, sheetViewXml)
 }
 
 function hasView({

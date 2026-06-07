@@ -81,7 +81,7 @@ export default {
 
         stream.pipe(outputStream)
         stream.on('end', function () {
-          console.log('Readalbe stream ended')
+          console.log('Readable stream ended')
         })
         stream.on('error', function (error) {
           reject(error)

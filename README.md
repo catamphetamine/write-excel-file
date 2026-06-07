@@ -584,7 +584,11 @@ An `.xlsx` file is really just a `*.zip` archive with the `.zip` file extension 
 
 ######
 
-Sidenote: When implementing a "feature", one could use the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage (the built-in "features" use these same helper functions):
+When implementing a "feature", there're two approaches to modifying `*.xml` files: either by "raw" XML markup manipulation or by JSON attributes modification. A developer could choose whatever's more convenient.
+
+JSON attributes modification works on a per-element basis, but is only supported for `xl/worksheets/sheet{id}.xml` and `xl/workbook.xml` files. To use it, define a `transformElementAttributes(tagName, attributes: object, index?, options, properties): object` function. See the TypeScript definition for more details.
+
+When choosing "raw" XML markup manipulation, one could utilize the few ["helper" functions](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xml) that are available for import from `write-excel-file/utility` subpackage — the built-in "features" use these same helper functions:
 
 * `findElement(xml, 'tag')` — Finds a single `<tag/>` element.
 * `findElementInsideElement(xml, 'tag', enclosingElement)` — Finds a single `<tag/>` element inside a given element.
@@ -607,10 +611,12 @@ Sidenote: When implementing a "feature", one could use the few ["helper" functio
 * `sanitizeAttributeName('attribute')` — "Sanitizes" a string for output as an attribute name. Removes any illegal characters. Escapes any "special" characters.
 * `sanitizeAttributeValue('value')` — "Sanitizes" a string for output as an attribute value. Removes any illegal characters. Escapes any "special" characters.
 * `sanitizeTextContent('text')` — "Sanitizes" a string for output as text content of an XML element. Removes any illegal characters. Escapes any "special" characters.
+* `getCellAddress(rowIndex, columnIndex)` — Converts cell row and column indexes to an address like `A1`, `B2`, etc.
+* `convertDateToSerialNumber(date)` — Converts a `Date` to an XLSX ["serial number"](https://support.microsoft.com/en-us/office/date-systems-in-excel-e7fe7167-48a9-4b96-bb53-5612a800b487).
 
 For an example of a "feature" implementation see [`./source/xlsx/features`](https://gitlab.com/catamphetamine/write-excel-file/-/tree/main/source/xlsx/features) directory of the code repository. Also see the definition of the `Feature` TypeScript interface in `./index.d.ts` file and also see `./types/features` directory for TypeScript definitions of the built-in "features". Also, see an [example](https://gitlab.com/catamphetamine/write-excel-file/-/blob/main/README_FEATURE_SENSITIVITY_LABEL.md) that adds a "sensitivity label" feature.
 
-The idea is that any "feature" has "raw" unrestricted read/write access to any of the files inside the `.xlsx` file. This means that anything is possible to implement. But it's not necessarily the most convenient way. More likely, implementing a feature will involve manipulating the markup of multiple `.xml` files through juggling with different elements and attributes in order to cover all possible cases, which is gonna feel clunky. But at the end of the day, flexibility outweighs convenience. For me as a "core" maintainer, at least. Potential (questionable) improvements could include adding a "hook" like `transformElementXml(elementXml, elementTagName, xmlFileName, { elementIndex, sheetId }, sheetOptions)`, but that would clutter the code further and I feel like the existing tools are already enough.
+The idea is that any "feature" has "raw" unrestricted read/write access to any of the files inside the `.xlsx` file. This means that anything is possible to implement. But it's not necessarily the most convenient way. More likely, implementing a feature will involve manipulating the markup of multiple `.xml` files through juggling with different elements and attributes in order to cover all possible cases, which is gonna feel clunky. But at the end of the day, flexibility outweighs convenience. For me as a "core" maintainer, at least.
 
 If a "feature" needs access to sheet data, simply pass it as an argument to the feature constructor:
 
@@ -632,6 +638,7 @@ Summary: This package intentionally offloads any non-essential stuff to custom "
 Here're some of the third-party features submitted by other developers.
 
 * [`@onparallel/write-excel-file-data-validation`](https://www.npmjs.com/package/@onparallel/write-excel-file-data-validation) — Adds interactive user input "data validation" when editing a spreadsheet: choosing a value from a [pre-defined list](https://www.youtube.com/shorts/9GX3kbfWxj0), restricting a numeric/integer/date/time value to a [certain range](https://www.youtube.com/shorts/pysK1Z0YJNk), adding [text length](https://www.youtube.com/shorts/9leDTxRNUA0) constraints, or validating user input using custom [formulas](https://www.youtube.com/watch?v=bDXQy60BcT4) in "tricky" cases.
+* [`@onparallel/write-excel-file-hide-rows-and-columns`](https://www.npmjs.com/package/@onparallel/write-excel-file-hide-rows-and-columns) — Allows hiding certain rows or columns.
 
 ## Images
 

@@ -1,18 +1,18 @@
 import sanitizeTextContent from '../../../xml/sanitizeTextContent.js'
-import getOpeningTagMarkup from '../../../xml/getOpeningTagMarkup.js'
-import getClosingTagMarkup from '../../../xml/getClosingTagMarkup.js'
-import getSelfClosingTagMarkup from '../../../xml/getSelfClosingTagMarkup.js'
 
-import getCellCoordinate from '../../helpers/getCellCoordinate.js'
-import convertDateToExcelSerial from './helpers/convertDateToExcelSerial.js'
+import getCellAddress from '../../helpers/getCellAddress.js'
+import convertDateToSerialNumber from '../../helpers/convertDateToSerialNumber.js'
 
 export default function generateCell(
-  rowNumber,
-  columnIndex,
-  value,
-  type,
-  cellStyleId,
-  findOrCreateSharedString
+  tag,
+  {
+    value,
+    type,
+    cellStyleId,
+    findOrCreateSharedString
+  },
+  index,
+  rowIndex
 ) {
   // Empty cells could be skipped completely,
   // if they don't have a style applied to them,
@@ -24,7 +24,7 @@ export default function generateCell(
   }
 
   const cellAttributes = {
-    r: getCellCoordinate(rowNumber - 1, columnIndex)
+    r: getCellAddress(rowIndex, index)
   }
 
   // Available formatting style IDs (built-in in Excel):
@@ -37,32 +37,30 @@ export default function generateCell(
   }
 
   if (value === null) {
-    return getSelfClosingTagMarkup('c', cellAttributes)
+    return tag('c', cellAttributes, null, index)
   }
 
   // Validate date format.
   if (type === Date && cellStyleId === undefined) {
-    throw new Error(`No \`format\` was specified for a \`Date\` value in a cell in row ${rowNumber} column ${columnIndex + 1}. Either specify a \`format\` for this cell or specify a default global one by passing \`dateFormat\` option to \`writeXlsxFile()\` function`)
+    throw new Error(`No \`format\` was specified for a \`Date\` value in a cell in row ${rowIndex + 1} column ${index + 1}. Either specify a \`format\` for this cell or specify a default global one by passing \`dateFormat\` option to \`writeXlsxFile()\` function`)
   }
 
-  const xlsxValue = getXlsxValue(type, value, findOrCreateSharedString)
-  const xlsxType = getXlsxType(type)
+  const valueTextContent = getValueTextContent(type, value, findOrCreateSharedString)
+  const typeAttribute = getTypeAttribute(type)
 
   // The default value for `t` is `"n"` (a number or a date).
-  if (xlsxType) {
-    cellAttributes.t = xlsxType
+  if (typeAttribute) {
+    cellAttributes.t = typeAttribute
   }
 
-  const [openingTags, closingTags] = getOpeningAndClosingTags(type)
+  const [valueOpeningTags, valueClosingTags] = getOpeningAndClosingTags(type)
 
-  return getOpeningTagMarkup('c', cellAttributes) +
-    openingTags +
-    xlsxValue +
-    closingTags +
-    getClosingTagMarkup('c')
+  const cellXml = valueOpeningTags + valueTextContent + valueClosingTags
+
+  return tag('c', cellAttributes, cellXml, index)
 }
 
-function getXlsxType(type) {
+function getTypeAttribute(type) {
   // Available Excel cell types:
   // https://github.com/SheetJS/sheetjs/blob/19620da30be2a7d7b9801938a0b9b1fd3c4c4b00/docbits/52_datatype.md
   //
@@ -98,7 +96,7 @@ function getXlsxType(type) {
   }
 }
 
-function getXlsxValue(type, value, findOrCreateSharedString) {
+function getValueTextContent(type, value, findOrCreateSharedString) {
   // Available Excel cell types:
   // https://github.com/SheetJS/sheetjs/blob/19620da30be2a7d7b9801938a0b9b1fd3c4c4b00/docbits/52_datatype.md
   //
@@ -124,7 +122,7 @@ function getXlsxValue(type, value, findOrCreateSharedString) {
       }
       // "d" type doesn't seem to work.
       // return value.toISOString()
-      return String(convertDateToExcelSerial(value))
+      return String(convertDateToSerialNumber(value))
 
     case Boolean:
       if (typeof value !== 'boolean') {

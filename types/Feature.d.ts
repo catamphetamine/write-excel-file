@@ -1,6 +1,6 @@
 import type { SheetOptions } from './SheetOptions.d.js'
 
-// `feature.files.transform` type
+// `feature.files.transform` type:
 
 interface FeatureTransformFile_<Options, Properties> {
 	// Inserts XML markup inside the root element (at its end).
@@ -15,7 +15,32 @@ interface FeatureTransformFile_<Options, Properties> {
 		options: Options,
 		properties: Properties
 	) => string;
+
+	// Transforms a given element's attributes.
+	// Currently, it only supports the following files:
+	// * 'xl/worksheets/sheet{id}.xml'
+	// * 'xl/workbook.xml'
+	transformElementAttributes?: (
+		tagName: string,
+		attributes: ElementAttributes,
+		// `index` property is a "logical" index of the element inside its parent element.
+		// It's not necessarily same as the actual index of the element inside the parent.
+		//
+		// For example, empty rows won't result in actual insertion of an `<r/>` element.
+		// Yet, `transformElementAttributes()` function will be called for each row,
+		// regardless of whether it's empty or not, with the `index` property being equal
+		// to the row index.
+		//
+		// The `index` is only present where it makes sense, i.e. when iterating through children
+		// having same tag name, such as iterating through `<r/>` elements inside `<sheetData/>`.
+		//
+		index: number | undefined,
+		options: Options,
+		properties: Properties
+	) => ElementAttributes;
 }
+
+type ElementAttributes = Record<string, string | number>
 
 interface FeatureTransformFileProperties {}
 
@@ -36,7 +61,7 @@ interface FeatureTransformFileRelatedToSpecificSheet<FileContent> extends Featur
 	FeatureTransformFilePropertiesWithSheetInfo
 > {}
 
-// `feature.files.write` type
+// `feature.files.write` type:
 
 interface FeatureWriteFiles<FileContent> {
 	// Writes new files or overwrites existing ones.
@@ -53,7 +78,7 @@ interface FeatureWriteFilesProperties<FileContent> {
 	read(path: string): ReadableFileContent<FileContent> | undefined;
 }
 
-// `feature` type
+// `feature` type:
 
 export interface Feature<FileContent> {
 	files?: {

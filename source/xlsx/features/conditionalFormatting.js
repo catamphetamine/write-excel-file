@@ -7,7 +7,7 @@ import hasBorder from '../helpers/hasBorder.js'
 import getBorderXml from '../helpers/getBorderXml.js'
 import hasFont from '../helpers/hasFont.js'
 import getFontXml from '../helpers/getFontXml.js'
-import getCellCoordinate from '../helpers/getCellCoordinate.js'
+import getCellAddress from '../helpers/getCellAddress.js'
 import getOrderOfSiblings from '../helpers/getOrderOfSiblings.js'
 
 export default {
@@ -63,7 +63,7 @@ function getConditionalFormattingRulesXml(conditionalFormattingRules) {
 		} = conditionalFormattingRule
 
 		// Cell range example: "A1:C5"
-		const cellRange = getCellCoordinate(from.row - 1, from.column - 1) + ':' + getCellCoordinate(to.row - 1, to.column - 1)
+		const cellRange = getCellAddress(from.row - 1, from.column - 1) + ':' + getCellAddress(to.row - 1, to.column - 1)
 
 		xml += `<conditionalFormatting sqref="${cellRange}">`
 

@@ -8,7 +8,7 @@ import getSelfClosingTagMarkup from '../../xml/getSelfClosingTagMarkup.js'
 import findElementInsideElement from '../../xml/findElementInsideElement.js'
 import insertElementMarkupAccordingToOrderOfSiblings from '../../xml/insertElementMarkupAccordingToOrderOfSiblings.js'
 
-import getCellCoordinate from '../helpers/getCellCoordinate.js'
+import getCellAddress from '../helpers/getCellAddress.js'
 import getOrderOfSiblings from '../helpers/getOrderOfSiblings.js'
 
 export default {
@@ -27,7 +27,7 @@ export default {
 							// or, when frozen, the number of visible columns in the left pane(s).
 							xSplit: stickyColumnsCount || 0,
 							// The visible cell in the top-left corner of the bottom-right pane.
-							topLeftCell: getCellCoordinate(stickyRowsCount || 0, stickyColumnsCount || 0),
+							topLeftCell: getCellAddress(stickyRowsCount || 0, stickyColumnsCount || 0),
 							// `activePane` defines which pane is active in a "split" or "frozen" `state`.
 							// Possible values: "bottomLeft", "bottomRight", "topLeft", "topRight".
 							activePane: 'bottomRight',

@@ -14,6 +14,8 @@ export { default as sanitizeAttributeName } from '../modules/xml/sanitizeAttribu
 export { default as sanitizeAttributeValue } from '../modules/xml/sanitizeAttributeValue.js'
 export { default as sanitizeTextContent } from '../modules/xml/sanitizeTextContent.js'
 export { default as getOrderOfSiblings } from '../modules/xlsx/helpers/getOrderOfSiblings.js'
+export { default as getCellAddress } from '../modules/xlsx/helpers/getCellAddress.js'
+export { default as convertDateToSerialNumber } from '../modules/xlsx/helpers/convertDateToSerialNumber.js'
 // Deprecated exports.
 export { default as escapeAttributeName } from '../modules/xml/sanitizeAttributeName.js'
 export { default as escapeAttributeValue } from '../modules/xml/sanitizeAttributeValue.js'

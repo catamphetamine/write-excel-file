@@ -14,6 +14,8 @@ exports.sanitizeAttributeName = require('../commonjs/xml/sanitizeAttributeName.j
 exports.sanitizeAttributeValue = require('../commonjs/xml/sanitizeAttributeValue.js').default
 exports.sanitizeTextContent = require('../commonjs/xml/sanitizeTextContent.js').default
 exports.getOrderOfSiblings = require('../commonjs/xlsx/helpers/getOrderOfSiblings.js').default
+exports.getCellAddress = require('../commonjs/xlsx/helpers/getCellAddress.js').default
+exports.convertDateToSerialNumber = require('../commonjs/xlsx/helpers/convertDateToSerialNumber.js').default
 // Deprecated exports.
 exports.escapeAttributeName = require('../commonjs/xml/sanitizeAttributeName.js').default
 exports.escapeAttributeValue = require('../commonjs/xml/sanitizeAttributeValue.js').default

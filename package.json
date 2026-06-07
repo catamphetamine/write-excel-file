@@ -1,6 +1,6 @@
 {
   "name": "write-excel-file",
-  "version": "4.0.7",
+  "version": "4.1.0",
   "description": "Write simple `*.xlsx` files in a browser or Node.js",
   "type": "module",
   "exports": {
@@ -45,7 +45,6 @@
     "node": ">=18"
   },
   "dependencies": {
-    "archiver-node": "^8.0.7",
     "fflate": "^0.8.2"
   },
   "devDependencies": {

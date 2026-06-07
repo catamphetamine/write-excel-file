@@ -1,6 +1,8 @@
 import { describe, it } from 'mocha'
 import { expect } from 'chai'
 
+import getElementXml from '../../helpers/features/getElementXml.js'
+
 import generateMergedCellsDescription from './mergedCellsDescription.js'
 import processMergedCells from './processMergedCells.js'
 
@@ -16,7 +18,7 @@ describe('generateMergedCellsDescription()', () => {
 
     const { mergedCells } = processMergedCells(data, { features: [] })
 
-    expect(generateMergedCellsDescription(mergedCells))
+    expect(generateMergedCellsDescription(tag, mergedCells))
       .to.equal('<mergeCells count="1"><mergeCell ref="A1:C1"/></mergeCells>')
   })
 
@@ -31,7 +33,7 @@ describe('generateMergedCellsDescription()', () => {
 
     const { mergedCells } = processMergedCells(data, { features: [] })
 
-    expect(generateMergedCellsDescription(mergedCells))
+    expect(generateMergedCellsDescription(tag, mergedCells))
       .to.equal('<mergeCells count="1"><mergeCell ref="A1:C1"/></mergeCells>')
   })
 
@@ -56,7 +58,11 @@ describe('generateMergedCellsDescription()', () => {
 
     const { mergedCells } = processMergedCells(data, { features: [] })
 
-    expect(generateMergedCellsDescription(mergedCells))
+    expect(generateMergedCellsDescription(tag, mergedCells))
       .to.equal('<mergeCells count="1"><mergeCell ref="A2:C3"/></mergeCells>')
   })
 })
+
+function tag(tagName, attributes, innerXml) {
+  return getElementXml('xl/worksheets/sheet{id}.xml', tagName, attributes, innerXml, 0, {}, {}, [])
+}

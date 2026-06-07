@@ -27,6 +27,8 @@ export function appendMarkupInsideElement(xml: string, element: FoundElement, ma
 export function sanitizeAttributeName(attributeName: string): string;
 export function sanitizeAttributeValue(attributeValue: string): string;
 export function sanitizeTextContent(textContent: string): string;
+export function getCellAddress(rowIndex: number, columnIndex: number): string;
+export function convertDateToSerialNumber(date: Date): number;
 
 type OrderOfSiblingsFileName =
 	| 'xl/workbook.xml'

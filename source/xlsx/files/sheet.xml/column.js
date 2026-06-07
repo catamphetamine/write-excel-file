@@ -1,6 +1,6 @@
 // import floatToInteger from './helpers/floatToInteger.js'
 
-export default function generateColumnDescription(column, index) {
+export default function generateColumnDescription(tag, column, index) {
   // Guards against a developer forgetting to put some columns
   // in the `columns` list.
   // For example, a developer may pass `data` with `7` columns
@@ -28,7 +28,14 @@ export default function generateColumnDescription(column, index) {
   // `customWidth="1"` is required in order for `width="..."` to be applied.
   // Otherwise, Microsoft Office 2007 Excel wouldn't apply the custom column `width`.
   //
-  return `<col min="${columnNumber}" max="${columnNumber}" width="${width}" customWidth="1"/>`
+  const attributes = {
+    min: columnNumber,
+    max: columnNumber,
+    width,
+    customWidth: 1
+  }
+
+  return tag('col', attributes, null, index)
 }
 
 // /**
