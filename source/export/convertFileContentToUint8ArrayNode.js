@@ -1,5 +1,5 @@
-import Stream from 'stream'
-import { Buffer, Blob } from 'buffer'
+import Stream from 'node:stream'
+import { Buffer, Blob } from 'node:buffer'
 
 // This function doesn't use `async`/`await` in order to avoid adding `@babel/runtime` to `dependencies`.
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/105

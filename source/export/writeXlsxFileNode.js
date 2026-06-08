@@ -1,6 +1,6 @@
-import fs, { write } from 'fs'
-import Stream from 'stream'
-// import { Blob } from 'buffer'
+import fs from 'node:fs'
+import Stream from 'node:stream'
+// import { Blob } from 'node:buffer'
 
 import generateXlsxFileContents from '../xlsx/generateXlsxFileContents.js'
 import convertFilesContentToUint8Arrays from './convertFilesContentToUint8Arrays.js'

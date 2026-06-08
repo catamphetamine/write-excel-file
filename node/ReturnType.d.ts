@@ -2,7 +2,7 @@
 // https://stackoverflow.com/questions/49508610/type-for-nodejs-stream-stream-in-typescript
 // Or does it?
 // https://gitlab.com/catamphetamine/write-excel-file/-/issues/53#note_1245377052
-import type { Readable, Writable } from 'stream'
+import type { Readable, Writable } from 'node:stream'
 
 export interface ReturnType {
 	toBuffer: () => Promise<Buffer>;

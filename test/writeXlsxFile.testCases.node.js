@@ -1,5 +1,5 @@
-import path from 'path'
-import fs from 'fs'
+import path from 'node:path'
+import fs from 'node:fs'
 
 import TEST_CASES, { data, columns } from './writeXlsxFile.testCases.js'
 
@@ -131,7 +131,7 @@ export default {
 	// 			return Buffer.from(await blob.arrayBuffer())
 	// 		}
   //
-  //     // import { Readable } from 'stream'
+  //     // import { Readable } from 'node:stream'
 	// 		// function createReadableStreamFromBlob(blob) {
 	// 		// 	return Readable.fromWeb(blob.stream())
 	// 		// }

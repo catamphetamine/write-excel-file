@@ -1,7 +1,7 @@
 // node --require ./babel.js test/writeXlsxFile
 
-import path from 'path'
-import fs from 'fs'
+import path from 'node:path'
+import fs from 'node:fs'
 
 import writeXlsxFileNode from '../source/export/writeXlsxFileNode.js'
 import writeXlsxFileUniversal from '../source/export/writeXlsxFileUniversal.js'
